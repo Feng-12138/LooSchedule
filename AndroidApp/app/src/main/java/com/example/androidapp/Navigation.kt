@@ -17,6 +17,5 @@ fun Navigation(){
         composable(route = Screen.SelectDegree.route){
             SelectDegree(navController = navController)
         }
-        TODO()
     }
 }
