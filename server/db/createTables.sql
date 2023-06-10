@@ -22,8 +22,9 @@ CREATE TABLE IF NOT EXISTS Communication
     subject VARCHAR(10) NOT NULL,
     code VARCHAR(5) NOT NULL,
     listNumber INT(1) NOT NULL,
-    FOREIGN KEY (courseID) REFERENCES Course(courseID),
-    PRIMARY KEY (courseID)
+    year VARCHAR(9) NOT NULL,
+    -- FOREIGN KEY (courseID) REFERENCES Course(courseID),
+    PRIMARY KEY (courseID, year)
 );
 
 CREATE TABLE IF NOT EXISTS Breath

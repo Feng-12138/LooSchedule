@@ -1,25 +1,12 @@
-import mysql.connector
-from json import load
 from sqlite3 import OperationalError
+from common.connect import connectDB
 
 
-path = open('mysqlConfig.json')
-config = load(path)
-db = mysql.connector.connect(
-    host=config['host'],
-    user=config['user'],
-    password=config['password'],
-)
+db = connectDB(None)
 cursor = db.cursor()
-
 cursor.execute('CREATE DATABASE IF NOT EXISTS LooScheduleDB')
 print('Database schema created successfully for LooSchedule!')
-db = mysql.connector.connect(
-    host=config['host'],
-    user=config['user'],
-    password=config['password'],
-    database='LooScheduleDB',
-)
+db = connectDB()
 cursor = db.cursor()
 fd = open('createTables.sql', 'r')
 sqlFile = fd.read()
