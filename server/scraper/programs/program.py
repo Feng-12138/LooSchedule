@@ -35,15 +35,15 @@ class Requirement:
         cursor.execute(command, data)
 
 def getRequirement(year):
-    param = '?ActiveDate=9/1/' + str(year)
-    html = get(programsURL + param).text
+    html = get(programsURL).text
     soup = BeautifulSoup(html, features='html.parser')
     div = soup.find('span', class_='MainContent')
     programs = div.find_all('a')
     for program in programs:
         requirementURL = program['href']
         html = get(baseURL + requirementURL).text
-        print(program.get_text())
+        print(html)
+        # TODO: fetch requirements for each programs
 
 def getPrograms(db):
     html = get(programsURL).text
