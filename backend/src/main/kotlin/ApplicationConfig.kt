@@ -1,7 +1,10 @@
 import controllers.TestApi
 import jakarta.inject.Singleton
+//import org.glassfish.jersey.guice.spi.container.GuiceComponentProviderFactory
 import org.glassfish.jersey.internal.inject.AbstractBinder
 import org.glassfish.jersey.server.ResourceConfig
+import org.hibernate.SessionFactory
+import org.hibernate.cfg.Configuration
 import repositories.TestRepo
 import repositories.interfaces.ITestRepo
 import services.TestService
@@ -10,6 +13,7 @@ import services.interfaces.ITestService
 
 class ApplicationConfig : ResourceConfig() {
     init {
+//        register(GuiceComponentProviderFactory::class.java)
         register(TestApi::class.java)
 //        register(TestService::class.java)
 
@@ -23,6 +27,13 @@ class ApplicationConfig : ResourceConfig() {
                     .to(ITestService::class.java)
                     .`in`(Singleton::class.java)
 
+                val sessionFactory = createSessionFactory()
+                bind(sessionFactory).to(SessionFactory::class.java)
+            }
+
+            private fun createSessionFactory(): SessionFactory {
+                val configuration = Configuration().configure()
+                return configuration.buildSessionFactory()
             }
         })
     }

@@ -1,20 +1,28 @@
 package repositories
 
-import HibernateUtil
 import entities.Test
 import jakarta.inject.Inject
-import jakarta.inject.Singleton
-import org.hibernate.Session
+import org.hibernate.SessionFactory
 import repositories.interfaces.ITestRepo
-import org.hibernate.criterion.Projections
 
-@Singleton
-@Suppress("UNCHECKED_CAST")
+//@Singleton
+//@Suppress("UNCHECKED_CAST")
 class TestRepo: ITestRepo {
+    @Inject
+    private lateinit var sessionFactory: SessionFactory
 
-    override fun findById(id: Long): Test {
-//        return Test()
-        return HibernateUtil.getSession().get(Test::class.java, id)
+    @Override
+    override fun findAllNames(): List<String> {
+
+        val session = sessionFactory.openSession()
+        val tests = session.createQuery("FROM Test", Test::class.java)
+        session.close()
+
+        return tests.list().map { it.name }
+    }
+    @Override
+    override fun helloWorld(): String {
+        return "hello world"
     }
 
 //    override fun findAllNames(): List<String> {

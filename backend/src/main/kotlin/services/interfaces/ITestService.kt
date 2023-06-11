@@ -8,6 +8,9 @@ import entities.Test
 interface   ITestService {
     fun helloWorld(): String
 
-    fun getTestById(): Test?
+//    fun getTestById(): Test?
+
+    fun findAll(): List<String>
 }
+
 

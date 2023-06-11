@@ -15,17 +15,18 @@ class TestService: ITestService {
 
     @Override
     override fun helloWorld(): String {
-        return "helloWorld"
+        return testRepo.helloWorld()
     }
 
-    @Override
-    override fun getTestById(): Test? {
-        return testRepo.findById(1)
-    }
-//
-//
-//
-//    fun getAll(): List<String> {
-//        return testRepo.findAllNames()
+//    @Override
+//    override fun getTestById(): Test? {
+//        return testRepo.findById(1)
 //    }
+//
+//
+//
+    @Override
+    override fun findAll(): List<String> {
+        return testRepo.findAllNames()
+    }
 }

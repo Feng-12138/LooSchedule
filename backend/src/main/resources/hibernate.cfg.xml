@@ -10,5 +10,7 @@
         <property name="hibernate.connection.password">12345678</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property>
         <!-- Other Hibernate properties -->
+
+        <mapping class="entities.Test"/>
     </session-factory>
 </hibernate-configuration>

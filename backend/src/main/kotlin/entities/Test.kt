@@ -13,3 +13,12 @@ class Test {
     @Column(name = "name", nullable = false)
     var name: String = ""
 }
+
+//@Entity(tableName = "users")
+//data class Test(
+//
+//
+//    @PrimaryKey val uid: Int,
+//    @ColumnInfo(name = "id") val id: Int = 0,
+//    @ColumnInfo(name = "name") val name: String = ""
+//)
