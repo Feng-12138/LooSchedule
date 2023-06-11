@@ -16,10 +16,10 @@ class TestRepo: ITestRepo {
 
         val session = sessionFactory.openSession()
         val tests = session.createQuery("FROM Test", Test::class.java)
-        session.close()
 
         return tests.list().map { it.name }
     }
+
     @Override
     override fun helloWorld(): String {
         return "hello world"
