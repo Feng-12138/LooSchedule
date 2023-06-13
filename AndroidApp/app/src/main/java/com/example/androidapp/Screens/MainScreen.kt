@@ -41,6 +41,12 @@ fun Greeting(name: String, navController: NavController, modifier: Modifier = Mo
         }) {
             Text(text = "Test Navigate")
         }
+        Spacer(modifier = Modifier.height(40.dp))
+        Button(onClick = {
+            navController.navigate(Screen.ViewSchedule.route)
+        }) {
+            Text(text = "View Schedule")
+        }
     }
 
 }

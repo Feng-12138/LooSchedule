@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.androidapp.Screens.MainScreen
 import com.example.androidapp.Screens.SelectDegree
+import com.example.androidapp.Screens.ViewSchedule
 
 @Composable
 fun Navigation(){
@@ -16,6 +17,9 @@ fun Navigation(){
         }
         composable(route = Screen.SelectDegree.route){
             SelectDegree(navController = navController)
+        }
+        composable(route = Screen.ViewSchedule.route){
+            ViewSchedule(navController = navController)
         }
     }
 }
