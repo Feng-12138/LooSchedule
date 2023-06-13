@@ -6,13 +6,13 @@ CREATE TABLE IF NOT EXISTS Course
     code VARCHAR(5) NOT NULL,
     description VARCHAR(500) NOT NULL,
     credit DECIMAL(10,2) NOT NULL,
-    availability VARCHAR(5),
-    isOnline BOOLEAN NOT NULL,
+    availability VARCHAR(15),
+    OnlineTerms VARCHAR(15),
     coreqs VARCHAR(500),
     antireqs VARCHAR(500),
-    likedRating INT(5),
-    easyRating INT(5),
-    usefulRating INT(5),
+    likedRating DECIMAL(21, 20),
+    easyRating DECIMAL(21, 20),
+    usefulRating DECIMAL(21, 20),
     PRIMARY KEY (courseID)
 );
 
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS Communication
     code VARCHAR(5) NOT NULL,
     listNumber INT(1) NOT NULL,
     year VARCHAR(9) NOT NULL,
-    -- FOREIGN KEY (courseID) REFERENCES Course(courseID),
+    FOREIGN KEY (courseID) REFERENCES Course(courseID),
     PRIMARY KEY (courseID, year)
 );
 
@@ -39,11 +39,11 @@ CREATE TABLE IF NOT EXISTS Breath
 CREATE TABLE IF NOT EXISTS Prerequisite
 (
     courseID VARCHAR(15) NOT NULL,
+    consentRequired BOOLEAN NOT NULL,
     courses VARCHAR(500),
     minimumLevel VARCHAR(5),
     onlyOpenTo VARCHAR(100),
     notOpenTo VARCHAR(100),
-    consentRequired BOOLEAN NOT NULL,
     FOREIGN KEY (courseID) REFERENCES Course(courseID),
     PRIMARY KEY (courseID)
 );
