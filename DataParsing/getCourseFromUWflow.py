@@ -3,51 +3,20 @@ import re
 from dotenv import dotenv_values
 from sqlite3 import OperationalError
 from multiprocessing.dummy import Pool
-from __init__ import Session, Base, engine
-from sqlalchemy import Column, Integer, String, Boolean, DECIMAL
-# from sqlalchemy.orm import relationship
-
-# Base = __init__.Base
+from __init__ import Session
+from schemas import Course, Prerequisite
 
 yearList = []
 courseDict = {}
-
-prereqList = []
+levels = ['1A', '1B', '2A', '2B', '3A']
 
 config = dotenv_values(".env")
-
-class Course(Base):
-    __tablename__ = "Course"
-    courseID = Column(String, primary_key=True, nullable=False)
-    courseName = Column(String, nullable=False)
-    subject = Column(String, nullable=False)
-    code = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-    credit = Column(DECIMAL, nullable=False)
-    availability = Column(String)
-    OnlineTerms = Column(String)
-    coreqs = Column(String)
-    antireqs = Column(String)
-    likedRating = Column(DECIMAL)
-    easyRating = Column(DECIMAL)
-    usefulRating = Column(DECIMAL)
-    
-
-        
-class prereq:
-    def __init__(self, year, courses, minimumLevel, onlyOpenTo, notOpenTo, consentRequired = False):
-        self.year = year
-        self.courses = courses
-        self.minimumLevel = minimumLevel
-        self.onlyOpenTo = onlyOpenTo
-        self.notOpenTo = notOpenTo
-        self.consentRequired = consentRequired
-        
 
 def getUrl(url: str, query = ""):
     data = ""
     try:
         if query == "":
+            print(url)
             res = requests.get(url=url)
             data = res.text
         else:
@@ -80,17 +49,14 @@ def parseCourses(coursePages: list):
         ex = "<center>.*</center>"
         courseInfo = re.findall(ex, coursePage)
         courseInfoStrList.append(courseInfo)
-
-# we can not get prereq/antirq/coreq data directly from UWflow because they could change
-# for example, for CS 2025, we do not need to take CS136L as coreq, but for CS 2027, they need
-# UWflow only shows current data       
+    
 def wrapperCourseDataFunc(curYear: int):
     enterYear = curYear - 6
     for year in range(enterYear, curYear + 1):
         startYear = str(year)[-2:]
         endYear = str(year + 1)[-2:]
         yearList.append(startYear + endYear)
-    data = getUrl("https://ugradcalendar.uwaterloo.ca/page/Course-Descriptions-Index")
+    data = getUrl(config["CourseIndexUrl"])
     urlList = parseCourseUrl(data, yearList)
     coursePages = getAllCoursePage(urlList)
     # get all the courses first
@@ -187,10 +153,19 @@ def wrapperCourseDataFunc(curYear: int):
                                 onlineStr += "F"
                 courseDict[courseNum].availability = availableStr
                 courseDict[courseNum].onlineTerms = onlineStr
+            coursePrereq = Prerequisite()
+            coursePrereq.courseID = courseNum
+            coursePrereq.consentRequired = False
+            # if courseDict[courseNum].prereqs.find("Level at least") != -1:
+            #     coursePrereq.minimumLevel = courseDict[courseNum].prereqs.split("Level at least")[-1].strip()[:2]
+            
+                
+                
+                
     return courseDict.values()
                 
 def getCourseFromUWflow(year: int):
-    courseData = wrapperCourseDataFunc(2023)
+    courseData = wrapperCourseDataFunc(year)
     try:
         Session.add_all(courseData)
         Session.commit()

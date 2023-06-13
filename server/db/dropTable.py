@@ -9,11 +9,12 @@ def dropTable():
             command = dropTable.readline()
             if not command:
                 break
-        try:
-            cursor.execute(command)
-        except OperationalError as msg:
-            print("Command skipped: ", msg)
+            try:
+                cursor.execute(command)
+            except OperationalError as msg:
+                print("Command skipped: ", msg)
     if db:
+        cursor.close()
         db.close()
         print("All tables drop successfully!")
         

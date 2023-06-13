@@ -39,12 +39,11 @@ CREATE TABLE IF NOT EXISTS Breath
 CREATE TABLE IF NOT EXISTS Prerequisite
 (
     courseID VARCHAR(15) NOT NULL,
-    -- year VARCHAR(15) NOT NULL,
+    consentRequired BOOLEAN NOT NULL,
     courses VARCHAR(500),
     minimumLevel VARCHAR(5),
     onlyOpenTo VARCHAR(100),
     notOpenTo VARCHAR(100),
-    consentRequired BOOLEAN NOT NULL,
     FOREIGN KEY (courseID) REFERENCES Course(courseID),
     PRIMARY KEY (courseID)
 );
