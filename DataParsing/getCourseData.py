@@ -7,15 +7,31 @@ config = dotenv_values(".env")
 
 
 class Course:
-    def __init__(self, courseName, courseNum, preList, antiList, restrictProgram, crossList, credit, restrictLevel):
+    def __init__(self, courseID, year, courseName, subject, code, description, credit, coreqs, antireqs, availability = "", isOnline = False, likedRating = 0, easyRating = 0, usefulRating = 0):
+        self.courseID = courseID
+        self.year = year
         self.courseName = courseName
-        self.courseNum = courseNum
-        self.preList = preList
-        self.antiList = antiList
-        self.restrictProgram = restrictProgram
-        self.crossList = crossList
+        self.subject = subject
+        self.code = code
+        self.description = description
         self.credit = credit
-        self.restrictLevel = restrictLevel
+        self.coreqs = coreqs
+        self.antireqs = antireqs
+        self.availability = availability
+        self.isOnline = isOnline
+        self.likedRating = likedRating
+        self.easyRating = easyRating
+        self.usefulRating = usefulRating
+
+        
+class prereq:
+    def __init__(self, year, courses, minimumLevel, onlyOpenTo, notOpenTo, consentRequired = False):
+        self.year = year
+        self.courses = courses
+        self.minimumLevel = minimumLevel
+        self.onlyOpenTo = onlyOpenTo
+        self.notOpenTo = notOpenTo
+        self.consentRequired = consentRequired
         
 
 def getUrl(url: str):
@@ -43,6 +59,7 @@ def getAllCoursePage(urlList: list):
     retval = pool.map(getUrl, urlList)
     return retval
 
+
 def parseCourses(coursePages: list):
     courseInfoStrList = []
     for coursePage in coursePages:
@@ -56,16 +73,24 @@ def parseCourses(coursePages: list):
             exAnti = "Antireq:.*</em>"
             exCross = "Cross-Listed:.*</em>"
             exCoreq = "Coreq:.*</em>"
-            exOffer = "Offered:.*]</div>"
+            exDescription = '<div class="divTableCell colspan-2">[^/]*</div>'
+            exDescription2 = '<div class="divTableCell colspan-2">[^<]*</div>'
             NumName = re.findall(exNumName, courseInfo)
             Prere = re.findall(exPre, courseInfo)
             Antire = re.findall(exAnti, courseInfo)
-            Cross = re.findall(exCross, courseInfo)
             coreq = re.findall(exCoreq, courseInfo)
+            descriptions1 = re.findall(exDescription, courseInfo)
+            descriptions2 = re.findall(exDescription2, courseInfo)
+            assert(len(descriptions1) != 0 or len(descriptions2) != 0)
+            realDescription = ""
+            if (len(descriptions2) == 0):
+                realDescription = descriptions1
+            else:
+                realDescription = descriptions2
             NumNameList = NumName[0].split('</strong>')
             infoList = NumNameList[0].split('</a>')[-1].split(' ')
-            courseNum = infoList[0] + " " + infoList[1]
-            credit = infoList[-1]
+            courseNum = infoList[0] + infoList[1]
+            credit = infoList[-1].strip()
             nameInfo = NumNameList[-2].split('<strong>')[-1]
             prereqInfo = ""
             AntiInfo = ""
@@ -80,7 +105,17 @@ def parseCourses(coursePages: list):
             if (prereqInfo.find("Level at least ") != -1):
                 restrictLevel = prereqInfo.split("Level at least ")[-1][0:2]
             # not open needs to be identified in 
-            print(courseNum, nameInfo, AntiInfo, prereqInfo, coreqInfo)
+            # print(courseNum, nameInfo, AntiInfo, prereqInfo, coreqInfo, credit)
+            antiStr = AntiInfo.split('Antireq: ')[-1]
+            coreStr = coreqInfo.split("Coreq: ")[-1]
+            subject = infoList[0]
+            code = infoList[1]
+    
+            
+            
+            
+            
+            
         
         
         
