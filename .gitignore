@@ -16,3 +16,8 @@ local.properties
 *.db
 *.db-shm
 *.db-wal
+build
+gradle
+.idea
+*__pycache__*
+*.pyc
