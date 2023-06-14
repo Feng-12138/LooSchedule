@@ -13,11 +13,17 @@ class TestRepo: ITestRepo {
 
     @Override
     override fun findAllNames(): List<String> {
+        try {
+            val session = sessionFactory.openSession()
+            val tests = session.createQuery("FROM Test", Test::class.java)
 
-        val session = sessionFactory.openSession()
-        val tests = session.createQuery("FROM Test", Test::class.java)
+            return tests.list().map { it.name }
+        } catch (e: Exception) {
+            println(e.message)
+            return listOf()
+        }
 
-        return tests.list().map { it.name }
+
     }
 
     @Override

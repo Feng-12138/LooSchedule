@@ -13,9 +13,7 @@ import services.interfaces.ITestService
 
 class ApplicationConfig : ResourceConfig() {
     init {
-//        register(GuiceComponentProviderFactory::class.java)
         register(TestApi::class.java)
-//        register(TestService::class.java)
 
         register(object : AbstractBinder() {
             override fun configure() {
@@ -32,7 +30,7 @@ class ApplicationConfig : ResourceConfig() {
             }
 
             private fun createSessionFactory(): SessionFactory {
-                val configuration = Configuration().configure()
+                val configuration = Configuration().configure("hibernate.cfg.xml")
                 return configuration.buildSessionFactory()
             }
         })
