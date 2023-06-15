@@ -21,3 +21,5 @@ gradle
 .idea
 *__pycache__*
 *.pyc
+backend/build
+backend/.gradle
