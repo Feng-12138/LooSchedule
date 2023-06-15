@@ -1,8 +1,10 @@
-import sys
-sys.path.append('..')
 from requests import get
 from bs4 import BeautifulSoup
-from settings import SESSION, BASE
+from re import compile
+from sqlite3 import OperationalError
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from datetime import datetime
+from settings import SESSION, BASE, MathDegreeRequirementsURL
 
 
 baseURL = 'https://ugradcalendar.uwaterloo.ca'
@@ -10,21 +12,35 @@ programsURL = 'https://ugradcalendar.uwaterloo.ca/page/MATH-List-of-Academic-Pro
 
 
 class Requirement(BASE):
-    def __init__(self, type, year, courses, additionalRequirements, links):
+    __tablename__ = 'Requirement'
+    type = Column(String, nullable=False)
+    year = Column(String, nullable=False)
+    courses = Column(String, nullable=False)
+    additionalRequirements = Column(String, nullable=True)
+    link = Column(String, nullable=True)
+
+    def __init__(self, type, year, courses, additionalRequirements, link):
         self.type = type
         self.year = year
         self.courses = courses
         self.additionalRequirements = additionalRequirements
-        self.links = links
+        self.links = link
     
     def insertDB(self, db):
         cursor = db.cursor()
-        data = [self.type, self.year, self.courses, self.additionalRequirements, self.links]
+        data = [self.type, self.year, self.courses, self.additionalRequirements, self.link]
         values = ('%s,' * len(data))[:-1]
         command = 'INSERT INTO Requirement VALUES (' + values +')'
         cursor.execute(command, data)
 
+
 class Major(BASE):
+    __tablename__ = 'Major'
+    requirementID = Column(Integer, primary_key=True, nullable=False)
+    majorName = Column(String, nullable=False)
+    isCoop = Column(Boolean, nullable=False)
+    isDoubleDegree = Column(Boolean, nullable=False)
+
     def __init__(self, requirementID, majorName, isCoop, isDoubleDegree):
         self.requirementID = requirementID
         self.majorName = majorName

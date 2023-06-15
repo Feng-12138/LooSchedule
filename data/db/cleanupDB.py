@@ -5,9 +5,9 @@ from os import remove
 def dropTables():
     db = connectDB()
     cursor = db.cursor()
-    with open('sql/dropTables.sql', 'r') as dropTable:
+    with open('sql/dropTables.sql', 'r') as file:
         while True:
-            command = dropTable.readline()
+            command = file.readline()
             if not command:
                 break
             try:
