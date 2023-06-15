@@ -4,7 +4,7 @@ from re import compile
 from sqlite3 import OperationalError
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from datetime import datetime
-from settings import SESSION, BASE, MathDegreeRequirementsURL
+from settings import SESSION, BASE, UndergradCalendarBaseURL, MathDegreeRequirementsURL
 
 
 baseURL = 'https://ugradcalendar.uwaterloo.ca'
@@ -13,6 +13,7 @@ programsURL = 'https://ugradcalendar.uwaterloo.ca/page/MATH-List-of-Academic-Pro
 
 class Requirement(BASE):
     __tablename__ = 'Requirement'
+    requirementID = Column(Integer, primary_key=True, nullable=False)
     type = Column(String, nullable=False)
     year = Column(String, nullable=False)
     courses = Column(String, nullable=False)
@@ -36,7 +37,7 @@ class Requirement(BASE):
 
 class Major(BASE):
     __tablename__ = 'Major'
-    requirementID = Column(Integer, primary_key=True, nullable=False)
+    requirementID = Column(Integer, ForeignKey('Requirement.requirementID'), primary_key=True, nullable=False)
     majorName = Column(String, nullable=False)
     isCoop = Column(Boolean, nullable=False)
     isDoubleDegree = Column(Boolean, nullable=False)
@@ -55,7 +56,6 @@ class Major(BASE):
         cursor.execute(command, data)
 
 
-
 def getRequirement(year):
     html = get(programsURL).text
     soup = BeautifulSoup(html, features='html.parser')
@@ -63,8 +63,9 @@ def getRequirement(year):
     programs = div.find_all('a')
     for program in programs:
         requirementURL = program['href']
-        html = get(baseURL + requirementURL).text
-        print(html)
+        print(requirementURL)
+        html = get(UndergradCalendarBaseURL + requirementURL).text
+        # print(html)
         # TODO: fetch requirements for each programs
 
 def getPrograms(db):
@@ -79,3 +80,58 @@ def getPrograms(db):
         cursor.execute("SELECT requirementID FROM Requirement WHERE type=?", (name,))
         result = cursor.fetchone()
         programEntity.append(Major(result[0],program.get_text(), True, True))
+
+
+def getAcademicPlans():
+    url = 'http://ugradcalendar.uwaterloo.ca/group/MATH-Academic-Plans-and-Requirements'
+    html = get(url).text
+    soup = BeautifulSoup(html, features='html.parser')
+    plans = soup.find('span', id='ctl00_contentMain_lblContent').find_all('li')
+    for plan in plans[2:]:
+        name = plan.get_text()
+        if name == 'Plans for Students outside the Mathematics Faculty': continue
+        print(name, plan.find('a')['href'])
+
+
+def getTable2Courses(year):
+    param = '?ActiveDate=9/1/' + str(year)
+    html = get(MathDegreeRequirementsURL + param).text
+    soup = BeautifulSoup(html, features='html.parser')
+    choices = soup.find(string='Table 2 – Faculty Core Courses').find_next('ul').contents
+    choices = list(filter(lambda c: c != '\n', choices))
+    courses = ''
+    for choice in choices:
+        courses += parseChoice(choice)
+    return courses
+
+
+def parseChoice(choice):
+    logic = choice.contents[0].lower()
+    options = [course.find('a').get_text() for course in choice.find_all('li')]
+    n, res = 0, ''
+    if logic == compile('all'):
+        for option in options: res += '1:' + option + ';'
+        return res
+    elif 'one' in logic: n = 1
+    elif logic == compile('two'): n = 2
+    elif logic == compile('three'): n = 3
+    elif logic == compile('four'): n = 4
+    elif logic == compile('five'): n = 5
+    elif logic == compile('six'): n = 6
+    elif logic == compile('seven'): n = 7
+    elif logic == compile('eight'): n = 8
+    elif logic == compile('nine'): n = 9
+    elif logic == compile('ten'): n = 10
+    else: 
+        print(f'Invalid number for:\n{logic}')
+        return res
+    res += str(n) + ':'
+    for option in options: res += option + ','
+    res = res[:-1] + ';'
+    return res
+    
+
+if __name__ == '__main__':
+    print(getTable2Courses(2023))
+    print(len(getTable2Courses(2023)))
+    # getAcademicPlans()
