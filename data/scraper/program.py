@@ -1,25 +1,15 @@
+import sys
+sys.path.append('..')
 from requests import get
 from bs4 import BeautifulSoup
-from re import compile
+from settings import SESSION, BASE
+
 
 baseURL = 'https://ugradcalendar.uwaterloo.ca'
 programsURL = 'https://ugradcalendar.uwaterloo.ca/page/MATH-List-of-Academic-Programs-or-Plans'
 
-class Major:
-    def __init__(self, requirementID, majorName, isCoop, isDoubleDegree):
-        self.requirementID = requirementID
-        self.majorName = majorName
-        self.isCoop = isCoop
-        self.isDoubleDegree = isDoubleDegree
 
-    def insertDB(self, db):
-        cursor = db.cursor()
-        data = [self.requirementID, self.majorName, self.isCoop, self.isDoubleDegree]
-        values = ('%s,' * len(data))[:-1]
-        command = 'INSERT INTO Major VALUES (' + values +')'
-        cursor.execute(command, data)
-
-class Requirement:
+class Requirement(BASE):
     def __init__(self, type, year, courses, additionalRequirements, links):
         self.type = type
         self.year = year
@@ -33,6 +23,22 @@ class Requirement:
         values = ('%s,' * len(data))[:-1]
         command = 'INSERT INTO Requirement VALUES (' + values +')'
         cursor.execute(command, data)
+
+class Major(BASE):
+    def __init__(self, requirementID, majorName, isCoop, isDoubleDegree):
+        self.requirementID = requirementID
+        self.majorName = majorName
+        self.isCoop = isCoop
+        self.isDoubleDegree = isDoubleDegree
+
+    def insertDB(self, db):
+        cursor = db.cursor()
+        data = [self.requirementID, self.majorName, self.isCoop, self.isDoubleDegree]
+        values = ('%s,' * len(data))[:-1]
+        command = 'INSERT INTO Major VALUES (' + values +')'
+        cursor.execute(command, data)
+
+
 
 def getRequirement(year):
     html = get(programsURL).text

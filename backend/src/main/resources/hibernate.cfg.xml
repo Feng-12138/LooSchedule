@@ -4,7 +4,7 @@
 <hibernate-configuration>
     <session-factory>
         <property name="hibernate.connection.driver_class">org.sqlite.JDBC</property>
-        <property name="hibernate.connection.url">jdbc:sqlite:../server/db/LooScheduleDB.db</property>
+        <property name="hibernate.connection.url">jdbc:sqlite:../data/db/LooSchedule.db</property>
         <property name="hibernate.dialect">org.sqlite.hibernate.dialect.SQLiteDialect</property>
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">update</property>

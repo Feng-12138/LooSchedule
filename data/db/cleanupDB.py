@@ -1,10 +1,11 @@
 from sqlite3 import OperationalError
 from common.connect import connectDB
+from os import remove
 
-def dropTable():
+def dropTables():
     db = connectDB()
     cursor = db.cursor()
-    with open("dropTable.sql", "r") as dropTable:
+    with open('sql/dropTables.sql', 'r') as dropTable:
         while True:
             command = dropTable.readline()
             if not command:
@@ -12,11 +13,12 @@ def dropTable():
             try:
                 cursor.execute(command)
             except OperationalError as msg:
-                print("Command skipped: ", msg)
+                print('Command skipped: ', msg)
     if db:
         cursor.close()
         db.close()
-        print("All tables drop successfully!")
+        print('Tables dropped successfully for LooSchedule!')
+    remove('LooSchedule.db')
         
-if __name__ == "__main__":
-    dropTable()
+if __name__ == '__main__':
+    dropTables()
