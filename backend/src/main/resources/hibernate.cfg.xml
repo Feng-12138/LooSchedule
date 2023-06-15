@@ -12,5 +12,8 @@
         <mapping class="entities.Test"/>
         <mapping class="entities.Requirement"/>
         <mapping class="entities.Major"/>
+        <mapping class="entities.Minor"/>
+        <mapping class="entities.Specialization"/>
+        <mapping class="entities.Joint"/>
     </session-factory>
 </hibernate-configuration>
