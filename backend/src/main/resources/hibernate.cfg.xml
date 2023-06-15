@@ -10,5 +10,7 @@
         <property name="hibernate.hbm2ddl.auto">update</property>
 
         <mapping class="entities.Test"/>
+        <mapping class="entities.Requirement"/>
+        <mapping class="entities.Major"/>
     </session-factory>
 </hibernate-configuration>
