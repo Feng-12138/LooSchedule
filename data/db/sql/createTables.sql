@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS Course
     description VARCHAR(500) NOT NULL,
     credit DECIMAL(10,2) NOT NULL,
     availability VARCHAR(15),
-    OnlineTerms VARCHAR(15),
+    onlineTerms VARCHAR(15),
     coreqs VARCHAR(500),
     antireqs VARCHAR(500),
     likedRating DECIMAL(21, 20),
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS Communication
     code VARCHAR(5) NOT NULL,
     listNumber INT(1) NOT NULL,
     year VARCHAR(9) NOT NULL,
-    FOREIGN KEY (courseID) REFERENCES Course(courseID),
+    -- FOREIGN KEY (courseID) REFERENCES Course(courseID),
     PRIMARY KEY (courseID, year)
 );
 
@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS Breath
     courseID VARCHAR(15) NOT NULL,
     subject VARCHAR(10) NOT NULL,
     code VARCHAR(5) NOT NULL,
-    FOREIGN KEY (courseID) REFERENCES Course(courseID),
+    category VARCHAR(15) NOT NULL,
+    -- FOREIGN KEY (courseID) REFERENCES Course(courseID),
     PRIMARY KEY (courseID)
 );
 
