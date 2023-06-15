@@ -1,0 +1,19 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">org.sqlite.JDBC</property>
+        <property name="hibernate.connection.url">jdbc:sqlite:../data/db/LooSchedule.db</property>
+        <property name="hibernate.dialect">org.sqlite.hibernate.dialect.SQLiteDialect</property>
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <mapping class="entities.Test"/>
+        <mapping class="entities.Requirement"/>
+        <mapping class="entities.Major"/>
+        <mapping class="entities.Minor"/>
+        <mapping class="entities.Specialization"/>
+        <mapping class="entities.Joint"/>
+    </session-factory>
+</hibernate-configuration>
