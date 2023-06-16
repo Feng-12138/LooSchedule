@@ -1,4 +1,4 @@
-package com.example.androidapp
+package com.example.androidapp.Screens
 
 sealed class Screen(val route: String){
     object MainScreen: Screen("main")
@@ -6,5 +6,5 @@ sealed class Screen(val route: String){
     object ViewSchedule: Screen("viewSchedule")
     object SelectDegree: Screen("selectDegree")
     object CourseDetail: Screen("courseDetail")
-
+    object ApiPlayground: Screen("apiPlayground")
 }
