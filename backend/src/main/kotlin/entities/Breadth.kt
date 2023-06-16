@@ -7,8 +7,8 @@ typealias Subject = String
 typealias Code = String
 
 @Entity
-@Table(name = "Breath")
-class Breath {
+@Table(name = "Breadth")
+class Breadth {
     @Id
     @Column(name = "courseID", nullable = false)
     var courseID: CourseId = ""

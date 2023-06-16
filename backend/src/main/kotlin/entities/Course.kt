@@ -67,7 +67,7 @@ class Course {
 
     @OneToOne(cascade = [CascadeType.ALL])
     @PrimaryKeyJoinColumn
-    lateinit var breath: Breath
+    lateinit var breadth: Breadth
 
     @OneToOne(cascade = [CascadeType.ALL])
     @PrimaryKeyJoinColumn

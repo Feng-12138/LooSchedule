@@ -13,7 +13,7 @@
         <mapping class="entities.Requirement"/>
         <mapping class="entities.Course"/>
         <mapping class="entities.Prerequisite"/>
-        <mapping class="entities.Breath"/>
+        <mapping class="entities.Breadth"/>
         <mapping class="entities.Major"/>
         <mapping class="entities.Minor"/>
         <mapping class="entities.Specialization"/>
