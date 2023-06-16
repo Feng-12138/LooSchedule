@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS Course
     courseID VARCHAR(15) NOT NULL,
     courseName VARCHAR(100) NOT NULL,
     subject VARCHAR(10) NOT NULL,
-    code VARCHAR(5) NOT NULL,
+    code INT(11) NOT NULL,
     description VARCHAR(500) NOT NULL,
     credit DECIMAL(10,2) NOT NULL,
     availability VARCHAR(15),
