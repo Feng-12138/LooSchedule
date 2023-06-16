@@ -1,5 +1,6 @@
 package repositories
 
+import entities.Communication
 import entities.Test
 import entities.Course
 import jakarta.inject.Inject
@@ -24,8 +25,18 @@ class TestRepo: ITestRepo {
             println(e.message)
             return listOf()
         }
+    }
 
-
+    @Override
+    override fun findCommunications(): List<Communication> {
+        return try {
+            val session = sessionFactory.openSession()
+            val communications = session.createQuery("FROM Communication", Communication::class.java)
+            communications.list()
+        } catch (e: Exception) {
+            println(e.message)
+            listOf()
+        }
     }
 
     @Override

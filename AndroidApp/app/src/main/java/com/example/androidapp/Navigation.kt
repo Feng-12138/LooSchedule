@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.androidapp.Screens.ApiPlayGround
 import com.example.androidapp.Screens.MainScreen
+import com.example.androidapp.Screens.Screen
 import com.example.androidapp.Screens.SelectDegree
 import com.example.androidapp.Screens.ViewSchedule
 
@@ -21,5 +23,10 @@ fun Navigation(){
         composable(route = Screen.ViewSchedule.route){
             ViewSchedule(navController = navController)
         }
+        composable(route = Screen.ApiPlayground.route){
+            ApiPlayGround(navController = navController)
+        }
     }
 }
+
+

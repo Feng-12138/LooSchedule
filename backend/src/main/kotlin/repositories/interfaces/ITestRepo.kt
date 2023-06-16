@@ -1,6 +1,6 @@
 package repositories.interfaces
 
-import entities.Test
+import entities.Communication
 
 interface ITestRepo {
 //    fun findById(id: Long): Test?
@@ -8,4 +8,5 @@ interface ITestRepo {
     fun helloWorld(): String
     fun findAllNames(): List<String>
 //    fun save(test: Test)
+    fun findCommunications(): List<Communication>
 }

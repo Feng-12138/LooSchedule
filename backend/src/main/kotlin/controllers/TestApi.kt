@@ -22,19 +22,19 @@ class TestApi() {
         return Response.ok(message).build()
     }
 
-//    @GET
-//    @Path("one")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    fun one(): Response {
-//        val message = testService.getTestById()
-//        return Response.ok(message).build()
-//    }
-
     @GET
     @Path("all")
     @Produces(MediaType.APPLICATION_JSON)
     fun getAll(): Response {
         val message = testService.findAll()
+        return Response.ok(message).build()
+    }
+
+    @GET
+    @Path("api/Communications")
+    @Produces(MediaType.APPLICATION_JSON)
+    fun getCommunications(): Response {
+        val message = testService.findCommunications()
         return Response.ok(message).build()
     }
 }
