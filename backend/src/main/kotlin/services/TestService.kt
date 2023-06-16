@@ -1,10 +1,8 @@
 package services
 
-import entities.Test
+import entities.Communication
 import jakarta.inject.Inject
-import jakarta.inject.Singleton
 //import org.jvnet.hk2.annotations.Service
-import repositories.TestRepo
 import repositories.interfaces.ITestRepo
 import services.interfaces.ITestService
 
@@ -28,5 +26,10 @@ class TestService: ITestService {
     @Override
     override fun findAll(): List<String> {
         return testRepo.findAllNames()
+    }
+
+    @Override
+    override fun findCommunications(): List<Communication>{
+        return testRepo.findCommunications()
     }
 }
