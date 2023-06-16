@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS Communication
     PRIMARY KEY (courseID, year)
 );
 
-CREATE TABLE IF NOT EXISTS Breath
+CREATE TABLE IF NOT EXISTS Breadth
 (
     courseID VARCHAR(15) NOT NULL,
     subject VARCHAR(10) NOT NULL,
@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS Requirement
     requirementID INT(11) NOT NULL,
     type VARCHAR(50) NOT NULL,
     year VARCHAR(10) NOT NULL,
-    courses VARCHAR(1000) NOT NULL,
-    additionalRequirements VARCHAR(1000),
+    courses VARCHAR(2500) NOT NULL,
+    additionalRequirements VARCHAR(2500),
     link VARCHAR(250),
     PRIMARY KEY (requirementID)
 );
