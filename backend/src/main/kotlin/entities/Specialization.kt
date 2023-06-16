@@ -7,8 +7,8 @@ import javax.persistence.*
 class Specialization {
     @Id
     @Column(name = "requirementID", nullable = false)
-    var requirementID: Long? = null
+    var requirementID: Long = 0
 
     @Column(name = "specializationName", nullable = false)
-    var specializationName: DegreeName? = null
+    var specializationName: DegreeName = ""
 }
