@@ -56,33 +56,33 @@ class Major(BASE):
         cursor.execute(command, data)
 
 
-def getRequirement(year):
-    html = get(programsURL).text
-    soup = BeautifulSoup(html, features='html.parser')
-    div = soup.find('span', class_='MainContent')
-    programs = div.find_all('a')
-    for program in programs:
-        requirementURL = program['href']
-        print(requirementURL)
-        html = get(UndergradCalendarBaseURL + requirementURL).text
-        # print(html)
-        # TODO: fetch requirements for each programs
+# def getRequirement(year):
+#     html = get(programsURL).text
+#     soup = BeautifulSoup(html, features='html.parser')
+#     div = soup.find('span', class_='MainContent')
+#     programs = div.find_all('a')
+#     for program in programs:
+#         requirementURL = program['href']
+#         print(requirementURL)
+#         html = get(UndergradCalendarBaseURL + requirementURL).text
+#         # print(html)
+#         # TODO: fetch requirements for each programs
 
-def getPrograms(db):
-    html = get(programsURL).text
-    soup = BeautifulSoup(html, features='html.parser')
-    div = soup.find('span', class_='MainContent')
-    programs = div.find_all('a')
-    programEntity = []
-    for program in programs:
-        name = program.get_text()
-        cursor = db.cursor()
-        cursor.execute("SELECT requirementID FROM Requirement WHERE type=?", (name,))
-        result = cursor.fetchone()
-        programEntity.append(Major(result[0],program.get_text(), True, True))
+# def getPrograms(db):
+#     html = get(programsURL).text
+#     soup = BeautifulSoup(html, features='html.parser')
+#     div = soup.find('span', class_='MainContent')
+#     programs = div.find_all('a')
+#     programEntity = []
+#     for program in programs:
+#         name = program.get_text()
+#         cursor = db.cursor()
+#         cursor.execute("SELECT requirementID FROM Requirement WHERE type=?", (name,))
+#         result = cursor.fetchone()
+#         programEntity.append(Major(result[0],program.get_text(), True, True))
 
 
-def getAcademicPlans():
+def getAcademicPlans(start=2019):
     url = 'http://ugradcalendar.uwaterloo.ca/group/MATH-Academic-Plans-and-Requirements'
     html = get(url).text
     soup = BeautifulSoup(html, features='html.parser')
@@ -90,7 +90,20 @@ def getAcademicPlans():
     for plan in plans[2:]:
         name = plan.get_text()
         if name == 'Plans for Students outside the Mathematics Faculty': continue
-        print(name, plan.find('a')['href'])
+        url = plan.find('a')['href']
+        print(name, url)
+        today = datetime.today()
+        # for year in range(start, today.year + 1):
+        #     getPlanRequirements(name, url, year)
+
+
+def getPlanRequirements(name, url, year):
+    param = '?ActiveDate=9/1/' + str(year)
+    html = get(UndergradCalendarBaseURL + url + param).text
+    soup = BeautifulSoup(html, features='html.parser')
+    requirements = soup.find('span', id='ctl00_contentMain_lblContent')
+    # plans = [req.find('a').get_text() for req in requirements[1:]]
+    print(html)
 
 
 def getTable2Courses(year):
@@ -99,10 +112,9 @@ def getTable2Courses(year):
     soup = BeautifulSoup(html, features='html.parser')
     choices = soup.find(string='Table 2 – Faculty Core Courses').find_next('ul').contents
     choices = list(filter(lambda c: c != '\n', choices))
-    courses = ''
-    for choice in choices:
-        courses += parseChoice(choice)
-    return courses
+    res = ''
+    for choice in choices: res += parseChoice(choice)
+    return res
 
 
 def parseChoice(choice):
@@ -133,5 +145,5 @@ def parseChoice(choice):
 
 if __name__ == '__main__':
     print(getTable2Courses(2023))
-    print(len(getTable2Courses(2023)))
-    # getAcademicPlans()
+    getAcademicPlans()
+    getPlanRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
