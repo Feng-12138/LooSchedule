@@ -18,7 +18,7 @@ dependencies {
 
     // Hibernate & sqlite
     implementation("org.hibernate:hibernate-core:5.4.33.Final")
-    implementation("org.xerial:sqlite-jdbc:3.30.1")
+    implementation("org.xerial:sqlite-jdbc:3.34.0")
     implementation("com.github.gwenn:sqlite-dialect:0.1.1")
 
     // jaxb
