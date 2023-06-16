@@ -26,6 +26,13 @@ class Requirement(BASE):
         self.courses = courses
         self.additionalRequirements = additionalRequirements
         self.links = link
+    
+    # def insertDB(self, db):
+    #     cursor = db.cursor()
+    #     data = [self.type, self.year, self.courses, self.additionalRequirements, self.link]
+    #     values = ('%s,' * len(data))[:-1]
+    #     command = 'INSERT INTO Requirement VALUES (' + values +')'
+    #     cursor.execute(command, data)
 
 
 class Major(BASE):
@@ -41,47 +48,62 @@ class Major(BASE):
         self.isCoop = isCoop
         self.isDoubleDegree = isDoubleDegree
 
+    # def insertDB(self, db):
+    #     cursor = db.cursor()
+    #     data = [self.requirementID, self.majorName, self.isCoop, self.isDoubleDegree]
+    #     values = ('%s,' * len(data))[:-1]
+    #     command = 'INSERT INTO Major VALUES (' + values +')'
+    #     cursor.execute(command, data)
 
-def getProgramRequirements(name, url, year):
+
+# def getRequirement(year):
+#     html = get(programsURL).text
+#     soup = BeautifulSoup(html, features='html.parser')
+#     div = soup.find('span', class_='MainContent')
+#     programs = div.find_all('a')
+#     for program in programs:
+#         requirementURL = program['href']
+#         print(requirementURL)
+#         html = get(UndergradCalendarBaseURL + requirementURL).text
+#         # print(html)
+#         # TODO: fetch requirements for each programs
+
+# def getPrograms(db):
+#     html = get(programsURL).text
+#     soup = BeautifulSoup(html, features='html.parser')
+#     div = soup.find('span', class_='MainContent')
+#     programs = div.find_all('a')
+#     programEntity = []
+#     for program in programs:
+#         name = program.get_text()
+#         cursor = db.cursor()
+#         cursor.execute("SELECT requirementID FROM Requirement WHERE type=?", (name,))
+#         result = cursor.fetchone()
+#         programEntity.append(Major(result[0],program.get_text(), True, True))
+
+
+def getAcademicPlans(start=2019):
+    url = 'http://ugradcalendar.uwaterloo.ca/group/MATH-Academic-Plans-and-Requirements'
+    html = get(url).text
+    soup = BeautifulSoup(html, features='html.parser')
+    plans = soup.find('span', id='ctl00_contentMain_lblContent').find_all('li')
+    for plan in plans[2:]:
+        name = plan.get_text()
+        if name == 'Plans for Students outside the Mathematics Faculty': continue
+        url = plan.find('a')['href']
+        print(name, url)
+        today = datetime.today()
+        # for year in range(start, today.year + 1):
+        #     getPlanRequirements(name, url, year)
+
+
+def getPlanRequirements(name, url, year):
     param = '?ActiveDate=9/1/' + str(year)
     html = get(UndergradCalendarBaseURL + url + param).text
     soup = BeautifulSoup(html, features='html.parser')
     requirements = soup.find('span', id='ctl00_contentMain_lblContent')
-    aList = requirements.find_all('a', href=compile('page'))
-    for a in aList[:3]:
-        planName, url = a.get_text(), a['href']
-        if not validatePlan(planName): continue
-        parentTag = a.find_previous()
-        if parentTag and parentTag.next_sibling and parentTag.next_sibling.name == 'ul':
-            url = parentTag.next_sibling.find('a', text='Degree Requirements')['href']
-        getRequirement(planName, url, year)
-
-
-def validatePlan(planName):
-    if planName == 'Admissions': return False
-    if planName == 'Plan Requirements': return False
-    if planName == 'Specializations': return False
-    if planName == 'Overview': return False
-    if planName == 'Degree Requirements': return False
-    return True
-
-
-def getRequirement(name, url, year):
-    param = '?ActiveDate=9/1/' + str(year)
-    html = get(UndergradCalendarBaseURL + url + param).text
-    soup = BeautifulSoup(html, features='html.parser')
-    contents = soup.find('span', id='ctl00_contentMain_lblContent')
-    aList = [a.get_text() for a in contents.find_all('a')]
-    res, courses = [], set()
-    if 'Table 1' in aList and 'Table 2' in aList: res += getTable2Courses(year)
-    choices = contents.find_next('ul').contents
-    choices = list(filter(lambda c: c != '\n', choices))
-    for choice in choices[:5]:
-        r, c = parseChoice(choice)
-        res += r
-        courses = courses.union(c)
-    # res = updateRequirement(res)
-    # print(res)
+    # plans = [req.find('a').get_text() for req in requirements[1:]]
+    print(html)
 
 
 def getTable2Courses(year):
@@ -90,42 +112,17 @@ def getTable2Courses(year):
     soup = BeautifulSoup(html, features='html.parser')
     choices = soup.find(string='Table 2 – Faculty Core Courses').find_next('ul').contents
     choices = list(filter(lambda c: c != '\n', choices))
-    res, courses = [], set()
-    for choice in choices:
-        r, c = parseChoice(choice)
-        res += r
-        courses = courses.union(set(c))
-    print(res)
-    print(courses)
-    return res, courses
-
-
-def updateRequirement(requirement, courses, choice):
-    r, _ = parseChoice(choice)
-    for req in r:
-        n, options = req[0], req[1]
-        for option in options:
-            if option in courses:
-                print(option)
-
-    # for i, req in enumerate(requirement):
-    #     n, options = req[0], req[1]
-    #     for j, r in enumerate(requirement):
-    #         if j == i: continue
-    #         count = 0
-    #         for option in options:
-    #             if option in r[1]: count += 1
-    #         print(count)
+    res = ''
+    for choice in choices: res += parseChoice(choice)
+    return res
 
 
 def parseChoice(choice):
     logic = choice.contents[0].lower()
     options = [course.find('a').get_text() for course in choice.find_all('li')]
-    n, res, courses = 0, [], []
+    n, res = 0, ''
     if logic == compile('all'):
-        for option in options: 
-            res.append((1, option))
-            courses.append(option)
+        for option in options: res += '1:' + option + ';'
         return res
     elif 'one' in logic: n = 1
     elif logic == compile('two'): n = 2
@@ -140,12 +137,13 @@ def parseChoice(choice):
     else: 
         print(f'Invalid number for:\n{logic}')
         return res
-    res.append((n, options))
-    for option in options: courses.append(option)
-    return res, courses
+    res += str(n) + ':'
+    for option in options: res += option + ','
+    res = res[:-1] + ';'
+    return res
     
 
 if __name__ == '__main__':
-    getTable2Courses(2023)
-    # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2023)
-    getRequirement('Bachelor of Computer Science', '/page/MATH-Bachelor-of-Computer-Science-1', 2023)
+    print(getTable2Courses(2023))
+    # getAcademicPlans()
+    getPlanRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)

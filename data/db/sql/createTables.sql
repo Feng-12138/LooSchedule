@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS Major
 (
     requirementID INT(11) NOT NULL,
     majorName VARCHAR(100) NOT NULL,
-    isCoop BOOLEAN NOT NULL,
+    coopOnly BOOLEAN NOT NULL,
     isDoubleDegree BOOLEAN NOT NULL,
     FOREIGN KEY (requirementID) REFERENCES Requirement(requirementID),
     PRIMARY KEY (requirementID)
