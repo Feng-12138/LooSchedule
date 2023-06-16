@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -37,18 +38,28 @@ fun SelectDegree(navController: NavController) {
         "Business Administration",
         "Computer Hardware"
     )
-    Column(
+    Box(
         Modifier
             .fillMaxWidth()
             .fillMaxHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally
     )
     {
-        SelectList(programs, context)
-        SelectList(years, context)
-        SelectList(sequences, context)
-        SelectList(minors, context)
-        SelectList(specializations, context)
+        Column(
+            modifier = Modifier
+            .align(Alignment.TopCenter),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            SelectList(programs, context)
+            SelectList(years, context)
+            SelectList(sequences, context)
+            SelectList(minors, context)
+            SelectList(specializations, context)
+        }
+        Button(onClick = { /*TODO*/ },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)) {
+            Text("Generate Course Schedules")
+        }
     }
 }
 
