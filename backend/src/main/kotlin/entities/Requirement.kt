@@ -21,13 +21,13 @@ class Requirement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "requirementID", nullable = false)
-    var requirementID: Long? = null
+    var requirementID: Long = 0
 
     @Column(name = "type", nullable = false)
-    var type: DegreeType? = null
+    var type: DegreeType = DegreeType.MAJOR
 
     @Column(name = "year", nullable = false)
-    var year: Year? = null
+    var year: Year = ""
 
     @Column(name = "courses")
     var courses: CourseList? = null
@@ -40,17 +40,17 @@ class Requirement {
 
     @OneToOne(cascade = [CascadeType.ALL])
     @PrimaryKeyJoinColumn
-    val major: Major? = null
+    lateinit var major: Major
 
     @OneToOne(cascade = [CascadeType.ALL])
     @PrimaryKeyJoinColumn
-    val minor: Minor? = null
+    lateinit var minor: Minor
 
     @OneToOne(cascade = [CascadeType.ALL])
     @PrimaryKeyJoinColumn
-    val specialization: Specialization? = null
+    lateinit var specialization: Specialization
 
     @OneToOne(cascade = [CascadeType.ALL])
     @PrimaryKeyJoinColumn
-    val joint: Joint? = null
+    lateinit var joint: Joint
 }

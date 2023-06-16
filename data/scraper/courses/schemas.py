@@ -10,7 +10,7 @@ class Course(Base):
     description = Column(String, nullable=False)
     credit = Column(DECIMAL, nullable=False)
     availability = Column(String)
-    OnlineTerms = Column(String)
+    onlineTerms = Column(String)
     coreqs = Column(String)
     antireqs = Column(String)
     likedRating = Column(DECIMAL)
