@@ -2,7 +2,7 @@ package com.example.androidapp.Models
 
 import com.google.gson.annotations.SerializedName
 
-class Communication {
+class Breadth {
     @SerializedName("courseId")
     var courseId : String = ""
 
@@ -12,9 +12,6 @@ class Communication {
     @SerializedName("code")
     var code : String = ""
 
-    @SerializedName("listNumber")
-    var listNumber : Int = 0
-
-    @SerializedName("year")
-    var year : String = ""
+    @SerializedName("category")
+    var category: String = ""
 }
