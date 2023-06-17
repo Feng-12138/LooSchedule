@@ -43,3 +43,8 @@ Add requirement data (major, minor, specialization, joint, etc.) [TEMPORARY]:
 ```
 python3 -B program.py
 ```
+Add course data:
+```
+python3 -B courses/getCourseFromUWflow.py
+```
+Note that if fetch fail, due to url error, try couple times more(I could write the own version of get, but just too lazy)
