@@ -19,12 +19,5 @@
         <mapping class="entities.Requirement"/>
         <mapping class="entities.Specialization"/>
         <mapping class="entities.Test"/>
-
-
-
-
-
-
-
     </session-factory>
 </hibernate-configuration>
