@@ -5,8 +5,9 @@ import org.glassfish.jersey.internal.inject.AbstractBinder
 import org.glassfish.jersey.server.ResourceConfig
 import org.hibernate.SessionFactory
 import org.hibernate.cfg.Configuration
-import repositories.Repository
-import repositories.interfaces.IRepo
+import repositories.CommunicationRepo
+import repositories.CourseRepo
+import repositories.TestRepo
 import services.Service
 import services.interfaces.IService
 
@@ -16,8 +17,16 @@ class ApplicationConfig : ResourceConfig() {
         register(Api::class.java)
         register(object : AbstractBinder() {
             override fun configure() {
-                bind(Repository::class.java)
-                    .to(IRepo::class.java)
+                bind(TestRepo::class.java)
+                    .to(TestRepo::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(CourseRepo::class.java)
+                    .to(CourseRepo::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(CommunicationRepo::class.java)
+                    .to(CommunicationRepo::class.java)
                     .`in`(Singleton::class.java)
 
                 bind(Service::class.java)
