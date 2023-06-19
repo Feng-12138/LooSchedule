@@ -1,35 +1,26 @@
 package services
 
 import entities.Communication
+import entities.Course
 import jakarta.inject.Inject
+import repositories.Repository
+import repositories.interfaces.IRepo
 //import org.jvnet.hk2.annotations.Service
-import repositories.interfaces.ITestRepo
-import services.interfaces.ITestService
-
-//@Service
-class TestService: ITestService {
+import services.interfaces.IService
+class Service: IService {
     @Inject
-    private lateinit var testRepo: ITestRepo
+    private lateinit var repository : IRepo
 
     @Override
     override fun helloWorld(): String {
-        return testRepo.helloWorld()
+        return repository.helloWorld()
     }
-
-//    @Override
-//    override fun getTestById(): Test? {
-//        return testRepo.findById(1)
-//    }
-//
-//
-//
     @Override
-    override fun findAll(): List<String> {
-        return testRepo.findAllNames()
+    override fun allCourses(): List<Course> {
+        return repository.getCoursesAll()
     }
-
     @Override
-    override fun findCommunications(): List<Communication>{
-        return testRepo.findCommunications()
+    override fun allCommunications(): List<Communication>{
+        return repository.getCommunicationsAll()
     }
 }

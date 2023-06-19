@@ -6,35 +6,51 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import repositories.TestRepo
-import services.TestService
-import services.interfaces.ITestService
+import services.Service
+import services.interfaces.IService
 
 @Path("/")
-class TestApi() {
+class Api() {
     @Inject
-    private lateinit var testService: ITestService
-
+    private lateinit var service: IService
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     fun helloWorld(): Response {
-        val message = testService.helloWorld()
-        return Response.ok(message).build()
+        try {
+            val message = service.helloWorld()
+            return Response.ok(message).build()
+        }
+        catch (e: Exception){
+            println(e.message)
+        }
+        return Response.serverError().build()
     }
 
     @GET
-    @Path("all")
+    @Path("api/Courses")
     @Produces(MediaType.APPLICATION_JSON)
-    fun getAll(): Response {
-        val message = testService.findAll()
-        return Response.ok(message).build()
+    fun getCourses(): Response {
+        try{
+            val message = service.allCourses()
+            return Response.ok(message).build()
+        }
+        catch (e: Exception){
+            println(e.message)
+        }
+        return Response.serverError().build()
     }
 
     @GET
     @Path("api/Communications")
     @Produces(MediaType.APPLICATION_JSON)
     fun getCommunications(): Response {
-        val message = testService.findCommunications()
-        return Response.ok(message).build()
+        try {
+            val message = service.allCommunications()
+            return Response.ok(message).build()
+        }
+        catch (e: Exception){
+            println(e.message)
+        }
+        return Response.serverError().build()
     }
 }

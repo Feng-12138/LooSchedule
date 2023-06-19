@@ -1,18 +1,15 @@
 package services.interfaces
 
 import entities.Communication
-import entities.Test
+import entities.Course
 
 //import org.jvnet.hk2.annotations.Contract
 
 //@Contract
-interface   ITestService {
+interface IService {
     fun helloWorld(): String
-
-//    fun getTestById(): Test?
-
-    fun findAll(): List<String>
-    fun findCommunications(): List<Communication>
+    fun allCourses(): List<Course>
+    fun allCommunications(): List<Communication>
 }
 
 
