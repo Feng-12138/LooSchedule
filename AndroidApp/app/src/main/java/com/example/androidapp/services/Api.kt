@@ -6,7 +6,5 @@ import retrofit2.http.GET
 
 interface Api {
     @GET("api/Communications")
-    fun GetCommunications(): Call<List<Communication>>
-
-
+    fun getCommunications(): Call<List<Communication>>
 }
