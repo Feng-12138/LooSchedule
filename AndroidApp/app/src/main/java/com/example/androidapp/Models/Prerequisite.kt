@@ -3,8 +3,8 @@ package com.example.androidapp.Models
 import com.google.gson.annotations.SerializedName
 
 class Prerequisite {
-    @SerializedName("courseId")
-    var courseId: String = ""
+    @SerializedName("courseID")
+    var courseID: String = ""
 
     @SerializedName("consentRequired")
     var consentRequired: Boolean = false
