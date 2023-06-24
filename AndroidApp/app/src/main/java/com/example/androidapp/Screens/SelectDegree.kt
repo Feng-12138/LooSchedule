@@ -4,8 +4,10 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -33,21 +35,21 @@ fun SelectDegree(navController: NavController) {
     val sequences = arrayOf("Sequence 1", "Sequence 2", "Sequence 3", "Sequence 4")
     val minors = arrayOf("Computing", "CO", "Stats", "PMath")
     val specializations = arrayOf(
-        "Not Applicable",
-        "Software Engineering",
-        "Business Administration",
-        "Computer Hardware"
+            "Not Applicable",
+            "Software Engineering",
+            "Business Administration",
+            "Computer Hardware"
     )
     Box(
-        Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
+            Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
     )
     {
         Column(
-            modifier = Modifier
-            .align(Alignment.TopCenter),
-            horizontalAlignment = Alignment.CenterHorizontally) {
+                modifier = Modifier
+                        .align(Alignment.TopCenter),
+                horizontalAlignment = Alignment.CenterHorizontally) {
             SelectList(programs, context)
             SelectList(years, context)
             SelectList(sequences, context)
@@ -55,9 +57,9 @@ fun SelectDegree(navController: NavController) {
             SelectList(specializations, context)
         }
         Button(onClick = { /*TODO*/ },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)) {
+                modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)) {
             Text("Generate Course Schedules")
         }
     }
@@ -71,35 +73,34 @@ fun SelectList(choices: Array<String>, context: Context) {
 
     Box(Modifier.padding(12.dp)) {
         ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = {
-                expanded = !expanded
-            },
+                expanded = expanded,
+                onExpandedChange = {
+                    expanded = !expanded
+                },
         ) {
             TextField(
-                value = selectedText,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor()
+                    value = selectedText,
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier.menuAnchor()
             )
 
             ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
             ) {
                 choices.forEach { item ->
                     DropdownMenuItem(
-                        text = { Text(text = item) },
-                        onClick = {
-                            selectedText = item
-                            expanded = false
-                            Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
-                        }
+                            text = { Text(text = item) },
+                            onClick = {
+                                selectedText = item
+                                expanded = false
+                                Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
+                            }
                     )
                 }
             }
         }
     }
 }
-

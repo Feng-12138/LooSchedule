@@ -18,6 +18,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -27,10 +32,21 @@ import androidx.navigation.NavController
 
 val termList = listOf("1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B")
 
-val courseList = listOf("CS 135", "MATH 135", "MATH 137", "EMLS 129R", "PHYS 111")
+val courseList1A = listOf("CS 135", "MATH 135", "MATH 137", "EMLS 129R", "PHYS 111")
+val courseList1B = listOf("1B 1", "1B 2", "1B 3", "1B 4", "1B 5")
+val courseList2A = listOf("2A 1", "2A 2", "2A 3", "2A 4", "2A 5")
+val courseList2B = listOf("2B 1", "2B 2", "2B 3", "2B 4", "2B 5")
+val courseList3A = listOf("3A 1", "3A 2", "3A 3", "3A 4", "3A 5")
+val courseList3B = listOf("3B 1", "3B 2", "3B 3", "3B 4", "3B 5")
+val courseList4A = listOf("4A 1", "4A 2", "4A 3", "4A 4", "4A 5")
+val courseList4B = listOf("4B 1", "4B 2", "4B 3", "4B 4", "4B 5")
+val schedule = mapOf("1A" to courseList1A, "1B" to courseList1B,
+    "2A" to courseList2A, "2B" to courseList2B,
+    "3A" to courseList3A, "3B" to courseList3B,
+    "4A" to courseList4A, "4B" to courseList4B)
 
 @Composable
-private fun TermButton(term: String) {
+private fun TermButton(term : String, updateTerm : () -> Unit) {
     Surface(
         modifier = Modifier
             .padding(horizontal = 10.dp)
@@ -38,7 +54,7 @@ private fun TermButton(term: String) {
             .width(100.dp)
     ) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = updateTerm
         ) {
             Text(text = term)
         }
@@ -70,7 +86,8 @@ private fun CourseDescription(course: String) {
 }
 
 @Composable
-fun ViewSchedule(navController: NavController) {
+fun ViewSchedule(navController: NavController){
+    var currentTerm by remember { mutableStateOf("1B") }
     Surface(
         modifier = Modifier.padding(horizontal = 10.dp)
     ) {
@@ -81,7 +98,7 @@ fun ViewSchedule(navController: NavController) {
                     .horizontalScroll(rememberScrollState())
             ) {
                 for (term in termList) {
-                    TermButton(term = term)
+                    TermButton(term = term, updateTerm = {currentTerm = term})
                 }
             }
 
@@ -89,7 +106,7 @@ fun ViewSchedule(navController: NavController) {
 
             // Course schedule for the each term
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                for (course in courseList) {
+                for (course in schedule[currentTerm]!!) {
                     CourseDescription(course = course)
                 }
             }
