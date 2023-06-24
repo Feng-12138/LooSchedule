@@ -3,8 +3,8 @@ package com.example.androidapp.Models
 import com.google.gson.annotations.SerializedName
 
 class Minor {
-    @SerializedName("requirementId")
-    var requirementId : Int = 0
+    @SerializedName("requirementID")
+    var requirementID : Int = 0
 
     @SerializedName("majorName")
     var majorName : String = ""

@@ -29,7 +29,7 @@ private fun getCommunications(context: Context) {
         override fun onResponse(call: Call<List<Communication>>, response: Response<List<Communication>>) {
             if (response.isSuccessful) {
                 val comList = response.body()
-                Toast.makeText(context, comList?.get(0)?.courseId ?: "fail to read", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, comList?.get(0)?.subject ?: "fail to read", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(context, "response unSuccessful", Toast.LENGTH_SHORT).show()
             }
