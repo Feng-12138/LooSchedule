@@ -2,9 +2,9 @@ package com.example.androidapp.Models
 
 import com.google.gson.annotations.SerializedName
 
-class Course {
+class Course(ID : String) {
     @SerializedName("courseID")
-    var courseID : String = ""
+    var courseID : String = ID
 
     @SerializedName("courseName")
     var courseName : String = ""
