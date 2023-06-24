@@ -1,10 +1,13 @@
 import requests
 import re
-from dotenv import dotenv_values
+from dotenv import dotenv_values, load_dotenv
 from sqlite3 import OperationalError
 from multiprocessing.dummy import Pool
 from __init__ import Session
 from schemas import Course, Prerequisite
+import os
+
+load_dotenv()
 
 yearList = []
 courseDict = {}
@@ -34,7 +37,7 @@ def parseCourseUrl(data: str, yearList: list):
         for item in lst:
             url = item.split('<a href="/courses/')[-1].split('">')[0]
             courseStr = f"course-{url}.html"
-            url = config["CourseCalendarBaseUrl"] + year + "/COURSE/" + courseStr
+            url = os.environ["CourseCalendarBaseUrl"] + year + "/COURSE/" + courseStr
             urlList.append(url)
     return urlList
 
@@ -56,7 +59,7 @@ def wrapperCourseDataFunc(curYear: int):
         startYear = str(year)[-2:]
         endYear = str(year + 1)[-2:]
         yearList.append(startYear + endYear)
-    data = getUrl(config["CourseIndexUrl"])
+    data = getUrl(os.environ["CourseIndexUrl"])
     urlList = parseCourseUrl(data, yearList)
     coursePages = getAllCoursePage(urlList)
     # get all the courses first
@@ -93,7 +96,7 @@ def wrapperCourseDataFunc(curYear: int):
                 courseDict[courseNum].subject = infoList[0]
                 courseDict[courseNum].code = infoList[1]
                 courseDict[courseNum].credit = credit
-    uwFlowCourseList = getUrl(config["uwflowUrl"], query="""query Course {
+    uwFlowCourseList = getUrl(os.environ['uwflowUrl'], query="""query Course {
     course {
         antireqs
         code
@@ -139,18 +142,21 @@ def wrapperCourseDataFunc(curYear: int):
                     if termId[-1] == "5" and availableStr.find("S") == -1:
                         availableStr += "S"
                         if (len(section["meetings"]) > 0):
-                            if section["meetings"][0]["location"].find("ONLN") != -1 and onlineStr.find("S") == -1:
-                                onlineStr += "S"
+                            for obj in section["meetings"]:
+                                if obj['location'].find("ONLN") != -1 and onlineStr.find("S") == -1:
+                                    onlineStr += "S"
                     elif termId[-1] == "1" and availableStr.find("W") == -1:
                         availableStr += "W"
                         if (len(section["meetings"]) > 0):
-                            if section["meetings"][0]["location"].find("ONLN") != -1 and onlineStr.find("W") == -1:
-                                onlineStr += "W"
-                    elif termId[-1] == "9" and availableStr.find("W") == -1:
+                            for obj in section["meetings"]:
+                                if obj['location'].find("ONLN") != -1 and onlineStr.find("W") == -1:
+                                    onlineStr += "W"
+                    elif termId[-1] == "9" and availableStr.find("F") == -1:
                         availableStr += "F"
                         if (len(section["meetings"]) > 0):
-                            if section["meetings"][0]["location"].find("ONLN") != -1 and onlineStr.find("F") == -1:
-                                onlineStr += "F"
+                            for obj in section["meetings"]:
+                                if obj['location'].find("ONLN") != -1 and onlineStr.find("F") == -1:
+                                    onlineStr += "F"
                 courseDict[courseNum].availability = availableStr
                 courseDict[courseNum].onlineTerms = onlineStr
             coursePrereq = Prerequisite()

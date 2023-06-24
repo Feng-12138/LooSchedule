@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS Course
     courseID VARCHAR(15) NOT NULL,
     courseName VARCHAR(100) NOT NULL,
     subject VARCHAR(10) NOT NULL,
-    code VARCHAR(5) NOT NULL,
+    code INT(11) NOT NULL,
     description VARCHAR(500) NOT NULL,
     credit DECIMAL(10,2) NOT NULL,
     availability VARCHAR(15),
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS Communication
     PRIMARY KEY (courseID, year)
 );
 
-CREATE TABLE IF NOT EXISTS Breath
+CREATE TABLE IF NOT EXISTS Breadth
 (
     courseID VARCHAR(15) NOT NULL,
     subject VARCHAR(10) NOT NULL,
@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS Requirement
     requirementID INT(11) NOT NULL,
     type VARCHAR(50) NOT NULL,
     year VARCHAR(10) NOT NULL,
-    courses VARCHAR(1000) NOT NULL,
-    additionalRequirements VARCHAR(1000),
+    courses VARCHAR(2500) NOT NULL,
+    additionalRequirements VARCHAR(2500),
     link VARCHAR(250),
     PRIMARY KEY (requirementID)
 );
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS Major
 (
     requirementID INT(11) NOT NULL,
     majorName VARCHAR(100) NOT NULL,
-    isCoop BOOLEAN NOT NULL,
+    coopOnly BOOLEAN NOT NULL,
     isDoubleDegree BOOLEAN NOT NULL,
     FOREIGN KEY (requirementID) REFERENCES Requirement(requirementID),
     PRIMARY KEY (requirementID)

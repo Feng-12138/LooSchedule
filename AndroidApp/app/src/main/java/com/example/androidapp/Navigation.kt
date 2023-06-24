@@ -38,7 +38,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.androidapp.Screens.ApiPlayGround
 import com.example.androidapp.Screens.MainScreen
+import com.example.androidapp.Screens.Screen
 import com.example.androidapp.Screens.SelectDegree
 import kotlinx.coroutines.launch
 import com.example.androidapp.Screens.ViewSchedule
@@ -56,104 +58,8 @@ fun Navigation(){
         composable(route = Screen.ViewSchedule.route){
             ViewSchedule(navController = navController)
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ToolBar() {
-    val contextForToast = LocalContext.current.applicationContext
-
-    TopAppBar(
-        title = {
-            Text(text = "LooSchedule")
-        },
-        navigationIcon = {
-            IconButton(onClick = {
-                Toast.makeText(contextForToast, "Navigation Icon Click", Toast.LENGTH_SHORT)
-                    .show()
-            }) {
-                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Navigation icon")
-            }
-        },
-    )
-}
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TestMain() {
-    val scope = rememberCoroutineScope()
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val selectedRoute = remember { mutableStateOf("Home") }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "LooSchedule") },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { scope.launch { drawerState.open() } }
-                    ) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
-                    }
-                }
-            )
-        },
-        content = {
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Your main content here
-
-                if (drawerState.isOpen) {
-                    // Overlay to capture clicks outside the drawer
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable { scope.launch { drawerState.close() } },
-                        content = {}
-                    )
-                }
-
-                DrawerContent(
-                    selectedRoute = selectedRoute.value,
-                    onRouteSelected = { route ->
-                        selectedRoute.value = route
-                        scope.launch { drawerState.close() }
-                    },
-                )
-            }
+        composable(route = Screen.ApiPlayground.route){
+            ApiPlayGround(navController = navController)
         }
-    )
-}
-
-@Composable
-fun DrawerContent(selectedRoute: String, onRouteSelected: (String) -> Unit) {
-    Column {
-        // Drawer items
-        DrawerItem(
-            text = "Home",
-            selected = selectedRoute == "Home",
-            onClick = { onRouteSelected("Home") }
-        )
-        DrawerItem(
-            text = "Profile",
-            selected = selectedRoute == "Profile",
-            onClick = { onRouteSelected("Profile") }
-        )
-        // Add more drawer items as needed
-    }
-}
-
-@Composable
-fun DrawerItem(text: String, selected: Boolean, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .clickable(onClick = onClick),
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(16.dp)
-        )
     }
 }

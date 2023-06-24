@@ -8,7 +8,8 @@ ENGINE = create_engine(f'sqlite:///{PATH}')
 SESSION = scoped_session(sessionmaker(bind=ENGINE))
 BASE = declarative_base()
 
-UndergradCalendarBaseURL = 'https://ucalendar.uwaterloo.ca/'
+UndergradCalendarBaseURL = 'https://ugradcalendar.uwaterloo.ca'
+CourseDescriptionBaseURL = 'https://ucalendar.uwaterloo.ca/'
 CourseDescriptionsIndexURL='https://ugradcalendar.uwaterloo.ca/page/Course-Descriptions-Index'
 MathDegreeRequirementsURL='https://ugradcalendar.uwaterloo.ca/page/MATH-Degree-Requirements-for-Math-students'
 CSDegreeRequirementsURL='https://ugradcalendar.uwaterloo.ca/page/MATH-Bachelor-of-Computer-Science-1'

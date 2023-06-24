@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import com.example.androidapp.services.RetrofitClient
 
 
 class MainActivity : ComponentActivity() {
@@ -14,7 +15,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Column(modifier = Modifier.fillMaxSize()) {
-                ToolBar()
                 Navigation()
             }
         }

@@ -9,11 +9,15 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
 
-        <mapping class="entities.Test"/>
-        <mapping class="entities.Requirement"/>
+        <mapping class="entities.Breadth"/>
+        <mapping class="entities.Communication"/>
+        <mapping class="entities.Course"/>
+        <mapping class="entities.Joint"/>
         <mapping class="entities.Major"/>
         <mapping class="entities.Minor"/>
+        <mapping class="entities.Prerequisite"/>
+        <mapping class="entities.Requirement"/>
         <mapping class="entities.Specialization"/>
-        <mapping class="entities.Joint"/>
+        <mapping class="entities.Test"/>
     </session-factory>
 </hibernate-configuration>

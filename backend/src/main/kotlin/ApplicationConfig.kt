@@ -1,32 +1,42 @@
-import controllers.TestApi
+import controllers.Api
 import jakarta.inject.Singleton
 //import org.glassfish.jersey.guice.spi.container.GuiceComponentProviderFactory
 import org.glassfish.jersey.internal.inject.AbstractBinder
 import org.glassfish.jersey.server.ResourceConfig
 import org.hibernate.SessionFactory
 import org.hibernate.cfg.Configuration
+import repositories.CommunicationRepo
+import repositories.CourseRepo
 import repositories.TestRepo
-import repositories.interfaces.ITestRepo
-import services.TestService
-import services.interfaces.ITestService
+import services.Service
+import services.interfaces.IService
 
 
 class ApplicationConfig : ResourceConfig() {
     init {
-        register(TestApi::class.java)
-
+        register(Api::class.java)
         register(object : AbstractBinder() {
             override fun configure() {
                 bind(TestRepo::class.java)
-                    .to(ITestRepo::class.java)
+                    .to(TestRepo::class.java)
                     .`in`(Singleton::class.java)
 
-                bind(TestService::class.java)
-                    .to(ITestService::class.java)
+                bind(CourseRepo::class.java)
+                    .to(CourseRepo::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(CommunicationRepo::class.java)
+                    .to(CommunicationRepo::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(Service::class.java)
+                    .to(IService::class.java)
                     .`in`(Singleton::class.java)
 
                 val sessionFactory = createSessionFactory()
-                bind(sessionFactory).to(SessionFactory::class.java)
+                bind(sessionFactory)
+                    .to(SessionFactory::class.java)
+                    .`in`(Singleton::class.java)
             }
 
             private fun createSessionFactory(): SessionFactory {
@@ -38,15 +48,5 @@ class ApplicationConfig : ResourceConfig() {
 
 
 }
-
-//class SessionFactoryFactory(private val sessionFactory: SessionFactory) : Factory<Session> {
-//    override fun provide(): Session {
-//        return sessionFactory.openSession()
-//    }
-//
-//    override fun dispose(instance: Session) {
-//        instance.close()
-//    }
-//}
 
 
