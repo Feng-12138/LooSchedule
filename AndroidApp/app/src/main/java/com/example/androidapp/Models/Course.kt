@@ -2,7 +2,7 @@ package com.example.androidapp.Models
 
 import com.google.gson.annotations.SerializedName
 
-class Course {
+class Course() {
     @SerializedName("courseID")
     var courseID : String = ""
 

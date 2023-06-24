@@ -80,14 +80,12 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
                             Icon(imageVector = Icons.Outlined.Menu, contentDescription = "")
                         }},
                     )},
-                    content = {
-                        Box(modifier = Modifier.padding(it)) {
-                            content()
-                        }},
-                )
+                ) {
+                    Box(modifier = Modifier.padding(it)) {
+                        content()
+                    }
+                }
             }
-
-
         }
     }
 }
@@ -95,6 +93,6 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
 @Composable
 fun Greeting(navController: NavController, modifier: Modifier = Modifier) {
     Column() {
-        Text("Please delete this page")
+        Text("Hello, please delete this page")
     }
 }
