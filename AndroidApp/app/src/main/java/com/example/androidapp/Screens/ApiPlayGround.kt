@@ -40,4 +40,3 @@ private fun getCommunications(context: Context) {
         }
     })
 }
-
