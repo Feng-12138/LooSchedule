@@ -24,7 +24,7 @@ fun ApiPlayGround(navController: NavController) {
 
 private fun getCommunications(context: Context) {
     val api = RetrofitClient.create()
-    val call = api.GetCommunications()
+    val call = api.getCommunications()
     call?.enqueue(object : Callback<List<Communication>>{
         override fun onResponse(call: Call<List<Communication>>, response: Response<List<Communication>>) {
             if (response.isSuccessful) {
