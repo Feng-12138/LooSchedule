@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -86,12 +88,13 @@ private fun CourseDescription(course: String) {
 @Composable
 fun ViewSchedule(navController: NavController){
     var currentTerm by remember { mutableStateOf("1A") }
-    var selectedTabIndex = 0
+    var selectedTabIndex by remember { mutableStateOf(0) }
+    var listState : LazyListState = rememberLazyListState()
 
     Surface(
         modifier = Modifier.padding(horizontal = 10.dp)
     ) {
-        Column(modifier = Modifier.padding(10.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 10.dp)) {
             ScrollableTabRow(
                 selectedTabIndex = selectedTabIndex,
                 edgePadding = 0.dp
@@ -106,17 +109,13 @@ fun ViewSchedule(navController: NavController){
                 }
             }
 
-            Spacer(modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.size(10.dp))
 
-            // Course schedule for the each term
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState())
+            LazyColumn(
+                state = listState
             ) {
-                for (course in schedule[currentTerm]!!) {
+                items(schedule[currentTerm]!!) { course ->
                     CourseDescription(course = course.courseID)
-//                    items(items = schedule[currentTerm]!!) { item ->
-//                        CourseDescription(course = item)
-//                    }
                 }
             }
         }
