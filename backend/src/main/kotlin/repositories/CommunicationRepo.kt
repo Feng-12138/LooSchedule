@@ -3,13 +3,12 @@ package repositories
 import entities.Communication
 import jakarta.inject.Inject
 import org.hibernate.SessionFactory
-import repositories.interfaces.IRepo
 
-class CommunicationRepo: IRepo<Communication> {
+class CommunicationRepo {
     @Inject
     private lateinit var sessionFactory: SessionFactory
-    @Override
-    override fun getAll(): List<Communication> {
+
+    fun getAll(): List<Communication> {
         return try {
             val session = sessionFactory.openSession()
             val communications = session.createQuery("FROM Communication", Communication::class.java)
@@ -20,8 +19,7 @@ class CommunicationRepo: IRepo<Communication> {
         }
     }
 
-    @Override
-    override fun getById(): Communication {
+    fun getById(): Communication {
         TODO("Not yet implemented")
     }
 }

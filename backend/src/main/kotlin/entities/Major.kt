@@ -2,8 +2,6 @@ package entities
 
 import javax.persistence.*
 
-typealias DegreeName = String
-
 @Entity
 @Table(name = "Major")
 class Major {
@@ -12,7 +10,7 @@ class Major {
     var requirementID: Long = 0
 
     @Column(name = "majorName", nullable = false)
-    var majorName: DegreeName = ""
+    var majorName: String = ""
 
     @Column(name = "isCoop", nullable = false)
     var isCoop: Boolean = true

@@ -19,12 +19,15 @@ import com.example.androidapp.Screens.SelectDegree
 import com.example.androidapp.Screens.ViewSchedule
 import com.example.androidapp.ViewModels.SelectDegreeVM
 import java.io.Serializable
+import com.example.androidapp.ViewModels.ScheduleViewModel
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun Navigation(){
     val navController = rememberNavController()
     val selectDegreeVM = SelectDegreeVM()
+    val scheduleViewModel = ScheduleViewModel()
+
     NavHost(navController = navController, startDestination = Screen.MainScreen.route){
         composable(route = Screen.MainScreen.route){
             MainScreen (navController = navController) { Greeting(navController = navController) }
@@ -33,7 +36,8 @@ fun Navigation(){
             MainScreen (navController = navController) { SelectDegree(navController = navController, viewModel = selectDegreeVM) }
         }
         composable(route = Screen.ViewSchedule.route){
-            MainScreen (navController = navController) { ViewSchedule(navController = navController) }
+            MainScreen (navController = navController) { ViewSchedule(navController = navController,
+                scheduleViewModel = scheduleViewModel) }
         }
         composable(route = Screen.ApiPlayground.route){
             MainScreen (navController = navController) { ApiPlayGround(navController = navController) }
