@@ -17,7 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,6 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key.Companion.Tab
+import androidx.compose.ui.semantics.Role.Companion.Tab
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,23 +63,6 @@ val schedule = mapOf("1A" to courseList1A, "1B" to courseList1B,
     "4A" to courseList4A, "4B" to courseList4B)
 
 @Composable
-private fun TermButton(term: String, updateTerm: () -> Unit, enabled: Boolean) {
-    Surface(
-        modifier = Modifier
-            .padding(horizontal = 10.dp)
-            .height(50.dp)
-            .width(100.dp)
-    ) {
-        Button(
-            onClick = updateTerm,
-            enabled = enabled
-        ) {
-            Text(text = term)
-        }
-    }
-}
-
-@Composable
 private fun CourseDescription(course: String) {
     Surface(
         modifier = Modifier
@@ -93,8 +80,6 @@ private fun CourseDescription(course: String) {
             Text(
                 text = course, color = Color.Black, fontSize = 25.sp, textAlign = TextAlign.Left
             )
-
-//            Text(text = "Description", textAlign = TextAlign.Right)
         }
     }
 }
@@ -102,35 +87,22 @@ private fun CourseDescription(course: String) {
 @Composable
 fun ViewSchedule(navController: NavController){
     var currentTerm by remember { mutableStateOf("1A") }
-
-    // Track the enabled/disabled state of each term button
-    var shownTerm = "1A"
-    val enabledStates = remember { mutableStateListOf<Boolean>() }
-    for (term in termList) {
-        enabledStates.add(term != shownTerm)
-    }
+    var selectedTabIndex = 0
 
     Surface(
         modifier = Modifier.padding(horizontal = 10.dp)
     ) {
         Column(modifier = Modifier.padding(10.dp)) {
-            Row(
-                modifier = Modifier
-                    .padding(vertical = 10.dp)
-                    .horizontalScroll(rememberScrollState())
+            ScrollableTabRow(
+                selectedTabIndex = selectedTabIndex,
+                edgePadding = 0.dp
             ) {
-                for (i in termList.indices) {
-                    TermButton(
-                        term = termList[i],
-                        updateTerm = {
-                            currentTerm = termList[i]
-                            shownTerm = termList[i]
-                            // Disable the clicked button
-                            for (j in enabledStates.indices) {
-                                enabledStates[j] = (j != i)
-                            }
-                        },
-                        enabled = enabledStates[i]
+                termList.forEachIndexed { index, term ->
+                    Tab(
+                        selected = index == selectedTabIndex,
+                        onClick = { currentTerm = term
+                                    selectedTabIndex = index},
+                        text = { Text(termList[index]) }
                     )
                 }
             }
