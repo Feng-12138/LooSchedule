@@ -5,11 +5,9 @@ import org.glassfish.jersey.internal.inject.AbstractBinder
 import org.glassfish.jersey.server.ResourceConfig
 import org.hibernate.SessionFactory
 import org.hibernate.cfg.Configuration
-import repositories.CommunicationRepo
-import repositories.CourseRepo
-import repositories.TestRepo
+import repositories.*
 import services.Service
-import services.interfaces.IService
+import services.IService
 
 
 class ApplicationConfig : ResourceConfig() {
@@ -27,6 +25,18 @@ class ApplicationConfig : ResourceConfig() {
 
                 bind(CommunicationRepo::class.java)
                     .to(CommunicationRepo::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(MajorRepo::class.java)
+                    .to(MajorRepo::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(MinorRepo::class.java)
+                    .to(MinorRepo::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(SpecializationRepo::class.java)
+                    .to(SpecializationRepo::class.java)
                     .`in`(Singleton::class.java)
 
                 bind(Service::class.java)

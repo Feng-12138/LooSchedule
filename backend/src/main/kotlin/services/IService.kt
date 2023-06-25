@@ -1,9 +1,8 @@
-package services.interfaces
+package services
 
-import Schedule
-import com.google.common.util.concurrent.AbstractScheduledService.Scheduler
 import entities.Communication
 import entities.Course
+import services.Schedule
 
 //@Contract
 interface IService {

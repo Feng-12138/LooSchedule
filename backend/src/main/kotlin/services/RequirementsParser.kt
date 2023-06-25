@@ -69,7 +69,7 @@ class RequirementsParser {
                 optionalCourses.courses.removeAll(commonCourses)
             } else {
                 commonCourses = commonTable.filterKeys { it in commonCourses }.toList()
-                    .sortedBy { (key, value) -> value }
+                    .sortedBy { (_, value) -> value }
                     .map { it.first }
                     .take(optionalCourses.nOf)
                     .toSet()

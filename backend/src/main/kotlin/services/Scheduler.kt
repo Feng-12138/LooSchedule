@@ -1,4 +1,7 @@
+package services
+
 import entities.Course
+import entities.Specialization
 
 typealias Term = String
 typealias TermSchedule = MutableList<Course>
@@ -12,4 +15,5 @@ class Scheduler {
     fun updateSchedule(): Boolean {
         return true
     }
+
 }

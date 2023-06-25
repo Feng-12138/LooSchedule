@@ -10,5 +10,5 @@ class Minor {
     var requirementID: Long = 0
 
     @Column(name = "minorName", nullable = false)
-    var minorName: DegreeName = ""
+    var minorName: String = ""
 }

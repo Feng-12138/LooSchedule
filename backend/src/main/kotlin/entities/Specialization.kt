@@ -10,5 +10,5 @@ class Specialization {
     var requirementID: Long = 0
 
     @Column(name = "specializationName", nullable = false)
-    var specializationName: DegreeName = ""
+    var specializationName: String = ""
 }
