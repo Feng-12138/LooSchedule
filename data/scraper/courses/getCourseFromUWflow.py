@@ -13,13 +13,14 @@ yearList = []
 courseDict = {}
 levels = ['1A', '1B', '2A', '2B', '3A']
 
+coursePrereqDict = {}
+
 config = dotenv_values(".env")
 
 def getUrl(url: str, query = ""):
     data = ""
     try:
         if query == "":
-            print(url)
             res = requests.get(url=url)
             data = res.text
         else:
@@ -82,17 +83,17 @@ def wrapperCourseDataFunc(curYear: int):
                 exNumName = "<td align=left><B><a name =.*</b></td><td align=right>"
                 NumName = re.findall(exNumName, courseInfo)
                 infoList = NumName[0].split('</a>')[-1].split('</b></td><td align=right>')[0].split(" ")
-                courseNum = (infoList[0] + infoList[1]).lower()
+                courseNum = (infoList[0] + ' ' + infoList[1]).upper()
                 credit = infoList[-1].strip()
             else:
                 NumNameList = NumName[0].split('</strong>')
                 infoList = NumNameList[0].split('</a>')[-1].split(' ')
-                courseNum = (infoList[0] + infoList[1]).lower()
+                courseNum = (infoList[0] + ' ' + infoList[1]).upper()
                 credit = infoList[-1].strip()
             credit = float(credit)
             if courseDict.get(courseNum) == None:
                 courseDict[courseNum] = Course()
-                courseDict[courseNum].courseID = courseNum.upper()
+                courseDict[courseNum].courseID = courseNum
                 courseDict[courseNum].subject = infoList[0]
                 courseDict[courseNum].code = infoList[1]
                 courseDict[courseNum].credit = credit
@@ -121,6 +122,12 @@ def wrapperCourseDataFunc(curYear: int):
 """)["data"]["course"]
     for course in uwFlowCourseList:
         courseNum = course["code"]
+        separateIdx = 0
+        for idx, char in enumerate(courseNum):
+            if char <= "9" and char >= "0":
+                separateIdx = idx
+                break
+        courseNum = courseNum[:separateIdx].upper() + " " + courseNum[separateIdx:]
         if courseDict.get(courseNum) != None:
             courseDict[courseNum].courseName = course["name"]
             courseDict[courseNum].description = course["description"]
@@ -159,23 +166,235 @@ def wrapperCourseDataFunc(curYear: int):
                                     onlineStr += "F"
                 courseDict[courseNum].availability = availableStr
                 courseDict[courseNum].onlineTerms = onlineStr
-            coursePrereq = Prerequisite()
-            coursePrereq.courseID = courseNum
-            coursePrereq.consentRequired = False
+            coursePrereqDict[courseNum] = course['prereqs']
+            # coursePrereq = Prerequisite()
+            # coursePrereq.courseID = courseNum
+            # coursePrereq.consentRequired = False
             # if courseDict[courseNum].prereqs.find("Level at least") != -1:
-            #     coursePrereq.minimumLevel = courseDict[courseNum].prereqs.split("Level at least")[-1].strip()[:2]
+            #     coursePrereq.minimumLevel = courseDict[courseNum].prereqs.split("Level at least")[-1].strip()[:2]    
+    return courseDict.values()
+
+
+def handleOneOf(prereq: str) -> str:
+    oneOfStr = ""
+    if (prereq):
+        oneOfIdxArr = []
+        twoOfIdxArr = []
+        threeOfIdxArr = []
+        closeBracketIdxArr = []
+        semiIdxArr = []
+        for i in re.finditer("One of|one of", prereq):
+            oneOfIdxArr.append(i.start())
+                
+        for i in re.finditer("Three of|three of", prereq):
+            threeOfIdxArr.append(i.start())
+                
+        for i in re.finditer("Two of|two of", prereq):
+            twoOfIdxArr.append(i.start())
+            
+        for i in re.finditer(";", prereq):
+            semiIdxArr.append(i.start())
+            
+        for i in re.finditer("\)", prereq):
+            closeBracketIdxArr.append(i.start())
+                
+        for oneIdx in oneOfIdxArr:
+            closeSemiIdx = 99999
+            closebracketIdx = 99999
+            for semiIdx in semiIdxArr:
+                if semiIdx > oneIdx:
+                    closeSemiIdx = semiIdx
+                    break
+            for closeBracket in closeBracketIdxArr:
+                if closeBracket > oneIdx:
+                    closebracketIdx = closeBracket
+                    break
+            betterIdx = min(closeSemiIdx, closebracketIdx)
+            
+            curStr = prereq[oneIdx:betterIdx]             
+            curStr = curStr.replace("One of", "1:")
+            curStr = curStr.replace("one of", "1:")
+            curStr = curStr.replace(" ", '')
+            curStr = curStr.replace("/", ",")
+            curStr = curStr.replace("or", ",")
+            curStr = curStr.replace(")", "")
+            curStr = curStr.replace(";", "")
+            curStr = curStr.replace(".", "")
+            oneOfStr += curStr + ";"
+            
+        
+        for oneIdx in twoOfIdxArr:
+            closeSemiIdx = 99999
+            closebracketIdx = 99999
+            for semiIdx in semiIdxArr:
+                if semiIdx > oneIdx:
+                    closeSemiIdx = semiIdx
+                    break
+            for closeBracket in closeBracketIdxArr:
+                if closeBracket > oneIdx:
+                    closebracketIdx = closeBracket
+                    break
+            betterIdx = min(closeSemiIdx, closebracketIdx)
+            
+            curStr = prereq[oneIdx:betterIdx]             
+            curStr = curStr.replace("One of", "1:")
+            curStr = curStr.replace("one of", "1:")
+            curStr = curStr.replace(" ", '')
+            curStr = curStr.replace("/", ",")
+            curStr = curStr.replace("or", ",")
+            curStr = curStr.replace(")", "")
+            curStr = curStr.replace(";", "")
+            curStr = curStr.replace(".", "")
+            oneOfStr += curStr + ";"
+        
+        for oneIdx in twoOfIdxArr:
+            closeSemiIdx = 99999
+            closebracketIdx = 99999
+            for semiIdx in semiIdxArr:
+                if semiIdx > oneIdx:
+                    closeSemiIdx = semiIdx
+                    break
+            for closeBracket in closeBracketIdxArr:
+                if closeBracket > oneIdx:
+                    closebracketIdx = closeBracket
+                    break
+            betterIdx = min(closeSemiIdx, closebracketIdx)
+            curStr = prereq[oneIdx:betterIdx]             
+            curStr = curStr.replace("Two of", "2:")
+            curStr = curStr.replace("two of", "2:")
+            curStr = curStr.replace(" ", '')
+            curStr = curStr.replace("/", ",")
+            curStr = curStr.replace("or", ",")
+            curStr = curStr.replace(")", "")
+            curStr = curStr.replace(";", "")
+            curStr = curStr.replace(".", "")
+            oneOfStr += curStr + ";"
+            
+        
+        for oneIdx in threeOfIdxArr:
+            closeSemiIdx = 99999
+            closebracketIdx = 99999
+            for semiIdx in semiIdxArr:
+                if semiIdx > oneIdx:
+                    closeSemiIdx = semiIdx
+                    break
+            for closeBracket in closeBracketIdxArr:
+                if closeBracket > oneIdx:
+                    closebracketIdx = closeBracket
+                    break
+            betterIdx = min(closeSemiIdx, closebracketIdx)
+            curStr = prereq[oneIdx:betterIdx]           
+            curStr = curStr.replace("Three of", "3:")
+            curStr = curStr.replace("three of", "3:")
+            curStr = curStr.replace(" ", '')
+            curStr = curStr.replace("/", ",")
+            curStr = curStr.replace("or", ",")
+            curStr = curStr.replace(")", "")
+            curStr = curStr.replace(";", "")
+            curStr = curStr.replace(".", "")
+            oneOfStr += curStr + ";"
+    return oneOfStr
+    
+    
+def parseStrCourses(prereq: str, oneOfCourseList = [], courseList = []):
+    courseIdxArr = []
+    courseStrArr = []
+    courseNameArr = []
+    courseIdxNameMap = {}
+    retvalList = []
+    for course in courseList:
+        course = course.replace(" ", "")
+        startIdx = prereq.find(course)
+        if startIdx != -1:
+            included = oneOfCourseList.count(course)
+            if included != 0:
+                continue
+            courseIdxArr.append(startIdx)
+            courseNameArr.append(course)
+            courseIdxNameMap[startIdx] = course
+    courseIdxArr.sort()
+    for arrIdx, startIdx in enumerate(courseIdxArr):
+        endIdx = startIdx + len(courseIdxNameMap[startIdx])
+        if arrIdx == 0:
+            retvalList.append(courseIdxNameMap[startIdx])
+        if arrIdx == len(courseIdxArr) - 1:
+            break
+        else:
+            curPartStr = prereq[endIdx:courseIdxArr[arrIdx + 1]]
+            curCourse = courseIdxNameMap[startIdx]
+            nextIdx = courseIdxArr[arrIdx + 1]
+            nextCourse = courseIdxNameMap[nextIdx]
+            if (curPartStr.find('or') != -1 or curPartStr.find('/') != -1):
+                curStrIdx = len(retvalList) - 1
+                newRetvalList = retvalList[:]
+                for item in retvalList:
+                    curCourse = courseIdxNameMap[startIdx]
+                    item = item.replace(curCourse, nextCourse)
+                    newRetvalList.append(item)
+                retvalList = newRetvalList
+            elif curPartStr.find('and') != -1 or curPartStr.find(',') != -1:
+                newList = []
+                for item in retvalList:
+                    item += ","
+                    item += nextCourse
+                    newList.append(item)
+                retvalList = newList
+                    
+    retval = ""
+    for item in retvalList:
+        retval += f'{item};'
+    if oneOfCourseList != [] and retval != "":
+        print(retval, oneOfCourseList)
+    return retval
+                
+                
+                
+                        
+
+def parsePrereqs():
+    courseList = []
+    retvalPrereq = []
+    for key in coursePrereqDict.keys():
+        courseList.append(key.upper())
+    for key in coursePrereqDict.keys():
+        prereq = coursePrereqDict[key]
+        courseStr = ""
+        if (prereq):
+            courseIdxArr = []
+            courseStrArr = []
+            courseNameArr = []
+            courseIdxNameMap = {}
+            
+            courseStr += handleOneOf(prereq)
+            oneOfcourseList = []
+            if courseStr != "":
+                firstCourseList = courseStr.split(";")
+                for item in firstCourseList:
+                    item = item.replace("1:", "")
+                    item = item.replace("2:", "")
+                    item = item.replace("3:", "")
+                    curList = item.split(",")
+                    for item2 in curList:
+                        if len(item2) > 1:
+                            oneOfcourseList.append(item2)
+                
+            retvalStr = parseStrCourses(prereq=prereq, oneOfCourseList=oneOfcourseList, courseList=courseList)
+            if retvalStr != "":
+                print(retvalStr, prereq, key)
+                        
+                
             
                 
-                
-                
-    return courseDict.values()
+        
+        
                 
 def getCourseFromUWflow(year: int):
-    courseData = wrapperCourseDataFunc(year)
     try:
-        Session.add_all(courseData)
-        Session.commit()
-        Session.close()
+        courseData = wrapperCourseDataFunc(year)
+        parsePrereqs()
+        # Session.add_all(courseData)
+        # Session.commit()
+        # Session.close()
     except OperationalError as msg:
         print("Error: ", msg)
 
