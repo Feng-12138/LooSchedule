@@ -1,10 +1,13 @@
 package com.example.androidapp.Models
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-class Course() {
+
+class Course(var courseId: String) : Serializable {
     @SerializedName("courseID")
-    var courseID : String = ""
+    var courseID : String = courseId
 
     @SerializedName("courseName")
     var courseName : String = ""

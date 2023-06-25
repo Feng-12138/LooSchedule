@@ -1,5 +1,6 @@
 package com.example.androidapp.Screens
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
@@ -20,23 +21,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.androidapp.DataClass.MyDegree
+import com.example.androidapp.Enum.CoopSequence
+import com.example.androidapp.Enum.MyMajor
+import com.example.androidapp.Enum.MyMinor
+import com.example.androidapp.Enum.MySpecialization
+import com.example.androidapp.Enum.MyYear
+import com.example.androidapp.ViewModels.SelectDegreeVM
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("StateFlowValueCalledInComposition")
+
 @Composable
-fun SelectDegree(navController: NavController) {
-
+fun SelectDegree(navController: NavController, viewModel: SelectDegreeVM) {
+    val viewModel: SelectDegreeVM = viewModel
     val context = LocalContext.current
-    val programs = arrayOf("Computer Science", "Cappuccino", "Espresso", "Latte", "Mocha")
-    val years = arrayOf("2018-2019", "2019-2020", "2020-2021", "2021-2022", "2022-2023")
-    val sequences = arrayOf("Sequence 1", "Sequence 2", "Sequence 3", "Sequence 4")
-    val minors = arrayOf("Computing", "CO", "Stats", "PMath")
-    val specializations = arrayOf(
-            "Not Applicable",
-            "Software Engineering",
-            "Business Administration",
-            "Computer Hardware"
-    )
     Box(
             Modifier
                     .fillMaxWidth()
@@ -47,11 +46,11 @@ fun SelectDegree(navController: NavController) {
                 modifier = Modifier
                         .align(Alignment.TopCenter),
                 horizontalAlignment = Alignment.CenterHorizontally) {
-            SelectList(programs, context)
-            SelectList(years, context)
-            SelectList(sequences, context)
-            SelectList(minors, context)
-            SelectList(specializations, context)
+            SelectList(MyMajor.values().map { it.major }.toTypedArray(), context, viewModel.uiState.value.major)
+            SelectList(MyYear.values().map { it.year }.toTypedArray(), context, viewModel.uiState.value.year)
+            SelectList(CoopSequence.values().map { it.sequence }.toTypedArray(), context, viewModel.uiState.value.sequence)
+            SelectList(MyMinor.values().map { it.minor }.toTypedArray(), context, viewModel.uiState.value.minor)
+            SelectList(MySpecialization.values().map { it.specialization }.toTypedArray(), context, viewModel.uiState.value.specialization)
         }
         Button(onClick = { /*TODO*/ },
                 modifier = Modifier
@@ -64,9 +63,10 @@ fun SelectDegree(navController: NavController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectList(choices: Array<String>, context: Context) {
+fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(choices[0]) }
+    // var selectedText by remember { mutableStateOf(choices[0]) }
+    var selectedText by remember { mutableStateOf(choices[enum.ordinal]) }
 
     Box(Modifier.padding(12.dp)) {
         ExposedDropdownMenuBox(
@@ -80,12 +80,13 @@ fun SelectList(choices: Array<String>, context: Context) {
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor()
+                    modifier = Modifier.fillMaxWidth().menuAnchor()
             )
 
             ExposedDropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth()
             ) {
                 choices.forEach { item ->
                     DropdownMenuItem(

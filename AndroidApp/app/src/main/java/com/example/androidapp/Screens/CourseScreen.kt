@@ -19,26 +19,32 @@ import androidx.compose.ui.unit.dp
 import com.example.androidapp.Models.Course
 
 @Composable
-fun CourseScreen(course: Course) {
+fun CourseScreen(course: Course?) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = course.courseName,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+        course?.courseName?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
 
-        RatingBar(rating = course.easyRating)
+        if (course != null) {
+            RatingBar(rating = course.easyRating)
+        }
 
-        Text(
-            text = course.description,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 16.dp)
-        )
+        if (course != null) {
+            Text(
+                text = course.description,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
     }
 }
 
