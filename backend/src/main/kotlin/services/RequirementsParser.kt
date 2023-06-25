@@ -28,7 +28,7 @@ class RequirementsParser {
                 } else {
                     optionalCourses.add(
                         OptionalCourses(
-                            nOf = nOf,
+                            nOf = nOf.toInt(),
                             courses = courses,
                         )
                     )
@@ -37,7 +37,53 @@ class RequirementsParser {
         }
 
         return Requirements(
-            optionalCoursesList = optionalCourses,
+            optionalCourses = optionalCourses,
+            mandatoryCourses = mandatoryCourses,
+        )
+    }
+
+    fun finalizeRequirements(requirements: Requirements): Requirements {
+        val optionalCoursesList = requirements.optionalCourses
+        val mandatoryCourses = requirements.mandatoryCourses
+        val commonTable: HashMap<Course, Int> = HashMap()
+
+        for (i in 0..optionalCoursesList.size) {
+            for (j in i..optionalCoursesList.size) {
+                val coursesI = optionalCoursesList.elementAt(i)
+                val coursesJ = optionalCoursesList.elementAt(j)
+                val commonCourses = coursesJ.courses.filter { coursesI.courses.contains(it) }.toSet()
+                for (commonCourse in commonCourses) {
+                    if (commonTable.containsKey(commonCourse)) {
+                        commonTable[commonCourse] = commonTable[commonCourse]!! + 1
+                    } else {
+                        commonTable[commonCourse] = 1
+                    }
+                }
+            }
+        }
+
+        for (optionalCourses in optionalCoursesList) {
+            var commonCourses = optionalCourses.courses.filter { it in commonTable.keys }.toSet()
+            if (commonCourses.size < optionalCourses.nOf) {
+                optionalCourses.nOf -= commonCourses.size
+                optionalCourses.courses.removeAll(commonCourses)
+            } else {
+                commonCourses = commonTable.filterKeys { it in commonCourses }.toList()
+                    .sortedBy { (key, value) -> value }
+                    .map { it.first }
+                    .take(optionalCourses.nOf)
+                    .toSet()
+                optionalCoursesList.remove(optionalCourses)
+            }
+            mandatoryCourses.addAll(commonCourses)
+        }
+
+        optionalCoursesList.removeIf { optionalCourses ->
+            mandatoryCourses.containsAll(optionalCourses.courses)
+        }
+
+        return Requirements(
+            optionalCourses = optionalCoursesList,
             mandatoryCourses = mandatoryCourses,
         )
     }
@@ -50,11 +96,11 @@ data class Course (
 )
 
 data class OptionalCourses (
-    val nOf: String? = "",
-    val courses: Set<Course>? = null
+    var nOf: Int = 1,
+    val courses: MutableSet<Course> = mutableSetOf(),
 )
 
 data class Requirements (
-    val optionalCoursesList: Set<OptionalCourses>? = null,
-    val mandatoryCourses: Set<Course>? = null
+    val optionalCourses: MutableSet<OptionalCourses> = mutableSetOf(),
+    val mandatoryCourses: MutableSet<Course> = mutableSetOf(),
 )
