@@ -30,6 +30,9 @@ dependencies {
     // guice
     implementation("com.google.inject:guice:4.0")
 
+    // gson
+    implementation("com.google.code.gson:gson:2.8.2")
+
 }
 
 application {

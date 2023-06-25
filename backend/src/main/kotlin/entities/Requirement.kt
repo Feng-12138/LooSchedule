@@ -3,7 +3,6 @@ package entities
 import javax.persistence.*
 
 typealias Year = String             // Year which the degree plan is for
-typealias CourseList = String       // List of required courses for the degree
 typealias RequirementNotes = String // Any additional notes in degree requirements
 typealias Url = String              // Link to undergrad calendar for accurate information
 @Entity
@@ -30,7 +29,7 @@ class Requirement {
     var year: Year = ""
 
     @Column(name = "courses")
-    var courses: CourseList? = null
+    var courses: String? = null
 
     @Column(name = "additionalRequirements")
     var additionalRequirements: RequirementNotes? = null

@@ -12,8 +12,8 @@ class Major {
     @Column(name = "majorName", nullable = false)
     var majorName: String = ""
 
-    @Column(name = "isCoop", nullable = false)
-    var isCoop: Boolean = true
+    @Column(name = "coopOnly", nullable = false)
+    var coopOnly: Boolean = true
 
     @Column(name = "isDoubleDegree", nullable = false)
     var isDoubleDegree: Boolean = false

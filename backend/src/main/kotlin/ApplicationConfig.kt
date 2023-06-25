@@ -8,6 +8,7 @@ import org.hibernate.cfg.Configuration
 import repositories.*
 import services.Service
 import services.IService
+import services.RequirementsParser
 
 
 class ApplicationConfig : ResourceConfig() {
@@ -39,8 +40,16 @@ class ApplicationConfig : ResourceConfig() {
                     .to(SpecializationRepo::class.java)
                     .`in`(Singleton::class.java)
 
+                bind(RequirementRepo::class.java)
+                    .to(RequirementRepo::class.java)
+                    .`in`(Singleton::class.java)
+
                 bind(Service::class.java)
                     .to(IService::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(RequirementsParser::class.java)
+                    .to(RequirementsParser::class.java)
                     .`in`(Singleton::class.java)
 
                 val sessionFactory = createSessionFactory()

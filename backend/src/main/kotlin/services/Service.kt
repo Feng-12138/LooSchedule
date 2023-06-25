@@ -23,10 +23,15 @@ class Service: IService {
     private lateinit var specializationRepo: SpecializationRepo
 
     @Inject
-    private lateinit var testRepo: TestRepo
+    private lateinit var requirementRepo: RequirementRepo
 
     @Inject
+    private lateinit var testRepo: TestRepo
+
     private lateinit var scheduler: Scheduler
+
+    @Inject
+    private lateinit var requirementsParser: RequirementsParser
 
     @Override
     override fun helloWorld(): String {
@@ -46,19 +51,28 @@ class Service: IService {
         return scheduler.generateSchedule()
     }
 
-    private fun getRequirements(plan: AcademicPlan) {
-        val requirementsId = mutableSetOf<Long>()
-        val requirementsData = mutableSetOf<String>()
+    @Override
+    override fun getRequirements(plan: AcademicPlan): Requirements {
         // get all requirement Ids
-        for (major in plan.majors) {
-            requirementsId.add(majorRepo.getRequirementIdByName(major))
+        try {
+            val requirementsId = mutableSetOf<Long>()
+            for (major in plan.majors) {
+                requirementsId.add(majorRepo.getRequirementIdByName(major))
+            }
+            for (minor in plan.minors) {
+                requirementsId.add(minorRepo.getRequirementIdByName(minor))
+            }
+            for (specialization in plan.majors) {
+                requirementsId.add(specializationRepo.getRequirementIdByName(specialization))
+            }
+
+            val requirementsData = requirementRepo.getRequirementCoursesByIds(requirementsId)
+            return requirementsParser.finalizeRequirements(requirementsData)
+        } catch (e: Exception) {
+            println(e)
+            return Requirements()
         }
-        for (minor in plan.minors) {
-            requirementsId.add(minorRepo.getRequirementIdByName(minor))
-        }
-        for (specialization in plan.majors) {
-            requirementsId.add(specializationRepo.getRequirementIdByName(specialization))
-        }
+
     }
 }
 

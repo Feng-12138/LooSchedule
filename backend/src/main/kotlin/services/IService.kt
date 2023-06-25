@@ -11,6 +11,8 @@ interface IService {
     fun allCommunications(): List<Communication>
 
     fun generateSchedule(): Schedule
+
+    fun getRequirements(plan: AcademicPlan): Requirements
 }
 
 
