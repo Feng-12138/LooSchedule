@@ -45,11 +45,11 @@ fun SelectDegree(navController: NavController, viewModel: SelectDegreeVM) {
                 modifier = Modifier
                         .align(Alignment.TopCenter),
                 horizontalAlignment = Alignment.CenterHorizontally) {
-            SelectList(MyMajor.values().map { it.major }.toTypedArray(), context, viewModel.uiState.value.major)
-            SelectList(MyYear.values().map { it.year }.toTypedArray(), context, viewModel.uiState.value.year)
-            SelectList(CoopSequence.values().map { it.sequence }.toTypedArray(), context, viewModel.uiState.value.sequence)
-            SelectList(MyMinor.values().map { it.minor }.toTypedArray(), context, viewModel.uiState.value.minor)
-            SelectList(MySpecialization.values().map { it.specialization }.toTypedArray(), context, viewModel.uiState.value.specialization)
+            SelectList(MyMajor.values().map { it.major }.toTypedArray(), context, viewModel.uiState.value.major, viewModel)
+            SelectList(MyYear.values().map { it.year }.toTypedArray(), context, viewModel.uiState.value.year, viewModel)
+            SelectList(CoopSequence.values().map { it.sequence }.toTypedArray(), context, viewModel.uiState.value.sequence, viewModel)
+            SelectList(MyMinor.values().map { it.minor }.toTypedArray(), context, viewModel.uiState.value.minor, viewModel)
+            SelectList(MySpecialization.values().map { it.specialization }.toTypedArray(), context, viewModel.uiState.value.specialization, viewModel)
         }
         Button(onClick = { /*TODO*/ },
                 modifier = Modifier
@@ -62,7 +62,7 @@ fun SelectDegree(navController: NavController, viewModel: SelectDegreeVM) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T) {
+fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T, viewModel: SelectDegreeVM) {
     var expanded by remember { mutableStateOf(false) }
     // var selectedText by remember { mutableStateOf(choices[0]) }
     var selectedText by remember { mutableStateOf(choices[enum.ordinal]) }
@@ -81,7 +81,6 @@ fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T)
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier.fillMaxWidth().menuAnchor()
             )
-
             ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
@@ -93,6 +92,23 @@ fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T)
                             onClick = {
                                 selectedText = item
                                 expanded = false
+                                when(enum){
+                                    is MyMajor ->{
+                                        viewModel.uiState.value.major = MyMajor.fromString(item)
+                                    }
+                                    is MyYear ->{
+                                        viewModel.uiState.value.year = MyYear.fromString(item)
+                                    }
+                                    is MyMinor ->{
+                                        viewModel.uiState.value.minor = MyMinor.fromString(item)
+                                    }
+                                    is MySpecialization ->{
+                                        viewModel.uiState.value.specialization = MySpecialization.fromString(item)
+                                    }
+                                    is CoopSequence ->{
+                                        viewModel.uiState.value.sequence = CoopSequence.fromString(item)
+                                    }
+                                }
                                 Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
                             }
                     )
