@@ -10,4 +10,20 @@ class SelectDegreeVM : ViewModel() {
     private val _uiState = MutableStateFlow(MyDegree())
     val uiState: StateFlow<MyDegree> = _uiState.asStateFlow()
 
+    fun generateSchedule(
+        major: MyMajor,
+        year: MyYear,
+        sequence: CoopSequence,
+        minor: MyMinor,
+        specialization: MySpecialization
+    ) {
+        println(major.toString())
+        println(year.toString())
+        println(sequence.toString())
+        println(minor.toString())
+        println(specialization.toString())
+        if (major.toString() == "Select your degree") {
+
+        }
+    }
 }

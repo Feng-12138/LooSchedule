@@ -51,7 +51,11 @@ fun SelectDegree(navController: NavController, viewModel: SelectDegreeVM) {
             SelectList(MyMinor.values().map { it.minor }.toTypedArray(), context, viewModel.uiState.value.minor, viewModel)
             SelectList(MySpecialization.values().map { it.specialization }.toTypedArray(), context, viewModel.uiState.value.specialization, viewModel)
         }
-        Button(onClick = { /*TODO*/ },
+        Button(onClick = { viewModel.generateSchedule(
+                                viewModel.uiState.value.major,
+                                viewModel.uiState.value.year, viewModel.uiState.value.sequence,
+                                viewModel.uiState.value.minor,
+                                viewModel.uiState.value.specialization) },
                 modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(16.dp)) {
