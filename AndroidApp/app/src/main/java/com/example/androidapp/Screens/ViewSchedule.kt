@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,30 +34,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.androidapp.Models.Course
 import com.example.androidapp.ViewModels.ScheduleViewModel
-
-//val termList = listOf("1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B")
-//
-//val courseList1A = listOf(Course("CS 135"), Course("MATH 135"),
-//    Course("MATH 137"), Course("EMLS 129R"), Course("PHYS 111"))
-//val courseList1B = listOf(Course("1B 1"), Course("1B 2"), Course("1B 3"),
-//    Course("1B 4"), Course("1B 5"))
-//val courseList2A = listOf(Course("2A 1"), Course("2A 2"), Course("2A 3"),
-//    Course("2A 4"), Course("2A 5"))
-//val courseList2B = listOf(Course("2B 1"), Course("2B 2"), Course("2B 3"),
-//    Course("2B 4"), Course("2B 5"))
-//val courseList3A = listOf(Course("3A 1"), Course("3A 2"), Course("3A 3"),
-//    Course("3A 4"), Course("3A 5"))
-//val courseList3B = listOf(Course("3B 1"), Course("3B 2"), Course("3B 3"),
-//    Course("3B 4"), Course("3B 5"))
-//val courseList4A = listOf(Course("4A 1"), Course("4A 2"), Course("4A 3"),
-//    Course("4A 4"), Course("4A 5"))
-//val courseList4B = listOf(Course("4B 1"), Course("4B 2"), Course("4B 3"),
-//    Course("4B 4"), Course("4B 5"))
-//val schedule = mapOf("1A" to courseList1A, "1B" to courseList1B,
-//    "2A" to courseList2A, "2B" to courseList2B,
-//    "3A" to courseList3A, "3B" to courseList3B,
-//    "4A" to courseList4A, "4B" to courseList4B
-//)
 
 @Composable
 private fun CourseDescription(course: String) {
@@ -87,35 +64,7 @@ private fun CourseDescription(course: String) {
     }
 }
 
-//@Composable
-//fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewModel) {
-//    Surface(
-//        modifier = Modifier.padding(horizontal = 10.dp)
-//    ) {
-//        Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-//            ScrollableTabRow(
-//                selectedTabIndex = scheduleViewModel.selectedTabIndex,
-//                edgePadding = 0.dp
-//            ) {
-//                scheduleViewModel.termList.forEachIndexed { index, term ->
-//                    Tab(
-//                        selected = index == scheduleViewModel.selectedTabIndex,
-//                        onClick = { scheduleViewModel.onTermSelected(term) },
-//                        text = { Text(term) }
-//                    )
-//                }
-//            }
-//
-//            Spacer(modifier = Modifier.size(10.dp))
-//
-//            LazyColumn {
-//                items(scheduleViewModel.courseList) { course ->
-//                    CourseDescription(course = course.courseID)
-//                }
-//            }
-//        }
-//    }
-//}
+
 @Composable
 fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewModel){
     var currentTerm by remember { mutableStateOf(scheduleViewModel.currentTerm) }

@@ -4,9 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
 import com.example.androidapp.Models.Course
+import kotlinx.coroutines.flow.MutableStateFlow
 
-class ScheduleViewModel {
+class ScheduleViewModel : ViewModel() {
     val termList = listOf("1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B")
 
     private val courseList1A = listOf(
@@ -47,13 +49,13 @@ class ScheduleViewModel {
         "4A" to courseList4A, "4B" to courseList4B)
     val schedule: Map<String, List<Course>> get() = _schedule
 
-    private var _currentTerm = mutableStateOf("1A")
+    private var _currentTerm = MutableStateFlow("1A")
     val currentTerm: String get() = _currentTerm.value
 
-    private val _courseList = mutableStateOf(courseList1A)
+    private val _courseList = MutableStateFlow(courseList1A)
     val courseList: List<Course> get() = _courseList.value
 
-    private val _selectedTabIndex = mutableStateOf(0)
+    private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex: Int get() = _selectedTabIndex.value
 
     init {
