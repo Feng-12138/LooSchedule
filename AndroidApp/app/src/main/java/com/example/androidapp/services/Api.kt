@@ -5,7 +5,6 @@ import com.example.androidapp.Models.Course
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
-import java.util.Dictionary
 
 interface Api {
     @GET("api/CourseSchedules")

@@ -1,6 +1,5 @@
 package com.example.androidapp
 
-import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -17,9 +16,8 @@ import com.example.androidapp.Screens.MainScreen
 import com.example.androidapp.Screens.Screen
 import com.example.androidapp.Screens.SelectDegree
 import com.example.androidapp.Screens.ViewSchedule
-import com.example.androidapp.ViewModels.SelectDegreeVM
-import java.io.Serializable
 import com.example.androidapp.ViewModels.ScheduleViewModel
+import com.example.androidapp.ViewModels.SelectDegreeVM
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable

@@ -1,6 +1,5 @@
 package com.example.androidapp.Models
 
-import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 

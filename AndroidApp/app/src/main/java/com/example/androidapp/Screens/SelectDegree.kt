@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.androidapp.DataClass.MyDegree
 import com.example.androidapp.Enum.CoopSequence
 import com.example.androidapp.Enum.MyMajor
 import com.example.androidapp.Enum.MyMinor
