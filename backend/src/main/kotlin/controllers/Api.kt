@@ -1,5 +1,6 @@
 package controllers
 
+import Scheduler
 import jakarta.inject.Inject
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.Path
@@ -13,6 +14,7 @@ import services.interfaces.IService
 class Api() {
     @Inject
     private lateinit var service: IService
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     fun helloWorld(): Response {
@@ -46,6 +48,20 @@ class Api() {
     fun getCommunications(): Response {
         try {
             val message = service.allCommunications()
+            return Response.ok(message).build()
+        }
+        catch (e: Exception){
+            println(e.message)
+        }
+        return Response.serverError().build()
+    }
+
+    @GET
+    @Path("api/GeneratedSchedule")
+    @Produces(MediaType.APPLICATION_JSON)
+    fun getSchedule(): Response {
+        try {
+            val message = service.generateSchedule()
             return Response.ok(message).build()
         }
         catch (e: Exception){

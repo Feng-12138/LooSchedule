@@ -1,5 +1,7 @@
 package services
 
+import Schedule
+import Scheduler
 import entities.Communication
 import entities.Course
 import jakarta.inject.Inject
@@ -15,6 +17,7 @@ class Service: IService {
     private lateinit var communicationRepo: CommunicationRepo
     @Inject
     private lateinit var testRepo: TestRepo
+    private lateinit var scheduler: Scheduler
 
     @Override
     override fun helloWorld(): String {
@@ -25,7 +28,12 @@ class Service: IService {
         return courseRepo.getAll()
     }
     @Override
-    override fun allCommunications(): List<Communication>{
+    override fun allCommunications(): List<Communication> {
         return communicationRepo.getAll()
+    }
+
+    @Override
+    override fun generateSchedule(): Schedule {
+        return scheduler.generateSchedule()
     }
 }
