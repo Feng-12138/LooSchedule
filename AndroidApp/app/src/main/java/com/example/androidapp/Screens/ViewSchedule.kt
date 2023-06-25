@@ -1,5 +1,6 @@
 package com.example.androidapp.Screens
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,20 +24,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.androidapp.Models.Course
 import com.example.androidapp.ViewModels.ScheduleViewModel
+import com.google.gson.Gson
 
 @Composable
-private fun CourseDescription(course: String) {
+private fun CourseDescription(course: String, navController: NavController) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -100,7 +99,7 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                 state = listState
             ) {
                 items(scheduleViewModel.schedule[currentTerm]!!) { course ->
-                    CourseDescription(course = course.courseID)
+                    CourseDescription(course = course.courseID, navController = navController)
                 }
             }
         }
