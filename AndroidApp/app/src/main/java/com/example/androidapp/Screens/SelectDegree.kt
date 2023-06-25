@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.androidapp.DataClass.MyDegree
 import com.example.androidapp.Enum.CoopSequence
 import com.example.androidapp.Enum.MyMajor
 import com.example.androidapp.Enum.MyMinor
@@ -52,7 +51,11 @@ fun SelectDegree(navController: NavController, viewModel: SelectDegreeVM) {
             SelectList(MyMinor.values().map { it.minor }.toTypedArray(), context, viewModel.uiState.value.minor)
             SelectList(MySpecialization.values().map { it.specialization }.toTypedArray(), context, viewModel.uiState.value.specialization)
         }
-        Button(onClick = { /*TODO*/ },
+        Button(onClick = { viewModel.generateSchedule(
+                                viewModel.uiState.value.major,
+                                viewModel.uiState.value.year, viewModel.uiState.value.sequence,
+                                viewModel.uiState.value.minor,
+                                viewModel.uiState.value.specialization) },
                 modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(16.dp)) {
