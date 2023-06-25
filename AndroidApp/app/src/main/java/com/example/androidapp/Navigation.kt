@@ -10,10 +10,13 @@ import com.example.androidapp.Screens.MainScreen
 import com.example.androidapp.Screens.Screen
 import com.example.androidapp.Screens.SelectDegree
 import com.example.androidapp.Screens.ViewSchedule
+import com.example.androidapp.ViewModels.ScheduleViewModel
 
 @Composable
 fun Navigation(){
     val navController = rememberNavController()
+    val scheduleViewModel = ScheduleViewModel()
+
     NavHost(navController = navController, startDestination = Screen.MainScreen.route){
         composable(route = Screen.MainScreen.route){
             MainScreen (navController = navController) { Greeting(navController = navController) }
@@ -22,7 +25,8 @@ fun Navigation(){
             MainScreen (navController = navController) { SelectDegree(navController = navController) }
         }
         composable(route = Screen.ViewSchedule.route){
-            MainScreen (navController = navController) { ViewSchedule(navController = navController) }
+            MainScreen (navController = navController) { ViewSchedule(navController = navController,
+                scheduleViewModel = scheduleViewModel) }
         }
         composable(route = Screen.ApiPlayground.route){
             MainScreen (navController = navController) { ApiPlayGround(navController = navController) }
