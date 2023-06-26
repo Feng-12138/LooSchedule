@@ -80,7 +80,7 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                 selectedTabIndex = selectedTabIndex,
                 edgePadding = 0.dp
             ) {
-                scheduleViewModel.termList.forEachIndexed { index, term ->
+                scheduleViewModel.schedule.keys.forEachIndexed { index, term ->
                     Tab(
                         selected = index == selectedTabIndex,
                         onClick = { scheduleViewModel.onTermSelected(term)

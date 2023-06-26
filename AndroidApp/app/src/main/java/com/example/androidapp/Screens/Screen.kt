@@ -7,4 +7,6 @@ sealed class Screen(val route: String){
     object SelectDegree: Screen("selectDegree")
     object CourseDetail: Screen("courseDetail")
     object ApiPlayground: Screen("apiPlayground")
+    object ScheduleHistory: Screen("scheduleHistory")
+    object OldSchedule: Screen("oldSchedule")
 }
