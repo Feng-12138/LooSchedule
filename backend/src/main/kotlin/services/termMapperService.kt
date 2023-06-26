@@ -3,6 +3,7 @@ import entities.Course
 import repositories.ParsedPrereqData
 import repositories.PrerequisiteRepo
 import javax.inject.Inject
+import kotlin.math.floor
 
 
 data class course(
@@ -26,7 +27,7 @@ data class prereqDataClass(
 class termMapperService() {
     @Inject
     private lateinit var prerequisiteRepo: PrerequisiteRepo
-
+    private var takeCourseInWT = false
 
     private var takenCourses : MutableList<String> = mutableListOf()
 
@@ -127,6 +128,10 @@ class termMapperService() {
                         break
                     }
                 }
+                // 没变
+                if (counter < numCourseCounter) {
+                    break
+                }
                 i = counter
             }
         }
@@ -139,24 +144,38 @@ class termMapperService() {
         val prereqsData = prerequisiteRepo.getParsedPrereqData(list)
         var countCourseTerm = mutableMapOf<String, Int>()
         var generatedSchedule = mutableMapOf<String, List<Course>>()
-        if (courseData.takeCourseInWT) {
-            if ("WT1" !in sequenceMap) {
-                println("impossible to achieve")
-                return mutableMapOf()
-            }
+        var totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
+        var coursePerTerm : Int = 0
+        var remainder = 0
+        if (takeCourseInWT) {
+            coursePerTerm = (totalNumberCourses - 6) / 8
+            remainder = (totalNumberCourses - 6) % 8
+        } else {
+            coursePerTerm = (totalNumberCourses) / 8
+            remainder = (totalNumberCourses) % 8
+        }
+        if (coursePerTerm == 5 && remainder != 0) {
+            takeCourseInWT = true
+        }
+        if (coursePerTerm > 5) {
+            takeCourseInWT = true
         }
         for ((key, value) in sequenceMap) {
             if (key.contains("WT")) {
                 if (courseData.takeCourseInWT) {
-                    countCourseTerm[key] = 1
+                    countCourseTerm[key] = 0
                 } else {
                     countCourseTerm[key] = 0
                 }
             } else {
-                countCourseTerm[key] = courseData.numOfCoursesPerTerm
+                if (remainder > 0) {
+                    countCourseTerm[key] = coursePerTerm + 1
+                    remainder--
+                } else {
+                    countCourseTerm[key] = coursePerTerm
+                }
             }
         }
-
         for ((key, value) in sequenceMap) {
             val courseList = generateCourseForTerm(mathCourse = courseData.mathCourses, nonMathCourse = courseData.nonMathCourses, numCourse = countCourseTerm[key]!!.toInt(), season = value, prereqMap = prereqsData, termName = key)
             generatedSchedule[key] = courseList
