@@ -8,4 +8,5 @@ sealed class Screen(val route: String){
     object ApiPlayground: Screen("apiPlayground")
     object ScheduleHistory: Screen("scheduleHistory")
     object OldSchedule: Screen("oldSchedule")
+    object About: Screen("about")
 }

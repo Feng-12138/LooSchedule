@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
+import com.example.androidapp.screens.AboutScreen
 import com.example.androidapp.screens.ApiPlayGround
 import com.example.androidapp.screens.CourseScreen
 import com.example.androidapp.screens.ErrorScreen
@@ -86,6 +87,9 @@ fun Navigation(){
 //    val scheduleViewModel = ScheduleViewModel(scheduleList[0])
 
     NavHost(navController = navController, startDestination = Screen.MainScreen.route){
+        composable(route = Screen.About.route){
+            MainScreen (navController = navController, name = "About") { AboutScreen() }
+        }
         composable(route = Screen.MainScreen.route){
             MainScreen (navController = navController, name = "LooSchedule") { GetStartScreen(navController = navController) }
         }
