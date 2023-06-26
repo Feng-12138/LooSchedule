@@ -1,6 +1,5 @@
 package repositories
 
-import entities.CourseID
 import entities.Prerequisite
 import jakarta.inject.Inject
 import org.hibernate.SessionFactory
@@ -9,17 +8,34 @@ class PrerequisiteRepo {
     @Inject
     private lateinit var sessionFactory: SessionFactory
 
-    fun getPrereqAndMinLvl(id: CourseID): Pair<String, String?>? {
+    fun getParsedPrereqData(courseIds: List<String>): MutableMap<String, ParsedPrereqData> {
         return try {
+            val map = mutableMapOf<String, ParsedPrereqData>()
             val session = sessionFactory.openSession()
-            val hql = "FROM Prerequisite WHERE courseID = :id"
-            val query = session.createQuery(hql, Prerequisite::class.java)
-            query.setParameter("id", id)
-            val prerequisite = query.singleResult
-            Pair(prerequisite.courseID, prerequisite.minimumLevel)
+            val hql = "FROM Prerequisite P WHERE P.courseID in :ids"
+            val requirements = session.createQuery(hql, Prerequisite::class.java)
+            requirements.setParameter("ids", courseIds)
+            val results = requirements.list()
+            for (requirement in results) {
+                val courses = requirement.courses?.split(";")?.map {
+                    it.split(",").toMutableList()
+                }!!.toMutableList()
+                map[requirement.courseID] = ParsedPrereqData(
+                    coursesID = requirement.courseID,
+                    courses = courses,
+                    minimumLevel = requirement.minimumLevel!!
+                )
+            }
+            map
         } catch (e: Exception) {
             println(e.message)
-            null
+            mutableMapOf()
         }
     }
 }
+
+data class ParsedPrereqData (
+    val coursesID: String = "",
+    val courses: MutableList<MutableList<String>> = mutableListOf(),
+    val minimumLevel: String = ""
+)
