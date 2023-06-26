@@ -34,7 +34,7 @@ import com.example.androidapp.viewModels.SelectDegreeVM
 
 @Composable
 fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
-    var showAlert by remember { mutableStateOf(viewModel.showDialog) }
+    var showAlert by remember { mutableStateOf(selectDegreeVM.showDialog) }
     val viewModel: SelectDegreeVM = selectDegreeVM
     val context = LocalContext.current
     Box(

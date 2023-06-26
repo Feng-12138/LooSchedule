@@ -9,7 +9,7 @@ import com.example.androidapp.enum.MyMajor
 import com.example.androidapp.enum.MyMinor
 import com.example.androidapp.enum.MySpecialization
 import com.example.androidapp.enum.MyYear
-import com.example.androidapp.Models.Communication
+import com.example.androidapp.models.Communication
 import com.example.androidapp.services.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
