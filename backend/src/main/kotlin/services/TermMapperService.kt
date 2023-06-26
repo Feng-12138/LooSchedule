@@ -3,7 +3,6 @@ import entities.Course
 import repositories.ParsedPrereqData
 import repositories.PrerequisiteRepo
 import javax.inject.Inject
-import kotlin.math.floor
 
 
 data class course(
@@ -24,7 +23,7 @@ data class prereqDataClass(
     var minimumLevel: String = ""
 )
 
-class termMapperService() {
+class TermMapperService() {
     @Inject
     private lateinit var prerequisiteRepo: PrerequisiteRepo
     private var takeCourseInWT = false

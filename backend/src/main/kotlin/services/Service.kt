@@ -37,6 +37,12 @@ class Service: IService {
     @Inject
     private lateinit var requirementsParser: RequirementsParser
 
+    @Inject
+    private lateinit var coursePlanner: CoursePlanner
+
+    @Inject
+    private lateinit var termMapperService: TermMapperService
+
     @Override
     override fun helloWorld(): String {
         return testRepo.helloWorld()
@@ -71,6 +77,14 @@ class Service: IService {
             println(e)
             return Requirements()
         }
+    }
+
+    @Override
+    override fun generateSchedule(plan: AcademicPlan): MutableMap<String, List<Course>> {
+        val requirements: Requirements = getRequirements(plan)
+        val selectedCourses: Pair<MutableSet<Course>, MutableSet<Course>> = coursePlanner.getCoursesPlanToTake(plan.startYear, requirements)
+        return termMapperService.mapCoursesToSequence(
+            courseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second), )
     }
 }
 

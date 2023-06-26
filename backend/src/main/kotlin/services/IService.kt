@@ -11,6 +11,8 @@ interface IService {
     fun allCommunications(): List<Communication>
 
     fun getRequirements(plan: AcademicPlan): Requirements
+
+    fun generateSchedule(plan: AcademicPlan): MutableMap<String, List<Course>>
 }
 
 
