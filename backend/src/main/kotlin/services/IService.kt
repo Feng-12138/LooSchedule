@@ -2,15 +2,13 @@ package services
 
 import entities.Communication
 import entities.Course
-import services.Schedule
+import entities.Year
 
 //@Contract
 interface IService {
     fun helloWorld(): String
     fun allCourses(): List<Course>
     fun allCommunications(): List<Communication>
-
-    fun generateSchedule(): Schedule
 
     fun getRequirements(plan: AcademicPlan): Requirements
 }
