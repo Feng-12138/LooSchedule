@@ -173,6 +173,9 @@ class TermMapperService {
         var i = 0
 
         while (i < numCourseCounter) {
+            println(termName)
+            println(numCourseCounter)
+            println(retvalList.size)
             var counter = i
             if (termName.contains("WT")) {
                 for (item in satisfyConstraintOnlineNonMathCourse) {
