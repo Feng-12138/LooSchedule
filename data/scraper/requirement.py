@@ -71,6 +71,7 @@ class Joint(BASE):
 
 requirementIDCounter = 1
 
+
 def getAcademicPrograms(start=2019):
     url = 'http://ugradcalendar.uwaterloo.ca/group/MATH-Academic-Plans-and-Requirements'
     html = get(url).text
@@ -92,7 +93,7 @@ def getProgramRequirements(name, url, year):
     soup = BeautifulSoup(html, features='html.parser')
     requirements = soup.find('span', id='ctl00_contentMain_lblContent')
     aList = requirements.find_all('a', href=compile('page'))
-    for a in aList[:3]:
+    for a in aList:
         planName, planUrl = a.get_text(), a['href']
         if not validatePlan(planName): continue
         parentTag = a.find_previous()
@@ -116,12 +117,14 @@ def getRequirement(name, url, year):
     html = get(UndergradCalendarBaseURL + url + param).text
     soup = BeautifulSoup(html, features='html.parser')
     contents = soup.find('span', id='ctl00_contentMain_lblContent')
+    # print(contents)
     aList = [a.get_text() for a in contents.find_all('a')]
     res, courses = [], set()
     if 'Table 2' in aList: 
         res, courses = getTable2Courses(year)
     choices = contents.find_next('ul').contents
     choices = list(filter(lambda c: c != '\n', choices))
+    # print(choices)
     for choice in choices:
         res, courses = updateRequirement(res, courses, choice)
     courses, addReq = parseRequirement(res)
@@ -197,13 +200,21 @@ def parseChoice(choice):
             for subject in subjects:
                 for level in levels:
                     options.append(subject + ' ' + level[0] + 'xx')
-            print(options)
+            #print(options)
         elif 'from' in logic:
             print(choice.contents)
             # print(choice.contents[0].split('from')[1])
             print(choice.find_all('a'))
     else:
-        options = [course.find('a').get_text() for course in choice.find_all('li')]
+        for course in choice.find_all('li'):
+            if 'level' in course.get_text():
+                levels = findall(r'\b\d+\b', course.get_text().split('level')[0])
+                subjects = [a.get_text() for a in course.find_all('a')]
+                for subject in subjects:
+                    for level in levels:
+                        options.append(subject + ' ' + level[0] + 'xx')
+            else:
+                options.append(course.find('a').get_text())
     if 'all' in logic:
         for option in options: res.append((1, set([option])))
         return res, options, additional
@@ -219,12 +230,13 @@ def parseChoice(choice):
     elif 'ten' in logic: n = 10
     else: 
         print(f'Invalid number for:\n{logic}')
-        return res
+        return res, options, additional
     res.append((n, set(options)))
     return res, options, additional
     
 
 def parseRequirement(requirement):
+    print(requirement)
     res = ''
     additionalReq = ''
     for r in requirement:
@@ -237,29 +249,35 @@ def parseRequirement(requirement):
 
 def addRequirement(planName, year, courses, addReq, link, coopOnly=False, isDD=False):
     global requirementIDCounter
-    r = Requirement(requirementIDCounter, getPlanType(planName), year, courses, addReq, UndergradCalendarBaseURL + link)
+    schoolYear = str(year) + '-' + str(year + 1)
+    r = Requirement(requirementIDCounter, getPlanType(planName), schoolYear, courses, addReq, UndergradCalendarBaseURL + link)
     requirementIDCounter += 1
     p = None
     if r.type == 'major':
         p = Major(r.requirementID, planName, coopOnly, isDD)
     elif r.type == 'minor':
         p = Minor(r.requirementID, planName)
-    elif r.type == 'specilization':
+    elif r.type == 'specialization':
         p = Specialization(r.requirementID, planName)
     elif r.type == 'joint':
         p = Joint(r.requirementID, planName)
     else:
         print('Invalid requirement type: ' + r.type + '!')
         return
-    try:
-        SESSION.add(r)
-        SESSION.add(p)
-        SESSION.commit()
-        SESSION.close()
-    except OperationalError as msg:
-        print("Error: ", msg)
+    # try:
+    #     SESSION.add(r)
+    #     SESSION.add(p)
+    #     SESSION.commit()
+    #     SESSION.close()
+    # except OperationalError as msg:
+    #     print("Error: ", msg)
 
 if __name__ == '__main__':
     # print(getTable2Courses(2023))
     # getAcademicPrograms()
-    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
+    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2019)
+    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
+    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
+    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
+    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
+    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2023)
