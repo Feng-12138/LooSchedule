@@ -2,6 +2,7 @@ package repositories
 
 import entities.Course
 import entities.CourseID
+import services.Course as CourseData
 import jakarta.inject.Inject
 import org.hibernate.SessionFactory
 
@@ -31,6 +32,21 @@ class CourseRepo {
         } catch (e: Exception) {
             println(e.message)
             null
+        }
+    }
+
+    fun getBySubjectCode(courseData: List<CourseData>): List<Course> {
+        val courseIDs = ArrayList<String>()
+        for (course in courseData) { courseIDs.add(course.code + " " + course.subject) }
+        return try {
+            val session = sessionFactory.openSession()
+            val hql = "FROM Course WHERE courseID in (:ids)"
+            val query = session.createQuery(hql, Course::class.java)
+            val courses = query.setParameterList("ids", courseIDs)
+            courses.list()
+        } catch (e: Exception) {
+            println(e.message)
+            listOf()
         }
     }
 }
