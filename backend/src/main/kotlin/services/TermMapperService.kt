@@ -52,6 +52,7 @@ class TermMapperService {
         }
         println(countCourseTerm)
         println(courseData.mathCourses.map{it.courseID})
+        println(takenCourses)
         for ((key, value) in sequenceMap) {
             val courseList = generateCourseForTerm(
                 mathCourse = courseData.mathCourses,
@@ -68,6 +69,7 @@ class TermMapperService {
 
         println("---------")
         println(generatedSchedule)
+        takenCourses.clear()
         return generatedSchedule
     }
 
