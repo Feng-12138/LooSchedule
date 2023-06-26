@@ -4,18 +4,11 @@ import repositories.ParsedPrereqData
 import repositories.PrerequisiteRepo
 import javax.inject.Inject
 
-data class CourseDataClass(
-    var numOfCoursesPerTerm: Int = 5,
-    var takeCourseInWT: Boolean = false,
-    var mathCourses: MutableSet<Course> = mutableSetOf(),
-    var nonMathCourses: MutableSet<Course> = mutableSetOf(),
-)
-
 class TermMapperService {
     @Inject
     private lateinit var prerequisiteRepo: PrerequisiteRepo
-    private var takeCourseInWT = false
 
+    private var takeCourseInWT = false
     private var takenCourses : MutableList<String> = mutableListOf()
 
     fun generateCourseForTerm(
@@ -157,8 +150,8 @@ class TermMapperService {
         val countCourseTerm = mutableMapOf<String, Int>()
         val generatedSchedule = mutableMapOf<String, List<Course>>()
         val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
-        var coursePerTerm : Int = 0
-        var remainder = 0
+        val coursePerTerm : Int
+        var remainder: Int
         if (takeCourseInWT) {
             coursePerTerm = (totalNumberCourses - 6) / 8
             remainder = (totalNumberCourses - 6) % 8
@@ -172,7 +165,7 @@ class TermMapperService {
         if (coursePerTerm > 5) {
             takeCourseInWT = true
         }
-        for ((key, value) in sequenceMap) {
+        for ((key, _) in sequenceMap) {
             if (key.contains("WT")) {
                 if (courseData.takeCourseInWT) {
                     countCourseTerm[key] = 0
@@ -204,3 +197,11 @@ class TermMapperService {
         return generatedSchedule
     }
 }
+
+
+data class CourseDataClass(
+    var numOfCoursesPerTerm: Int = 5,
+    var takeCourseInWT: Boolean = false,
+    var mathCourses: MutableSet<Course> = mutableSetOf(),
+    var nonMathCourses: MutableSet<Course> = mutableSetOf(),
+)

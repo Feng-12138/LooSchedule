@@ -4,17 +4,14 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import jakarta.inject.Inject
-import jakarta.ws.rs.Consumes
-import jakarta.ws.rs.GET
-import jakarta.ws.rs.Path
-import jakarta.ws.rs.Produces
+import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import services.AcademicPlan
 import services.IService
 
 @Path("/")
-class Api() {
+class Api {
     @Inject
     private lateinit var service: IService
 
@@ -59,33 +56,12 @@ class Api() {
         return Response.serverError().build()
     }
 
-    @GET
-    @Path("api/requirements")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    fun getReqs(jsonData: JsonObject): Response {
-        try {
-
-            val gson = Gson()
-            val academicPlan = gson.fromJson(jsonData, AcademicPlan::class.java)
-            val message = service.getRequirements(academicPlan)
-
-            return Response.ok(message).build()
-        }
-        catch (e: Exception){
-            println(e.message)
-        }
-        return Response.serverError().build()
-    }
-
-    @GET
+    @POST
     @Path("api/schedule")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    fun getSchedule(jsonData: JsonObject): Response {
+    fun getSchedule(academicPlan: AcademicPlan): Response {
         try {
-            val gson = Gson()
-            val academicPlan = gson.fromJson(jsonData, AcademicPlan::class.java)
             val message = service.generateSchedule(academicPlan)
             return Response.ok(message).build()
         }

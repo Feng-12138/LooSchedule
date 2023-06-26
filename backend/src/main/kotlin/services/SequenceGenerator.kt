@@ -74,6 +74,8 @@ class SequenceGenerator {
                 generatedSequence.clear()
             }
         }
+        println("/////////////")
+        println(generatedSequence)
         return generatedSequence
     }
 }

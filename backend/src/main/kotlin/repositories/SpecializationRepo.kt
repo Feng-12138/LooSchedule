@@ -12,8 +12,8 @@ class SpecializationRepo {
     fun getRequirementIdByName(name: String): Long {
         return try {
             val session = sessionFactory.openSession()
-            val hql = "FROM Minor M WHERE M.minorName = :specialization_name"
-            val specializations = session.createQuery(hql, Minor::class.java)
+            val hql = "FROM Specialization S WHERE S.specializationName = :specialization_name"
+            val specializations = session.createQuery(hql, Specialization::class.java)
             specializations.setParameter("specialization_name", name)
             specializations.uniqueResult().requirementID
         } catch (e: Exception) {

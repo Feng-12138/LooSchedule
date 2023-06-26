@@ -55,7 +55,19 @@ class Service: IService {
     }
 
     @Override
-    override fun getRequirements(plan: AcademicPlan): Requirements {
+    override fun generateSchedule(plan: AcademicPlan): MutableMap<String, List<Course>> {
+        val requirements: Requirements = getRequirements(plan)
+        val selectedCourses = coursePlanner.getCoursesPlanToTake(plan.startYear, requirements)
+        println(selectedCourses.first.map { it.courseID })
+        println(selectedCourses.second.map { it.courseID })
+
+        return termMapperService.mapCoursesToSequence(
+            CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
+            sequenceGenerator.generateSequence(plan.startYear)
+        )
+    }
+
+    private fun getRequirements(plan: AcademicPlan): Requirements {
         // get all requirement Ids
         try {
             val requirementsId = mutableSetOf<Long>()
@@ -65,7 +77,7 @@ class Service: IService {
             for (minor in plan.minors) {
                 requirementsId.add(minorRepo.getRequirementIdByName(minor))
             }
-            for (specialization in plan.majors) {
+            for (specialization in plan.specializations) {
                 requirementsId.add(specializationRepo.getRequirementIdByName(specialization))
             }
 
@@ -75,16 +87,6 @@ class Service: IService {
             println(e)
             return Requirements()
         }
-    }
-
-    @Override
-    override fun generateSchedule(plan: AcademicPlan): MutableMap<String, List<Course>> {
-        val requirements: Requirements = getRequirements(plan)
-        val selectedCourses: Pair<MutableSet<Course>, MutableSet<Course>> = coursePlanner.getCoursesPlanToTake(plan.startYear, requirements)
-        return termMapperService.mapCoursesToSequence(
-            CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
-            sequenceGenerator.generateSequence(plan.startYear)
-        )
     }
 }
 
@@ -107,9 +109,12 @@ data class CourseSchedule(
 )
 
 data class AcademicPlan(
-    val majors: List<String> = listOf(),
-    val startYear: String = "",
-    val sequence: Int = 1,
-    val minors: List<String> = listOf(),
-    val specializations: List<String>,
-)
+    var majors: List<String> = listOf(),
+    var startYear: String = "",
+    var sequence: Int = 1,
+    var minors: List<String> = listOf(),
+    var specializations: List<String> = listOf()
+) {
+    // Default constructor
+    constructor() : this(listOf(), "2023", 1, listOf(), listOf())
+}

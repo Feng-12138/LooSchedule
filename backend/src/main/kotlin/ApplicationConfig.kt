@@ -42,6 +42,10 @@ class ApplicationConfig : ResourceConfig() {
                     .to(RequirementRepo::class.java)
                     .`in`(Singleton::class.java)
 
+                bind(PrerequisiteRepo::class.java)
+                    .to(PrerequisiteRepo::class.java)
+                    .`in`(Singleton::class.java)
+
                 bind(Service::class.java)
                     .to(IService::class.java)
                     .`in`(Singleton::class.java)
