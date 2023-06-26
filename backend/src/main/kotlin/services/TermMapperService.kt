@@ -15,7 +15,6 @@ class TermMapperService {
         val list = courseData.mathCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.nonMathCourses.map { it.courseID })
         val prereqsData = prerequisiteRepo.getParsedPrereqData(list)
-        print("here")
         val countCourseTerm = mutableMapOf<String, Int>()
         val generatedSchedule = mutableMapOf<String, List<Course>>()
         val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
@@ -37,7 +36,7 @@ class TermMapperService {
         for ((key, _) in sequenceMap) {
             if (key.contains("WT")) {
                 if (takeCourseInWT) {
-                    countCourseTerm[key] = 0
+                    countCourseTerm[key] = 1
                 } else {
                     countCourseTerm[key] = 0
                 }
@@ -50,9 +49,6 @@ class TermMapperService {
                 }
             }
         }
-        println(countCourseTerm)
-        println(courseData.mathCourses.map{it.courseID})
-        println(takenCourses)
         for ((key, value) in sequenceMap) {
             val courseList = generateCourseForTerm(
                 mathCourse = courseData.mathCourses,
@@ -66,9 +62,6 @@ class TermMapperService {
             takenCourses.addAll(coursesTakeThisTerm)
             generatedSchedule[key] = courseList
         }
-
-        println("---------")
-        println(generatedSchedule)
         takenCourses.clear()
         return generatedSchedule
     }
@@ -84,11 +77,11 @@ class TermMapperService {
         // non math courses have not taken
         val notTakenNonMathCourse = mutableListOf<Course>()
         val notTakenMathCourse = mutableListOf<Course>()
-        val satisfyConstraintMathCourse = mutableListOf<Course>()
+        var satisfyConstraintMathCourse = mutableListOf<Course>()
         // non math courses could be taken this term
-        val satisfyConstraintNonMathCourse = mutableListOf<Course>()
+        var satisfyConstraintNonMathCourse = mutableListOf<Course>()
         // non math courses could be taken this term online, DOES NOT DUPLICATE WITH satisfyConstraintNonMathCourse
-        val satisfyConstraintOnlineNonMathCourse = mutableListOf<Course>()
+        var satisfyConstraintOnlineNonMathCourse = mutableListOf<Course>()
         val retvalList = mutableListOf<Course>()
         for (course in mathCourse) {
             if (course.courseID !in takenCourses) {
@@ -99,6 +92,11 @@ class TermMapperService {
             if (course.courseID !in takenCourses) {
                 notTakenNonMathCourse.add(course)
             }
+        }
+        if (termName == "4A") {
+            println("here")
+            println(notTakenMathCourse.map { it.courseID })
+            println(notTakenNonMathCourse.map { it.courseID })
         }
 
         for (course in notTakenMathCourse) {
@@ -160,32 +158,34 @@ class TermMapperService {
                 }
             }
         }
-
+        var newSatisfyConstraintMathCourse = satisfyConstraintMathCourse.sortedBy { it.courseID }
+        var newSatisfyConstraintNonMathCourse = satisfyConstraintNonMathCourse.sortedBy { it.courseID }
+        var newSatisfyConstraintOnlineNonMathCourse = satisfyConstraintOnlineNonMathCourse.sortedBy { it.courseID }
         var numCourseCounter = numCourse
         for (i in 0 until numCourse - 1) {
-            if (i >= satisfyConstraintMathCourse.size) {
+            if (i >= newSatisfyConstraintMathCourse.size) {
                 break
             } else {
-                retvalList.add(satisfyConstraintMathCourse[i])
+                retvalList.add(newSatisfyConstraintMathCourse[i])
             }
             numCourseCounter--
         }
         var i = 0
 
         while (i < numCourseCounter) {
-            println(termName)
-            println(numCourseCounter)
-            println(retvalList.size)
             var counter = i
             if (termName.contains("WT")) {
-                for (item in satisfyConstraintOnlineNonMathCourse) {
+                for (item in newSatisfyConstraintOnlineNonMathCourse) {
                     retvalList.add(item)
                     counter++
                     if (counter >= numCourseCounter) {
                         break
                     }
                 }
-                for (item in satisfyConstraintNonMathCourse) {
+                if (counter >= numCourseCounter) {
+                    break
+                }
+                for (item in newSatisfyConstraintNonMathCourse) {
                     retvalList.add(item)
                     counter++
                     if (counter >= numCourseCounter) {
@@ -194,14 +194,17 @@ class TermMapperService {
                 }
                 i = counter
             } else {
-                for (item in satisfyConstraintNonMathCourse) {
+                for (item in newSatisfyConstraintNonMathCourse) {
                     retvalList.add(item)
                     counter++
                     if (counter >= numCourseCounter) {
                         break
                     }
                 }
-                for (item in satisfyConstraintOnlineNonMathCourse) {
+                if (counter >= numCourseCounter) {
+                    break
+                }
+                for (item in newSatisfyConstraintOnlineNonMathCourse) {
                     retvalList.add(item)
                     counter++
                     if (counter >= numCourseCounter) {
@@ -215,6 +218,7 @@ class TermMapperService {
                 i = counter
             }
         }
+        println(retvalList.map{it.courseID})
         return retvalList
     }
 }
