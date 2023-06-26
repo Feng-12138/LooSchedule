@@ -1,4 +1,4 @@
-package com.example.androidapp.Enum
+package com.example.androidapp.enum
 
 enum class MyMinor(val minor: String) {
     SelectMinor("Select your minor"),

@@ -1,4 +1,4 @@
-package com.example.androidapp.Enum
+package com.example.androidapp.enum
 
 enum class MyYear(val year : String) {
     SelectYear("Select your academic year"),

@@ -1,4 +1,4 @@
-package com.example.androidapp.Screens
+package com.example.androidapp.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,8 +30,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.androidapp.Models.Course
-import com.example.androidapp.ViewModels.ScheduleViewModel
+import com.example.androidapp.models.Course
+import com.example.androidapp.viewModels.ScheduleViewModel
 
 @Composable
 private fun CourseDescription(course: Course, navController: NavController) {
