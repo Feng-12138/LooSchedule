@@ -96,7 +96,7 @@ fun Navigation(){
                 selectDegreeVM = selectDegreeVM) }
         }
         composable(route = Screen.ViewSchedule.route){
-            MainScreen (navController = navController, name = "Schedule") { ViewSchedule(navController = navController,
+            MainScreen (navController = navController, name = "Current Schedule") { ViewSchedule(navController = navController,
                 scheduleViewModel = scheduleViewModel) }
         }
         composable(route = Screen.ApiPlayground.route){
@@ -113,18 +113,19 @@ fun Navigation(){
         }
         composable(route = Screen.OldSchedule.route) {
             val schedule = navController.previousBackStackEntry?.arguments?.getParcelable("schedule", Schedule::class.java)
+            val index = navController.previousBackStackEntry?.arguments?.getInt("index")
             println(schedule.toString())
             if(schedule != null){
-                MainScreen(navController = navController, name = "") {
+                MainScreen(navController = navController, name = "Schedule $index") {
                     ViewSchedule(navController = navController,
                         scheduleViewModel = ScheduleViewModel(schedule))
                 }
             }
-            else{
-                MainScreen(navController = navController, name = "") {
-                    ErrorScreen(navController = navController)
-                }
-            }
+//            else{
+//                MainScreen(navController = navController, name = "Error") {
+//                    ErrorScreen(navController = navController)
+//                }
+//            }
         }
     }
 }

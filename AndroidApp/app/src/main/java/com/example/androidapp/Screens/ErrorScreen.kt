@@ -34,7 +34,6 @@ fun ErrorScreen(navController: NavController) {
         Button(
             onClick = { navController.navigate(Screen.ScheduleHistory.route) },
             modifier = Modifier
-                .fillMaxWidth()
                 .height(48.dp)
         ) {
             Text(text = "Go back!")
