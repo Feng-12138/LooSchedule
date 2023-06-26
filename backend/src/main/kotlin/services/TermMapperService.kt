@@ -3,7 +3,6 @@ import entities.Course
 import repositories.ParsedPrereqData
 import repositories.PrerequisiteRepo
 import javax.inject.Inject
-import kotlin.math.floor
 
 
 data class course(
@@ -24,7 +23,7 @@ data class prereqDataClass(
     var minimumLevel: String = ""
 )
 
-class termMapperService() {
+class TermMapperService() {
     @Inject
     private lateinit var prerequisiteRepo: PrerequisiteRepo
     private var takeCourseInWT = false
@@ -142,9 +141,9 @@ class termMapperService() {
         val list = courseData.mathCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.nonMathCourses.map { it.courseID })
         val prereqsData = prerequisiteRepo.getParsedPrereqData(list)
-        var countCourseTerm = mutableMapOf<String, Int>()
-        var generatedSchedule = mutableMapOf<String, List<Course>>()
-        var totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
+        val countCourseTerm = mutableMapOf<String, Int>()
+        val generatedSchedule = mutableMapOf<String, List<Course>>()
+        val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
         var coursePerTerm : Int = 0
         var remainder = 0
         if (takeCourseInWT) {
