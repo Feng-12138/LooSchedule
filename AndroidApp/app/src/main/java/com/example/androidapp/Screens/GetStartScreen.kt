@@ -35,10 +35,9 @@ fun GetStartScreen(navController: NavController) {
         Button(
             onClick = { navController.navigate(Screen.SelectDegree.route) },
             modifier = Modifier
-                .fillMaxWidth()
                 .height(48.dp)
         ) {
-            Text(text = "Schedule your courses!")
+            Text(text = "Schedule Your Courses!")
         }
     }
 }

@@ -44,6 +44,7 @@ fun CourseScheduleItem(scheduleItem: Schedule, navController: NavController, ind
         Button(
             onClick = {
                 navController.currentBackStackEntry?.arguments?.putParcelable("schedule", scheduleItem)
+                navController.currentBackStackEntry?.arguments?.putInt("index", index)
                 navController.navigate(Screen.OldSchedule.route)
             },
             shape = RoundedCornerShape(0.dp),
