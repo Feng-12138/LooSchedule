@@ -23,8 +23,8 @@ class CoursePlanner {
         val course1Useful = course1.usefulRating ?: 0.0
         val course2Useful = course2.usefulRating ?: 0.0
 
-        val averageRating1 = (course1Liked.plus(course1Easy * 2).plus(course1Useful)) / 3.0
-        val averageRating2 = (course2Liked.plus(course2Easy * 2).plus(course2Useful)) / 3.0
+        val averageRating1 = ((course1Liked * 1).plus(course1Easy * 2).plus(course1Useful)) / 3.0
+        val averageRating2 = ((course2Liked * 1).plus(course2Easy * 2).plus(course2Useful)) / 3.0
 
         averageRating2.compareTo(averageRating1)
     }
