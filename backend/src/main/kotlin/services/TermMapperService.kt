@@ -49,17 +49,22 @@ class TermMapperService {
         for (course in notTakenMathCourse) {
             val parsedPrereqData = prereqMap[course.courseID]
             if (parsedPrereqData != null) {
+                var satisfyTerm = true
+                if (course.availability!!.contains(season)
+                    && parsedPrereqData.minimumLevel <= termName) {
+                    satisfyTerm = false
+                }
                 for (requirement in parsedPrereqData.courses) {
-                    var satisfy = true
+                    var satisfyPrereq = true
                     for (prereqCourse in requirement) {
-                        if (prereqCourse !in takenCourses && course.availability!!.contains(season)
-                            && parsedPrereqData.minimumLevel <= termName) {
-                            satisfy = false
+                        if (prereqCourse !in takenCourses) {
+                            satisfyPrereq = false
                             break
                         }
                     }
-                    if (satisfy) {
+                    if (satisfyPrereq && satisfyTerm) {
                         satisfyConstraintMathCourse.add(course)
+                        break
                     }
                 }
             }
@@ -68,19 +73,25 @@ class TermMapperService {
         for (course in notTakenNonMathCourse) {
             val parsedPrereqData = prereqMap[course.courseID]
             if (parsedPrereqData != null) {
+                var satisfyTerm = true
+                if (course.availability!!.contains(season)
+                    && parsedPrereqData.minimumLevel <= termName) {
+                    satisfyTerm = false
+                }
                 for (requirement in parsedPrereqData.courses) {
-                    var satisfy = true
+                    var satisfyPrereq = true
                     for (prereqCourse in requirement) {
-                        if (prereqCourse !in takenCourses && course.availability!!.contains(season)
-                            && parsedPrereqData.minimumLevel <= termName) {
-                            satisfy = false
+                        if (prereqCourse !in takenCourses) {
+                            satisfyPrereq = false
                             break
                         }
                     }
-                    if (satisfy && course.onlineTerms!!.contains(season)) {
+                    if (satisfyPrereq && satisfyTerm && course.onlineTerms!!.contains(season)) {
                         satisfyConstraintOnlineNonMathCourse.add(course)
-                    } else if (satisfy) {
+                        break
+                    } else if (satisfyPrereq && satisfyTerm) {
                         satisfyConstraintNonMathCourse.add(course)
+                        break
                     }
                 }
             }
