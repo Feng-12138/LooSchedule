@@ -60,20 +60,6 @@ class Api() {
     }
 
     @GET
-    @Path("api/GeneratedSchedule")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun getSchedule(): Response {
-        try {
-            val message = service.generateSchedule()
-            return Response.ok(message).build()
-        }
-        catch (e: Exception){
-            println(e.message)
-        }
-        return Response.serverError().build()
-    }
-
-    @GET
     @Path("api/requirements")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -83,6 +69,24 @@ class Api() {
             val gson = Gson()
             val academicPlan = gson.fromJson(jsonData, AcademicPlan::class.java)
             val message = service.getRequirements(academicPlan)
+
+            return Response.ok(message).build()
+        }
+        catch (e: Exception){
+            println(e.message)
+        }
+        return Response.serverError().build()
+    }
+
+    @GET
+    @Path("api/schedule")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    fun getSchedule(jsonData: JsonObject): Response {
+        try {
+            val gson = Gson()
+            val academicPlan = gson.fromJson(jsonData, AcademicPlan::class.java)
+            val message = service.generateSchedule(academicPlan)
             return Response.ok(message).build()
         }
         catch (e: Exception){

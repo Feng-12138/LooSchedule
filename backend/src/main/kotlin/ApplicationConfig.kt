@@ -6,9 +6,7 @@ import org.glassfish.jersey.server.ResourceConfig
 import org.hibernate.SessionFactory
 import org.hibernate.cfg.Configuration
 import repositories.*
-import services.Service
-import services.IService
-import services.RequirementsParser
+import services.*
 
 
 class ApplicationConfig : ResourceConfig() {
@@ -50,6 +48,18 @@ class ApplicationConfig : ResourceConfig() {
 
                 bind(RequirementsParser::class.java)
                     .to(RequirementsParser::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(TermMapperService::class.java)
+                    .to(TermMapperService::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(CoursePlanner::class.java)
+                    .to(CoursePlanner::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(SequenceGenerator::class.java)
+                    .to(SequenceGenerator::class.java)
                     .`in`(Singleton::class.java)
 
                 val sessionFactory = createSessionFactory()

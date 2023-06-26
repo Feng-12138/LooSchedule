@@ -4,7 +4,6 @@ import entities.Communication
 import entities.Course
 import jakarta.inject.Inject
 import repositories.*
-//import org.jvnet.hk2.annotations.Service
 
 class Service: IService {
     @Inject
@@ -12,12 +11,6 @@ class Service: IService {
 
     @Inject
     private lateinit var communicationRepo: CommunicationRepo
-
-    @Inject
-    private lateinit var breadthRepo: BreadthRepo
-
-    @Inject
-    private lateinit var prerequisiteRepo: PrerequisiteRepo
 
     @Inject
     private lateinit var majorRepo: MajorRepo
@@ -43,14 +36,19 @@ class Service: IService {
     @Inject
     private lateinit var termMapperService: TermMapperService
 
+    @Inject
+    private lateinit var sequenceGenerator: SequenceGenerator
+
     @Override
     override fun helloWorld(): String {
         return testRepo.helloWorld()
     }
+
     @Override
     override fun allCourses(): List<Course> {
         return courseRepo.getAll()
     }
+
     @Override
     override fun allCommunications(): List<Communication> {
         return communicationRepo.getAll()
@@ -84,7 +82,9 @@ class Service: IService {
         val requirements: Requirements = getRequirements(plan)
         val selectedCourses: Pair<MutableSet<Course>, MutableSet<Course>> = coursePlanner.getCoursesPlanToTake(plan.startYear, requirements)
         return termMapperService.mapCoursesToSequence(
-            courseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second), )
+            CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
+            sequenceGenerator.generateSequence(plan.startYear)
+        )
     }
 }
 
