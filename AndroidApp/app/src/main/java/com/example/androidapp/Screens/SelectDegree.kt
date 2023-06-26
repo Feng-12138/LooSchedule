@@ -61,7 +61,8 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
                 viewModel.uiState.value.sequence,
                 viewModel.uiState.value.minor,
                 viewModel.uiState.value.specialization,
-                context)
+                context,
+                navController)
             showAlert = viewModel.showDialog
         },
                 modifier = Modifier
@@ -73,9 +74,6 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
         if (showAlert) {
             AlertDialog(
                 onDismissRequest = {
-                    // Dismiss the dialog when the user clicks outside the dialog or on the back
-                    // button. If you want to disable that functionality, simply use an empty
-                    // onCloseRequest.
                     viewModel.toggleDialog()
                     showAlert = viewModel.showDialog
                 },
@@ -149,7 +147,6 @@ fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T,
                                     viewModel.uiState.value.sequence = CoopSequence.fromString(item)
                                 }
                             }
-                            Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
                         }
                     )
                 }

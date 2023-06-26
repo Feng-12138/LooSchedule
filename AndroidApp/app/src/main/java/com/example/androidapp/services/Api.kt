@@ -8,11 +8,9 @@ import retrofit2.http.Path
 
 interface Api {
     @GET("api/CourseSchedules")
-    fun getCourseSchedule(): Call<List<Pair<String, List<Course>>>>
+    fun getCourseSchedule(): Call<Map<String, List<Course>>>
 
     @GET("api/Communications")
     fun getCommunications(): Call<List<Communication>>
 
-    @GET("api/Courses/{courseId}")
-    fun getCourseDetails(@Path("courseId") courseId: String): Call<Course>
 }
