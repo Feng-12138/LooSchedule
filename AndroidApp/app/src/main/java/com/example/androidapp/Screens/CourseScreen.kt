@@ -63,7 +63,7 @@ fun RatingBar(rating: Float) {
 
         Row {
             repeat(5) {index ->
-                if (index < rating.toInt()){
+                if (index < (rating * 5).toInt()){
                     Icon(
                         imageVector = Icons.Outlined.Star,
                         contentDescription = null,
