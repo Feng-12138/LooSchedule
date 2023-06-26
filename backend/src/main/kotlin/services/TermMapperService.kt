@@ -101,8 +101,6 @@ class TermMapperService {
             }
         }
 
-        println(season)
-        println(notTakenMathCourse.map { it.courseID })
         for (course in notTakenMathCourse) {
             val parsedPrereqData = prereqMap[course.courseID]
             if (parsedPrereqData != null) {
@@ -111,18 +109,11 @@ class TermMapperService {
                     && parsedPrereqData.minimumLevel <= termName) {
                     satisfyTerm = true
                 }
-//                println("ddddddd")
-                println(course.courseID)
-                println(satisfyTerm)
-                if (parsedPrereqData.courses.isEmpty()) {
-//                    println(course.courseID)
-                    println("added")
+
+                if (parsedPrereqData.courses.isEmpty() || parsedPrereqData.courses.all {it.isEmpty()}) {
                     satisfyConstraintMathCourse.add(course)
                 } else {
                     for (requirement in parsedPrereqData.courses) {
-//                        println("--------")
-//                        println(requirement)
-//                        println("--------")
                         var satisfyPrereq = true
                         for (prereqCourse in requirement) {
                             if (prereqCourse !in takenCourses) {
@@ -130,10 +121,8 @@ class TermMapperService {
                                 break
                             }
                         }
-//                        println(satisfyPrereq)
                         if (satisfyPrereq && satisfyTerm) {
                             println(course.courseID)
-                            println("added")
                             satisfyConstraintMathCourse.add(course)
                             break
                         }
@@ -142,7 +131,7 @@ class TermMapperService {
             }
         }
 
-        println("dddddddd")
+        println("----------------")
         println(satisfyConstraintMathCourse.map { it.courseID })
 
         for (course in notTakenNonMathCourse) {

@@ -17,7 +17,7 @@ class PrerequisiteRepo {
                 .setParameter("ids", courseIds)
             val results = prerequisites.list()
             results.forEach {
-                val courses = if (it.courses != null) {
+                val courses = if (it.courses != null && it.courses != "") {
                     it.courses!!.split(";").map { course ->
                         course.split(",").toMutableList()
                     }
