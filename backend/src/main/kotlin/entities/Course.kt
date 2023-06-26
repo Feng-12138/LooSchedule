@@ -65,9 +65,9 @@ class Course {
     @Column(name = "usefulRating")
     var usefulRating: UsefulRating? = 0.0
 
-    @OneToOne(cascade = [CascadeType.ALL])
-    @PrimaryKeyJoinColumn
-    lateinit var breadth: Breadth
+//    @OneToOne(cascade = [CascadeType.ALL])
+//    @PrimaryKeyJoinColumn
+//    lateinit var breadth: Breadth
 
     @OneToOne(cascade = [CascadeType.ALL])
     @PrimaryKeyJoinColumn
