@@ -2,7 +2,7 @@ package services
 import entities.Course
 import repositories.ParsedPrereqData
 import repositories.PrerequisiteRepo
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 class TermMapperService {
     @Inject
@@ -11,7 +11,69 @@ class TermMapperService {
     private var takeCourseInWT = false
     private var takenCourses : MutableList<String> = mutableListOf()
 
-    fun generateCourseForTerm(
+    fun mapCoursesToSequence(courseData: CourseDataClass, sequenceMap: Map<String, String>) : MutableMap<String, List<Course>> {
+        val list = courseData.mathCourses.map { it.courseID }.toMutableList()
+        list.addAll(courseData.nonMathCourses.map { it.courseID })
+        val prereqsData = prerequisiteRepo.getParsedPrereqData(list)
+//        println(";;;;;;;;;;;;;;;")
+//        println(prereqsData)
+        val countCourseTerm = mutableMapOf<String, Int>()
+        val generatedSchedule = mutableMapOf<String, List<Course>>()
+        val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
+        val coursePerTerm : Int
+        var remainder: Int
+        if (takeCourseInWT) {
+            coursePerTerm = (totalNumberCourses - 6) / 8
+            remainder = (totalNumberCourses - 6) % 8
+        } else {
+            coursePerTerm = (totalNumberCourses) / 8
+            remainder = (totalNumberCourses) % 8
+        }
+        if (coursePerTerm == 5 && remainder != 0) {
+            takeCourseInWT = true
+        }
+        if (coursePerTerm > 5) {
+            takeCourseInWT = true
+        }
+        for ((key, _) in sequenceMap) {
+            if (key.contains("WT")) {
+                if (courseData.takeCourseInWT) {
+                    countCourseTerm[key] = 0
+                } else {
+                    countCourseTerm[key] = 0
+                }
+            } else {
+                if (remainder > 0) {
+                    countCourseTerm[key] = coursePerTerm + 1
+                    remainder--
+                } else {
+                    countCourseTerm[key] = coursePerTerm
+                }
+            }
+        }
+        println("1111111111")
+        println(countCourseTerm)
+        for ((key, value) in sequenceMap) {
+            val courseList = generateCourseForTerm(
+                mathCourse = courseData.mathCourses,
+                nonMathCourse = courseData.nonMathCourses,
+                numCourse = countCourseTerm[key]!!.toInt(),
+                season = value,
+                prereqMap = prereqsData,
+                termName = key,
+            )
+            break
+            val coursesTakeThisTerm = courseList.map{it.courseID}
+            takenCourses.addAll(coursesTakeThisTerm)
+            generatedSchedule[key] = courseList
+        }
+
+        println("---------")
+        println(generatedSchedule)
+        return generatedSchedule
+    }
+
+    private fun generateCourseForTerm(
         termName : String,
         season: String,
         numCourse: Int,
@@ -39,29 +101,49 @@ class TermMapperService {
             }
         }
 
+        println(season)
+        println(notTakenMathCourse.map { it.courseID })
         for (course in notTakenMathCourse) {
             val parsedPrereqData = prereqMap[course.courseID]
             if (parsedPrereqData != null) {
-                var satisfyTerm = true
+                var satisfyTerm = false
                 if (course.availability!!.contains(season)
                     && parsedPrereqData.minimumLevel <= termName) {
-                    satisfyTerm = false
+                    satisfyTerm = true
                 }
-                for (requirement in parsedPrereqData.courses) {
-                    var satisfyPrereq = true
-                    for (prereqCourse in requirement) {
-                        if (prereqCourse !in takenCourses) {
-                            satisfyPrereq = false
+//                println("ddddddd")
+                println(course.courseID)
+                println(satisfyTerm)
+                if (parsedPrereqData.courses.isEmpty()) {
+//                    println(course.courseID)
+                    println("added")
+                    satisfyConstraintMathCourse.add(course)
+                } else {
+                    for (requirement in parsedPrereqData.courses) {
+//                        println("--------")
+//                        println(requirement)
+//                        println("--------")
+                        var satisfyPrereq = true
+                        for (prereqCourse in requirement) {
+                            if (prereqCourse !in takenCourses) {
+                                satisfyPrereq = false
+                                break
+                            }
+                        }
+//                        println(satisfyPrereq)
+                        if (satisfyPrereq && satisfyTerm) {
+                            println(course.courseID)
+                            println("added")
+                            satisfyConstraintMathCourse.add(course)
                             break
                         }
-                    }
-                    if (satisfyPrereq && satisfyTerm) {
-                        satisfyConstraintMathCourse.add(course)
-                        break
                     }
                 }
             }
         }
+
+        println("dddddddd")
+        println(satisfyConstraintMathCourse.map { it.courseID })
 
         for (course in notTakenNonMathCourse) {
             val parsedPrereqData = prereqMap[course.courseID]
@@ -89,6 +171,9 @@ class TermMapperService {
                 }
             }
         }
+
+        println(satisfyConstraintMathCourse)
+
         var numCourseCounter = numCourse
         for (i in 1 until numCourse - 1) {
             if (i - 1 >= satisfyConstraintMathCourse.size) {
@@ -141,60 +226,6 @@ class TermMapperService {
             }
         }
         return retvalList
-    }
-
-    fun mapCoursesToSequence(courseData: CourseDataClass, sequenceMap: Map<String, String>) : MutableMap<String, List<Course>> {
-        val list = courseData.mathCourses.map { it.courseID }.toMutableList()
-        list.addAll(courseData.nonMathCourses.map { it.courseID })
-        val prereqsData = prerequisiteRepo.getParsedPrereqData(list)
-        val countCourseTerm = mutableMapOf<String, Int>()
-        val generatedSchedule = mutableMapOf<String, List<Course>>()
-        val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
-        val coursePerTerm : Int
-        var remainder: Int
-        if (takeCourseInWT) {
-            coursePerTerm = (totalNumberCourses - 6) / 8
-            remainder = (totalNumberCourses - 6) % 8
-        } else {
-            coursePerTerm = (totalNumberCourses) / 8
-            remainder = (totalNumberCourses) % 8
-        }
-        if (coursePerTerm == 5 && remainder != 0) {
-            takeCourseInWT = true
-        }
-        if (coursePerTerm > 5) {
-            takeCourseInWT = true
-        }
-        for ((key, _) in sequenceMap) {
-            if (key.contains("WT")) {
-                if (courseData.takeCourseInWT) {
-                    countCourseTerm[key] = 0
-                } else {
-                    countCourseTerm[key] = 0
-                }
-            } else {
-                if (remainder > 0) {
-                    countCourseTerm[key] = coursePerTerm + 1
-                    remainder--
-                } else {
-                    countCourseTerm[key] = coursePerTerm
-                }
-            }
-        }
-        for ((key, value) in sequenceMap) {
-            val courseList = generateCourseForTerm(
-                mathCourse = courseData.mathCourses,
-                nonMathCourse = courseData.nonMathCourses,
-                numCourse = countCourseTerm[key]!!.toInt(),
-                season = value,
-                prereqMap = prereqsData,
-                termName = key,
-            )
-            val coursesTakeThisTerm = courseList.map{it.courseID}
-            takenCourses.addAll(coursesTakeThisTerm)
-            generatedSchedule[key] = courseList
-        }
-        return generatedSchedule
     }
 }
 

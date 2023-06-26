@@ -63,7 +63,7 @@ class Service: IService {
 
         return termMapperService.mapCoursesToSequence(
             CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
-            sequenceGenerator.generateSequence(plan.startYear)
+            sequenceGenerator.generateSequence(plan.sequence.toString())
         )
     }
 
@@ -111,10 +111,10 @@ data class CourseSchedule(
 data class AcademicPlan(
     var majors: List<String> = listOf(),
     var startYear: String = "",
-    var sequence: Int = 1,
+    var sequence: String = "Regular",
     var minors: List<String> = listOf(),
     var specializations: List<String> = listOf()
 ) {
     // Default constructor
-    constructor() : this(listOf(), "2023", 1, listOf(), listOf())
+    constructor() : this(listOf(), "2023", "Regular", listOf(), listOf())
 }

@@ -13,29 +13,34 @@ class PrerequisiteRepo {
             val map = mutableMapOf<String, ParsedPrereqData>()
             val session = sessionFactory.openSession()
             val hql = "FROM Prerequisite P WHERE P.courseID in :ids"
-            val requirements = session.createQuery(hql, Prerequisite::class.java)
-            requirements.setParameter("ids", courseIds)
-            val results = requirements.list()
-            for (requirement in results) {
-                val courses = requirement.courses?.split(";")?.map {
-                    it.split(",").toMutableList()
-                }!!.toMutableList()
-                map[requirement.courseID] = ParsedPrereqData(
-                    coursesID = requirement.courseID,
-                    courses = courses,
-                    minimumLevel = requirement.minimumLevel!!
+            val prerequisites = session.createQuery(hql, Prerequisite::class.java)
+                .setParameter("ids", courseIds)
+            val results = prerequisites.list()
+            results.forEach {
+                val courses = if (it.courses != null) {
+                    it.courses!!.split(";").map { course ->
+                        course.split(",").toMutableList()
+                    }
+                } else {
+                    listOf()
+                }
+                val data = ParsedPrereqData(
+                    courseID = it.courseID,
+                    courses = courses.toMutableList(),
+                    minimumLevel = it.minimumLevel ?: ""
                 )
+                map[it.courseID] = data
             }
             map
         } catch (e: Exception) {
-            println(e.message)
+            println(e)
             mutableMapOf()
         }
     }
 }
 
 data class ParsedPrereqData (
-    val coursesID: String = "",
+    val courseID: String = "",
     val courses: MutableList<MutableList<String>> = mutableListOf(),
     val minimumLevel: String = ""
 )
