@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,12 +34,13 @@ import com.example.androidapp.viewModels.SelectDegreeVM
 
 @Composable
 fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
+    var showAlert by remember { mutableStateOf(viewModel.showDialog) }
     val viewModel: SelectDegreeVM = selectDegreeVM
     val context = LocalContext.current
     Box(
-            Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
+        Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
     )
     {
         Column(
@@ -51,15 +53,48 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
             SelectList(MyMinor.values().map { it.minor }.toTypedArray(), context, viewModel.uiState.value.minor, viewModel)
             SelectList(MySpecialization.values().map { it.specialization }.toTypedArray(), context, viewModel.uiState.value.specialization, viewModel)
         }
-        Button(onClick = { viewModel.generateSchedule(
-                                viewModel.uiState.value.major,
-                                viewModel.uiState.value.year, viewModel.uiState.value.sequence,
-                                viewModel.uiState.value.minor,
-                                viewModel.uiState.value.specialization) },
+        Button(onClick =
+        {
+            viewModel.generateSchedule(
+                viewModel.uiState.value.major,
+                viewModel.uiState.value.year,
+                viewModel.uiState.value.sequence,
+                viewModel.uiState.value.minor,
+                viewModel.uiState.value.specialization,
+                context)
+            showAlert = viewModel.showDialog
+        },
                 modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(16.dp)) {
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp)) {
             Text("Generate Course Schedules")
+        }
+
+        if (showAlert) {
+            AlertDialog(
+                onDismissRequest = {
+                    // Dismiss the dialog when the user clicks outside the dialog or on the back
+                    // button. If you want to disable that functionality, simply use an empty
+                    // onCloseRequest.
+                    viewModel.toggleDialog()
+                    showAlert = viewModel.showDialog
+                },
+                title = {
+                    Text(text = "Warning")
+                },
+                text = {
+                    Text("You must select degree, academic year and sequence!")
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.toggleDialog()
+                            showAlert = viewModel.showDialog
+                        }) {
+                        Text("Confirm")
+                    }
+                }
+            )
         }
     }
 }
@@ -82,7 +117,9 @@ fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T,
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
             )
             ExposedDropdownMenu(
                     expanded = expanded,
@@ -91,29 +128,29 @@ fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T,
             ) {
                 choices.forEach { item ->
                     DropdownMenuItem(
-                            text = { Text(text = item) },
-                            onClick = {
-                                selectedText = item
-                                expanded = false
-                                when(enum){
-                                    is MyMajor ->{
-                                        viewModel.uiState.value.major = MyMajor.fromString(item)
-                                    }
-                                    is MyYear ->{
-                                        viewModel.uiState.value.year = MyYear.fromString(item)
-                                    }
-                                    is MyMinor ->{
-                                        viewModel.uiState.value.minor = MyMinor.fromString(item)
-                                    }
-                                    is MySpecialization ->{
-                                        viewModel.uiState.value.specialization = MySpecialization.fromString(item)
-                                    }
-                                    is CoopSequence ->{
-                                        viewModel.uiState.value.sequence = CoopSequence.fromString(item)
-                                    }
+                        text = { Text(text = item) },
+                        onClick = {
+                            selectedText = item
+                            expanded = false
+                            when(enum){
+                                is MyMajor ->{
+                                    viewModel.uiState.value.major = MyMajor.fromString(item)
                                 }
-                                Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
+                                is MyYear ->{
+                                    viewModel.uiState.value.year = MyYear.fromString(item)
+                                }
+                                is MyMinor ->{
+                                    viewModel.uiState.value.minor = MyMinor.fromString(item)
+                                }
+                                is MySpecialization ->{
+                                    viewModel.uiState.value.specialization = MySpecialization.fromString(item)
+                                }
+                                is CoopSequence ->{
+                                    viewModel.uiState.value.sequence = CoopSequence.fromString(item)
+                                }
                             }
+                            Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
+                        }
                     )
                 }
             }
