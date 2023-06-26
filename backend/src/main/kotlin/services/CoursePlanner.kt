@@ -13,9 +13,9 @@ class CoursePlanner {
     @Inject
     private lateinit var communicationRepo: CommunicationRepo
 
-    private val mathSubjects = listOf("MATH", "STAT", "CS", "CO", "ACTSC")
+    val mathSubjects = listOf("MATH", "STAT", "CS", "CO", "ACTSC")
 
-    private val courseComparator = Comparator<Course> { course1, course2 ->
+    val courseComparator = Comparator<Course> { course1, course2 ->
         val course1Liked = course1.likedRating ?: 0.0
         val course2Liked = course2.likedRating ?: 0.0
         val course1Easy = course1.easyRating ?: 0.0

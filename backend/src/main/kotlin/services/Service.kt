@@ -55,7 +55,7 @@ class Service: IService {
     }
 
     @Override
-    override fun generateSchedule(plan: AcademicPlan): MutableMap<String, List<Course>> {
+    override fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>> {
         val requirements: Requirements = getRequirements(plan)
         val selectedCourses = coursePlanner.getCoursesPlanToTake(plan.startYear, requirements)
         println(selectedCourses.first.map { it.courseID })

@@ -3,20 +3,28 @@ import entities.Course
 import repositories.ParsedPrereqData
 import repositories.PrerequisiteRepo
 import jakarta.inject.Inject
+import repositories.CourseRepo
+import java.util.TooManyListenersException
 
 class TermMapperService {
     @Inject
     private lateinit var prerequisiteRepo: PrerequisiteRepo
 
+    @Inject
+    private lateinit var courseRepo: CourseRepo
+
+    @Inject
+    private lateinit var coursePlanner: CoursePlanner
+
     private var takeCourseInWT = false
     private var takenCourses : MutableList<String> = mutableListOf()
 
-    fun mapCoursesToSequence(courseData: CourseDataClass, sequenceMap: Map<String, String>) : MutableMap<String, List<Course>> {
+    fun mapCoursesToSequence(courseData: CourseDataClass, sequenceMap: Map<String, String>): MutableMap<String, MutableList<Course>> {
         val list = courseData.mathCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.nonMathCourses.map { it.courseID })
         val prereqsData = prerequisiteRepo.getParsedPrereqData(list)
         val countCourseTerm = mutableMapOf<String, Int>()
-        val generatedSchedule = mutableMapOf<String, List<Course>>()
+        val generatedSchedule = mutableMapOf<String, MutableList<Course>>()
         val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
         var coursePerTerm : Int
         var remainder: Int
@@ -63,8 +71,71 @@ class TermMapperService {
             takenCourses.addAll(coursesTakeThisTerm)
             generatedSchedule[key] = courseList
         }
+        var finalSchedule: MutableMap<String, MutableList<Course>> = finalizeSchedule(generatedSchedule, countCourseTerm, sequenceMap, prereqsData)
         takenCourses.clear()
-        return generatedSchedule
+        return finalSchedule
+    }
+
+    private fun checkMathCourseConstraint(course: Course, termName : String, season: String,
+                                          prereqMap: MutableMap<String, ParsedPrereqData>): Boolean {
+        val parsedPrereqData = prereqMap[course.courseID]
+        assert(parsedPrereqData != null)
+        var satisfyTerm = false
+        if (course.availability!!.contains(season) && parsedPrereqData!!.minimumLevel <= termName) {
+            satisfyTerm = true
+        }
+
+        if (parsedPrereqData!!.courses.isEmpty() || parsedPrereqData.courses.all {it.isEmpty()}) {
+            return true
+        } else {
+            for (requirement in parsedPrereqData.courses) {
+                var satisfyPrereq = true
+                for (prereqCourse in requirement) {
+                    if (prereqCourse !in takenCourses) {
+                        satisfyPrereq = false
+                        break
+                    }
+                }
+                if (satisfyPrereq && satisfyTerm) {
+                    return true
+                }
+            }
+            return false
+        }
+    }
+
+    enum class NonMathAddStatus {
+        AddToOnline,
+        AddToInPerson,
+        DontAdd,
+    }
+    private fun checkNonMathCourseConstraint(course: Course, termName : String, season: String,
+                                             prereqMap: MutableMap<String, ParsedPrereqData>): NonMathAddStatus {
+        val parsedPrereqData = prereqMap[course.courseID]
+        assert(parsedPrereqData != null)
+        var satisfyTerm = false
+        if (course.availability!!.contains(season) && parsedPrereqData!!.minimumLevel <= termName) {
+            satisfyTerm = true
+        }
+        if (parsedPrereqData!!.courses.isEmpty() || parsedPrereqData.courses.all {it.isEmpty()}) {
+            return NonMathAddStatus.AddToOnline
+        } else {
+            for (requirement in parsedPrereqData.courses) {
+                var satisfyPrereq = true
+                for (prereqCourse in requirement) {
+                    if (prereqCourse !in takenCourses) {
+                        satisfyPrereq = false
+                        break
+                    }
+                }
+                if (satisfyPrereq && satisfyTerm && course.onlineTerms!!.contains(season)) {
+                    return NonMathAddStatus.AddToOnline
+                } else if (satisfyPrereq && satisfyTerm) {
+                    return NonMathAddStatus.AddToInPerson
+                }
+            }
+            return NonMathAddStatus.DontAdd
+        }
     }
 
     private fun generateCourseForTerm(
@@ -94,74 +165,19 @@ class TermMapperService {
                 notTakenNonMathCourse.add(course)
             }
         }
-//        if (termName == "4A") {
-//            println("here")
-//            println(notTakenMathCourse.map { it.courseID })
-//            println(notTakenNonMathCourse.map { it.courseID })
-//        }
 
         for (course in notTakenMathCourse) {
-            val parsedPrereqData = prereqMap[course.courseID]
-            if (parsedPrereqData != null) {
-                var satisfyTerm = false
-                if (course.availability!!.contains(season)
-                    && parsedPrereqData.minimumLevel <= termName) {
-                    satisfyTerm = true
-//                    if (course.courseID == "MATH 146") {
-//                        println(course.availability)
-//                        println(season)
-//                        println(termName)
-//                        println("here")
-//                    }
-                }
-                if (parsedPrereqData.courses.isEmpty() || parsedPrereqData.courses.all {it.isEmpty()}) {
-                    satisfyConstraintMathCourse.add(course)
-                } else {
-                    for (requirement in parsedPrereqData.courses) {
-                        var satisfyPrereq = true
-                        for (prereqCourse in requirement) {
-                            if (prereqCourse !in takenCourses) {
-                                satisfyPrereq = false
-                                break
-                            }
-                        }
-                        if (satisfyPrereq && satisfyTerm) {
-                            satisfyConstraintMathCourse.add(course)
-                            break
-                        }
-                    }
-                }
+            if (checkMathCourseConstraint(course, termName, season, prereqMap)) {
+                satisfyConstraintMathCourse.add(course)
             }
         }
 
         for (course in notTakenNonMathCourse) {
-            val parsedPrereqData = prereqMap[course.courseID]
-            if (parsedPrereqData != null) {
-                var satisfyTerm = false
-                if (course.availability!!.contains(season)
-                    && parsedPrereqData.minimumLevel <= termName) {
-                    satisfyTerm = true
-                }
-                if (parsedPrereqData.courses.isEmpty() || parsedPrereqData.courses.all {it.isEmpty()}) {
-                    satisfyConstraintOnlineNonMathCourse.add(course)
-                } else {
-                    for (requirement in parsedPrereqData.courses) {
-                        var satisfyPrereq = true
-                        for (prereqCourse in requirement) {
-                            if (prereqCourse !in takenCourses) {
-                                satisfyPrereq = false
-                                break
-                            }
-                        }
-                        if (satisfyPrereq && satisfyTerm && course.onlineTerms!!.contains(season)) {
-                            satisfyConstraintOnlineNonMathCourse.add(course)
-                            break
-                        } else if (satisfyPrereq && satisfyTerm) {
-                            satisfyConstraintNonMathCourse.add(course)
-                            break
-                        }
-                    }
-                }
+            val addStatus: NonMathAddStatus = checkNonMathCourseConstraint(course, termName, season, prereqMap)
+            if (addStatus == NonMathAddStatus.AddToOnline) {
+                satisfyConstraintOnlineNonMathCourse.add(course)
+            } else if (addStatus == NonMathAddStatus.AddToInPerson) {
+                satisfyConstraintNonMathCourse.add(course)
             }
         }
         var newSatisfyConstraintMathCourse = satisfyConstraintMathCourse.sortedBy { it.courseID }
@@ -227,8 +243,42 @@ class TermMapperService {
         println(retvalList.map{it.courseID})
         return retvalList
     }
-}
 
+    private fun finalizeSchedule(scheduleSoFar: MutableMap<String, MutableList<Course>>,
+                                 countCourseTerm: MutableMap<String, Int>, sequenceMap: Map<String, String>,
+                                 prereqMap: MutableMap<String, ParsedPrereqData>): MutableMap<String, MutableList<Course>> {
+        var availableCourses: MutableList<Course> = courseRepo.getAll().sortedWith(coursePlanner.courseComparator).toMutableList()
+        for ((term, schedule) in scheduleSoFar) {
+            // Remove taken courses so that no retake
+            availableCourses.removeAll(schedule)
+            var unfillCourseCount = countCourseTerm[term]!! - schedule.size
+            println("Need to have: " + countCourseTerm[term].toString())
+            println("have: " + schedule.size.toString())
+            println("Need to add: $unfillCourseCount")
+
+            for (availableCourse in availableCourses) {
+                var canAddCourse: Boolean
+                println("Considering: ${availableCourse.courseID}")
+                if (coursePlanner.mathSubjects.contains(availableCourse.subject)) {
+                    canAddCourse = checkMathCourseConstraint(availableCourse, term, sequenceMap[term]!!, prereqMap)
+                    println("math")
+                } else {
+                    canAddCourse = checkNonMathCourseConstraint(availableCourse, term, sequenceMap[term]!!, prereqMap) != NonMathAddStatus.DontAdd
+                    println("Nonmath")
+                }
+                if (canAddCourse) {
+                    scheduleSoFar[term]!!.add(availableCourse)
+                    takenCourses.add(availableCourse.courseID)
+                    println("Added: " + availableCourse.courseID)
+                    unfillCourseCount--
+                    if (unfillCourseCount <= 0) break
+                }
+                println("Did we add? $canAddCourse")
+            }
+        }
+        return scheduleSoFar
+    }
+}
 
 data class CourseDataClass(
     var numOfCoursesPerTerm: Int = 5,

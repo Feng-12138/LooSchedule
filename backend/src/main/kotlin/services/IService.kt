@@ -10,7 +10,7 @@ interface IService {
     fun allCourses(): List<Course>
     fun allCommunications(): List<Communication>
 
-    fun generateSchedule(plan: AcademicPlan): MutableMap<String, List<Course>>
+    fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>>
 }
 
 
