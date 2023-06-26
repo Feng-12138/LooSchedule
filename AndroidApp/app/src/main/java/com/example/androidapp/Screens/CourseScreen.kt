@@ -2,6 +2,7 @@ package com.example.androidapp.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,16 +38,22 @@ fun CourseScreen(course: Course?) {
             )
         }
 
+        course?.courseName?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+
         if (course != null) {
             RatingBar(rating = course.easyRating)
         }
 
+        Spacer(modifier = Modifier.size(16.dp))
+
         if (course != null) {
-            Text(
-                text = course.description,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 16.dp)
-            )
+            Description(description = course.description)
         }
     }
 }
@@ -73,5 +80,23 @@ fun RatingBar(rating: Float) {
 
             }
         }
+    }
+}
+
+@Composable
+fun Description(description: String) {
+    Column {
+        Text(
+            text = "Course Description",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 0.dp)
+        )
+        
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 16.dp)
+        )
     }
 }
