@@ -63,7 +63,7 @@ class Service: IService {
 
         return termMapperService.mapCoursesToSequence(
             CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
-            sequenceGenerator.generateSequence(plan.sequence.toString())
+            sequenceGenerator.generateSequence(plan.sequence)
         )
     }
 
