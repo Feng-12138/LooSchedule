@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Divider
@@ -31,7 +32,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
+fun MainScreen(navController: NavController, name: String, content: @Composable () -> Unit) {
     AndroidAppTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -48,17 +49,26 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
                         NavigationDrawerItem(
                             label = { Text(text = "Get Start") },
                             selected = false,
+                            shape = RoundedCornerShape(0.dp),
                             onClick = { navController.navigate(Screen.MainScreen.route) }
                         )
                         NavigationDrawerItem(
                             label = { Text(text = "My Current Schedule") },
                             selected = false,
+                            shape = RoundedCornerShape(0.dp),
                             onClick = { navController.navigate(Screen.ViewSchedule.route) }
                         )
                         NavigationDrawerItem(
                             label = { Text(text = "Schedule My Course") },
                             selected = false,
+                            shape = RoundedCornerShape(0.dp),
                             onClick = { navController.navigate(Screen.SelectDegree.route) }
+                        )
+                        NavigationDrawerItem(
+                            label = { Text(text = "Schedule History") },
+                            selected = false,
+                            shape = RoundedCornerShape(0.dp),
+                            onClick = { navController.navigate(Screen.ScheduleHistory.route) }
                         )
                         // For testing purpose
 //                        NavigationDrawerItem(
@@ -71,7 +81,7 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
             ) {
                 Scaffold(
                     topBar = { TopAppBar(
-                        title = { Text("LooSchedule") },
+                        title = { Text(name) },
                         navigationIcon = { IconButton(
                             onClick = {
                                 scope.launch {
