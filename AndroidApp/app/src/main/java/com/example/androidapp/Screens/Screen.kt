@@ -1,4 +1,4 @@
-package com.example.androidapp.Screens
+package com.example.androidapp.screens
 
 sealed class Screen(val route: String){
     object MainScreen: Screen("main")

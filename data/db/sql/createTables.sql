@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS Prerequisite
 (
     courseID VARCHAR(15) NOT NULL,
     consentRequired BOOLEAN NOT NULL,
-    courses VARCHAR(500),
+    courses VARCHAR(2000),
     minimumLevel VARCHAR(5),
     onlyOpenTo VARCHAR(100),
     notOpenTo VARCHAR(100),

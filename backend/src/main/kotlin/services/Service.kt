@@ -67,7 +67,7 @@ class Service: IService {
             }
 
             val requirementsData = requirementRepo.getRequirementCoursesByIds(requirementsId)
-            return requirementsParser.finalizeRequirements(requirementsData)
+            return requirementsParser.parseRequirements(requirementsData)
         } catch (e: Exception) {
             println(e)
             return Requirements()

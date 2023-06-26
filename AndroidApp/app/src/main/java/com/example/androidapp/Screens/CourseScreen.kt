@@ -1,4 +1,4 @@
-package com.example.androidapp.Screens
+package com.example.androidapp.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-import com.example.androidapp.Models.Course
+import com.example.androidapp.models.Course
 
 @Composable
 fun CourseScreen(course: Course?) {
@@ -25,7 +25,7 @@ fun CourseScreen(course: Course?) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        course?.courseName?.let {
+        course?.courseID?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.headlineMedium,

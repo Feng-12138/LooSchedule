@@ -1,4 +1,4 @@
-package com.example.androidapp.Enum
+package com.example.androidapp.enum
 
 enum class CoopSequence(val sequence: String) {
     SelectSequence("Select your Coop sequence"),

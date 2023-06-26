@@ -1,4 +1,4 @@
-package com.example.androidapp.Screens
+package com.example.androidapp.screens
 
 import android.content.Context
 import android.widget.Toast
@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
-import com.example.androidapp.Models.Communication
+import com.example.androidapp.models.Communication
 import com.example.androidapp.services.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback

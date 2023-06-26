@@ -1,6 +1,5 @@
-package com.example.androidapp.Screens
+package com.example.androidapp.screens
 
-import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -31,11 +30,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.androidapp.ViewModels.ScheduleViewModel
-import com.google.gson.Gson
+import com.example.androidapp.models.Course
+import com.example.androidapp.viewModels.ScheduleViewModel
 
 @Composable
-private fun CourseDescription(course: String, navController: NavController) {
+private fun CourseDescription(course: Course, navController: NavController) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -44,9 +43,8 @@ private fun CourseDescription(course: String, navController: NavController) {
     ) {
         Button(
             onClick = {
-                val json = Uri.encode(Gson().toJson(course))
-                val route = "${Screen.CourseDetail.route}/$json"
-                navController.navigate(route)
+                navController.currentBackStackEntry?.arguments?.putParcelable("course", course)
+                navController.navigate(Screen.CourseDetail.route)
             },
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(
@@ -58,7 +56,7 @@ private fun CourseDescription(course: String, navController: NavController) {
                     .fillMaxWidth()
                     .fillMaxHeight()) {
                 Text(
-                    text = course,
+                    text = course.courseID,
                     Modifier.align(Alignment.TopStart),
                     color = Color.Black, fontSize = 25.sp
                 )
@@ -99,7 +97,7 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                 state = listState
             ) {
                 items(scheduleViewModel.schedule[currentTerm]!!) { course ->
-                    CourseDescription(course = course.courseID, navController = navController)
+                    CourseDescription(course = course, navController = navController)
                 }
             }
         }

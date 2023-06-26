@@ -1,10 +1,11 @@
-package com.example.androidapp.Models
+package com.example.androidapp.models
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
+import kotlinx.android.parcel.Parcelize
 
-
-class Course(var courseId: String) : Serializable {
+@Parcelize
+class Course(var courseId: String) : Parcelable {
     @SerializedName("courseID")
     var courseID : String = courseId
 

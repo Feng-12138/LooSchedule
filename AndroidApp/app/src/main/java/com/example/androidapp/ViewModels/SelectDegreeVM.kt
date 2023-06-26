@@ -1,14 +1,14 @@
-package com.example.androidapp.ViewModels
+package com.example.androidapp.viewModels
 
 import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import com.example.androidapp.DataClass.MyDegree
-import com.example.androidapp.Enum.CoopSequence
-import com.example.androidapp.Enum.MyMajor
-import com.example.androidapp.Enum.MyMinor
-import com.example.androidapp.Enum.MySpecialization
-import com.example.androidapp.Enum.MyYear
+import com.example.androidapp.dataClass.MyDegree
+import com.example.androidapp.enum.CoopSequence
+import com.example.androidapp.enum.MyMajor
+import com.example.androidapp.enum.MyMinor
+import com.example.androidapp.enum.MySpecialization
+import com.example.androidapp.enum.MyYear
 import com.example.androidapp.Models.Communication
 import com.example.androidapp.services.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow

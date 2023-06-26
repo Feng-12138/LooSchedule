@@ -3,21 +3,19 @@ package com.example.androidapp
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.androidapp.Models.Course
-import com.example.androidapp.Screens.ApiPlayGround
-import com.example.androidapp.Screens.CourseScreen
-import com.example.androidapp.Screens.Greeting
-import com.example.androidapp.Screens.MainScreen
-import com.example.androidapp.Screens.Screen
-import com.example.androidapp.Screens.SelectDegree
-import com.example.androidapp.Screens.ViewSchedule
-import com.example.androidapp.ViewModels.ScheduleViewModel
-import com.example.androidapp.ViewModels.SelectDegreeVM
+import com.example.androidapp.models.Course
+import com.example.androidapp.screens.ApiPlayGround
+import com.example.androidapp.screens.CourseScreen
+import com.example.androidapp.screens.GetStartScreen
+import com.example.androidapp.screens.MainScreen
+import com.example.androidapp.screens.Screen
+import com.example.androidapp.screens.SelectDegree
+import com.example.androidapp.screens.ViewSchedule
+import com.example.androidapp.viewModels.ScheduleViewModel
+import com.example.androidapp.viewModels.SelectDegreeVM
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -28,10 +26,11 @@ fun Navigation(){
 
     NavHost(navController = navController, startDestination = Screen.MainScreen.route){
         composable(route = Screen.MainScreen.route){
-            MainScreen (navController = navController) { Greeting(navController = navController) }
+            MainScreen (navController = navController) { GetStartScreen(navController = navController) }
         }
         composable(route = Screen.SelectDegree.route){
-            MainScreen (navController = navController) { SelectDegree(navController = navController, viewModel = selectDegreeVM) }
+            MainScreen (navController = navController) { SelectDegree(navController = navController,
+                selectDegreeVM = selectDegreeVM) }
         }
         composable(route = Screen.ViewSchedule.route){
             MainScreen (navController = navController) { ViewSchedule(navController = navController,
@@ -40,11 +39,12 @@ fun Navigation(){
         composable(route = Screen.ApiPlayground.route){
             MainScreen (navController = navController) { ApiPlayGround(navController = navController) }
         }
-        composable(route = "${Screen.CourseDetail.route}/{course}",
-            arguments = listOf(navArgument("course") { NavType.SerializableType(Course::class.java) }))
-        { backStackEntry ->
-            val course = backStackEntry.arguments?.getSerializable("course", Course::class.java)
-            MainScreen (navController = navController) { CourseScreen(course) }
+        composable(route = Screen.CourseDetail.route) {
+            val course = navController.previousBackStackEntry?.arguments?.getParcelable("course", Course::class.java)
+            println(course.toString())
+            MainScreen(navController = navController) {
+                CourseScreen(course)
+            }
         }
     }
 }

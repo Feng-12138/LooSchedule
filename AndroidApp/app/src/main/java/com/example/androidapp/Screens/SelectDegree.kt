@@ -1,4 +1,4 @@
-package com.example.androidapp.Screens
+package com.example.androidapp.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -22,20 +22,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.androidapp.Enum.CoopSequence
-import com.example.androidapp.Enum.MyMajor
-import com.example.androidapp.Enum.MyMinor
-import com.example.androidapp.Enum.MySpecialization
-import com.example.androidapp.Enum.MyYear
-import com.example.androidapp.ViewModels.SelectDegreeVM
+import com.example.androidapp.enum.CoopSequence
+import com.example.androidapp.enum.MyMajor
+import com.example.androidapp.enum.MyMinor
+import com.example.androidapp.enum.MySpecialization
+import com.example.androidapp.enum.MyYear
+import com.example.androidapp.viewModels.SelectDegreeVM
 
 
 @SuppressLint("StateFlowValueCalledInComposition")
 
 @Composable
-fun SelectDegree(navController: NavController, viewModel: SelectDegreeVM) {
+fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
     var showAlert by remember { mutableStateOf(viewModel.showDialog) }
-    val viewModel: SelectDegreeVM = viewModel
+    val viewModel: SelectDegreeVM = selectDegreeVM
     val context = LocalContext.current
     Box(
         Modifier
@@ -103,7 +103,6 @@ fun SelectDegree(navController: NavController, viewModel: SelectDegreeVM) {
 @Composable
 fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T, viewModel: SelectDegreeVM) {
     var expanded by remember { mutableStateOf(false) }
-    // var selectedText by remember { mutableStateOf(choices[0]) }
     var selectedText by remember { mutableStateOf(choices[enum.ordinal]) }
 
     Box(Modifier.padding(12.dp)) {
