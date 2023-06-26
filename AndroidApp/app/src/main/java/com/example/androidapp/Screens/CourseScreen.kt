@@ -25,7 +25,7 @@ fun CourseScreen(course: Course?) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        course?.courseName?.let {
+        course?.courseID?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.headlineMedium,

@@ -3,11 +3,9 @@ package com.example.androidapp
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.androidapp.Models.Course
 import com.example.androidapp.Screens.ApiPlayGround
 import com.example.androidapp.Screens.CourseScreen
@@ -31,7 +29,8 @@ fun Navigation(){
             MainScreen (navController = navController) { Greeting(navController = navController) }
         }
         composable(route = Screen.SelectDegree.route){
-            MainScreen (navController = navController) { SelectDegree(navController = navController, viewModel = selectDegreeVM) }
+            MainScreen (navController = navController) { SelectDegree(navController = navController,
+                selectDegreeVM = selectDegreeVM) }
         }
         composable(route = Screen.ViewSchedule.route){
             MainScreen (navController = navController) { ViewSchedule(navController = navController,
@@ -40,11 +39,12 @@ fun Navigation(){
         composable(route = Screen.ApiPlayground.route){
             MainScreen (navController = navController) { ApiPlayGround(navController = navController) }
         }
-        composable(route = "${Screen.CourseDetail.route}/{course}",
-            arguments = listOf(navArgument("course") { NavType.SerializableType(Course::class.java) }))
-        { backStackEntry ->
-            val course = backStackEntry.arguments?.getSerializable("course", Course::class.java)
-            MainScreen (navController = navController) { CourseScreen(course) }
+        composable(route = Screen.CourseDetail.route) {
+            val course = navController.previousBackStackEntry?.arguments?.getParcelable("course", Course::class.java)
+            println(course.toString())
+            MainScreen(navController = navController) {
+                CourseScreen(course)
+            }
         }
     }
 }
