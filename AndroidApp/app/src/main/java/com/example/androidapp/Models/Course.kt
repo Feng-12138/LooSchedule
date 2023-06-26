@@ -1,4 +1,4 @@
-package com.example.androidapp.Models
+package com.example.androidapp.models
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName

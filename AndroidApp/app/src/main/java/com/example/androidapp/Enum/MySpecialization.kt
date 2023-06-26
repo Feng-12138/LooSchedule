@@ -1,4 +1,4 @@
-package com.example.androidapp.Enum
+package com.example.androidapp.enum
 
 enum class MySpecialization(val specialization : String) {
     SelectSpecialization("Select your specialization"),

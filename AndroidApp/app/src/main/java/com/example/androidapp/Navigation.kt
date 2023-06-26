@@ -6,16 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.androidapp.Models.Course
-import com.example.androidapp.Screens.ApiPlayGround
-import com.example.androidapp.Screens.CourseScreen
-import com.example.androidapp.Screens.GetStartScreen
-import com.example.androidapp.Screens.MainScreen
-import com.example.androidapp.Screens.Screen
-import com.example.androidapp.Screens.SelectDegree
-import com.example.androidapp.Screens.ViewSchedule
-import com.example.androidapp.ViewModels.ScheduleViewModel
-import com.example.androidapp.ViewModels.SelectDegreeVM
+import com.example.androidapp.models.Course
+import com.example.androidapp.screens.ApiPlayGround
+import com.example.androidapp.screens.CourseScreen
+import com.example.androidapp.screens.GetStartScreen
+import com.example.androidapp.screens.MainScreen
+import com.example.androidapp.screens.Screen
+import com.example.androidapp.screens.SelectDegree
+import com.example.androidapp.screens.ViewSchedule
+import com.example.androidapp.viewModels.ScheduleViewModel
+import com.example.androidapp.viewModels.SelectDegreeVM
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable

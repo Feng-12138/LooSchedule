@@ -1,7 +1,8 @@
-package com.example.androidapp.ViewModels
+package com.example.androidapp.viewModels
 
 import androidx.lifecycle.ViewModel
-import com.example.androidapp.Models.Course
+import com.example.androidapp.models.Course
+import com.example.androidapp.models.Schedule
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class ScheduleViewModel : ViewModel() {
@@ -39,16 +40,16 @@ class ScheduleViewModel : ViewModel() {
         Course("4B 1"), Course("4B 2"), Course("4B 3"),
         Course("4B 4"), Course("4B 5")
     )
-    private val _schedule = mapOf("1A" to courseList1A, "1B" to courseList1B,
+    private val _schedule = Schedule(mapOf("1A" to courseList1A, "1B" to courseList1B,
         "2A" to courseList2A, "2B" to courseList2B,
         "3A" to courseList3A, "3B" to courseList3B,
-        "4A" to courseList4A, "4B" to courseList4B)
-    val schedule: Map<String, List<Course>> get() = _schedule
+        "4A" to courseList4A, "4B" to courseList4B))
+    val schedule: Map<String, List<Course>> get() = _schedule.term
 
-    private var _currentTerm = MutableStateFlow("1A")
+    private val _currentTerm = MutableStateFlow(schedule.keys.first())
     val currentTerm: String get() = _currentTerm.value
 
-    private val _courseList = MutableStateFlow(courseList1A)
+    private val _courseList = MutableStateFlow(schedule.getValue(schedule.keys.first()))
     val courseList: List<Course> get() = _courseList.value
 
     private val _selectedTabIndex = MutableStateFlow(0)

@@ -1,10 +1,10 @@
-package com.example.androidapp.DataClass
+package com.example.androidapp.dataClass
 
-import com.example.androidapp.Enum.CoopSequence
-import com.example.androidapp.Enum.MyMajor
-import com.example.androidapp.Enum.MyMinor
-import com.example.androidapp.Enum.MySpecialization
-import com.example.androidapp.Enum.MyYear
+import com.example.androidapp.enum.CoopSequence
+import com.example.androidapp.enum.MyMajor
+import com.example.androidapp.enum.MyMinor
+import com.example.androidapp.enum.MySpecialization
+import com.example.androidapp.enum.MyYear
 
 data class MyDegree(
     var major: MyMajor = MyMajor.Selectmajor,

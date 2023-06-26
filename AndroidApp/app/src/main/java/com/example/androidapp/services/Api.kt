@@ -1,7 +1,7 @@
 package com.example.androidapp.services
 
-import com.example.androidapp.Models.Communication
-import com.example.androidapp.Models.Course
+import com.example.androidapp.models.Communication
+import com.example.androidapp.models.Course
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
