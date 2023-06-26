@@ -68,7 +68,7 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(16.dp)) {
-            Text("Generate Course Schedules")
+            Text("Create Course Schedule")
         }
 
         if (showAlert) {

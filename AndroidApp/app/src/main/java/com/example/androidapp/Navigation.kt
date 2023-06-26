@@ -94,7 +94,7 @@ fun Navigation(){
             MainScreen (navController = navController, name = "LooSchedule") { GetStartScreen(navController = navController) }
         }
         composable(route = Screen.SelectDegree.route){
-            MainScreen (navController = navController, name = "Configure") { SelectDegree(navController = navController,
+            MainScreen (navController = navController, name = "Create") { SelectDegree(navController = navController,
                 selectDegreeVM = selectDegreeVM) }
         }
         composable(route = Screen.ViewSchedule.route){
@@ -102,11 +102,17 @@ fun Navigation(){
             val sharedPreferences = LocalContext.current.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
             val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
             val scheduleList = existingList?.map { Gson().fromJson(it, Schedule::class.java) } ?: emptyList()
-            val scheduleViewModel = ScheduleViewModel(scheduleList[0])
+            if(scheduleList.isEmpty()){
+                MainScreen(navController = navController, name = "Current Schedule") {
+                    ErrorScreen(navController = navController)
+                }
+            }
+            else{
+                val scheduleViewModel = ScheduleViewModel(scheduleList[0])
+                MainScreen (navController = navController, name = "Current Schedule") { ViewSchedule(navController = navController,
+                    scheduleViewModel = scheduleViewModel) }
+            }
 
-
-            MainScreen (navController = navController, name = "Current Schedule") { ViewSchedule(navController = navController,
-                scheduleViewModel = scheduleViewModel) }
         }
         composable(route = Screen.ApiPlayground.route){
             MainScreen (navController = navController, name = "ApiPlayground") { ApiPlayGround(navController = navController) }

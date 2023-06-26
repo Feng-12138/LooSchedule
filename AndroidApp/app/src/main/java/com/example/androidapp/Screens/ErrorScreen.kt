@@ -27,16 +27,16 @@ fun ErrorScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "The schedule does not exist!",
+            text = "You don't have a schedule yet!",
             style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(bottom = 16.dp)
         )
         Button(
-            onClick = { navController.navigate(Screen.ScheduleHistory.route) },
+            onClick = { navController.navigate(Screen.SelectDegree.route) },
             modifier = Modifier
                 .height(48.dp)
         ) {
-            Text(text = "Go back!")
+            Text(text = "Create Schedule!")
         }
     }
 }
