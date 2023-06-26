@@ -18,7 +18,7 @@ class TermMapperService {
         val countCourseTerm = mutableMapOf<String, Int>()
         val generatedSchedule = mutableMapOf<String, List<Course>>()
         val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
-        val coursePerTerm : Int
+        var coursePerTerm : Int
         var remainder: Int
         if (takeCourseInWT) {
             coursePerTerm = (totalNumberCourses - 6) / 8
@@ -33,6 +33,7 @@ class TermMapperService {
         if (coursePerTerm > 5) {
             takeCourseInWT = true
         }
+        coursePerTerm = 5
         for ((key, _) in sequenceMap) {
             if (key.contains("WT")) {
                 if (takeCourseInWT) {
@@ -93,11 +94,11 @@ class TermMapperService {
                 notTakenNonMathCourse.add(course)
             }
         }
-        if (termName == "4A") {
-            println("here")
-            println(notTakenMathCourse.map { it.courseID })
-            println(notTakenNonMathCourse.map { it.courseID })
-        }
+//        if (termName == "4A") {
+//            println("here")
+//            println(notTakenMathCourse.map { it.courseID })
+//            println(notTakenNonMathCourse.map { it.courseID })
+//        }
 
         for (course in notTakenMathCourse) {
             val parsedPrereqData = prereqMap[course.courseID]
@@ -106,8 +107,13 @@ class TermMapperService {
                 if (course.availability!!.contains(season)
                     && parsedPrereqData.minimumLevel <= termName) {
                     satisfyTerm = true
+//                    if (course.courseID == "MATH 146") {
+//                        println(course.availability)
+//                        println(season)
+//                        println(termName)
+//                        println("here")
+//                    }
                 }
-
                 if (parsedPrereqData.courses.isEmpty() || parsedPrereqData.courses.all {it.isEmpty()}) {
                     satisfyConstraintMathCourse.add(course)
                 } else {

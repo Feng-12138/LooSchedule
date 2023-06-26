@@ -35,7 +35,6 @@ class CoursePlanner {
         nonMathCourses: MutableSet<Course>
     ) {
         val selectedCourses = optionalCourseList.courses.sortedWith(courseComparator).take(optionalCourseList.nOf).toSet()
-//        println(selectedCourses.map { it.courseID })
         selectedCourses.forEach {
             if (mathSubjects.contains(it.subject)) {
                 mathCourses.add(it)
@@ -79,6 +78,28 @@ class CoursePlanner {
         }
 
         selectCommunication(startYear, nonMathCourses)
+        // Always prefer MATH136 over MATH146
+        for (mathCourse in mathCourses) {
+            if (mathCourse.courseID == "MATH 146") {
+                mathCourses.remove(mathCourse)
+                var math136 = courseRepo.getById("MATH 136")
+                if (math136 != null) {
+                    mathCourses.add(math136)
+                    break
+                }
+            }
+        }
+        // Always prefer STAT20 over STAT240
+        for (mathCourse in mathCourses) {
+            if (mathCourse.courseID == "STAT 240") {
+                mathCourses.remove(mathCourse)
+                var stat230 = courseRepo.getById("STAT 230")
+                if (stat230 != null) {
+                    mathCourses.add(stat230)
+                    break
+                }
+            }
+        }
 
         // Always prefer MATH136 over MATH146
         for (mathCourse in mathCourses) {

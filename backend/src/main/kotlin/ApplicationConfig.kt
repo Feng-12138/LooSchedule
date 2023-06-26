@@ -8,10 +8,10 @@ import org.hibernate.cfg.Configuration
 import repositories.*
 import services.*
 
-
 class ApplicationConfig : ResourceConfig() {
     init {
         register(Api::class.java)
+
         register(object : AbstractBinder() {
             override fun configure() {
                 bind(TestRepo::class.java)
