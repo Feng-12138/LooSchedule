@@ -35,7 +35,7 @@ class CourseRepo {
         }
     }
 
-    fun getBySubjectCode(courseData: List<CourseData>): List<Course> {
+    fun getBySubjectCode(courseData: Set<CourseData>): MutableSet<Course> {
         val courseIDs = ArrayList<String>()
         for (course in courseData) { courseIDs.add(course.code + " " + course.subject) }
         return try {
@@ -43,10 +43,10 @@ class CourseRepo {
             val hql = "FROM Course WHERE courseID in (:ids)"
             val query = session.createQuery(hql, Course::class.java)
             val courses = query.setParameterList("ids", courseIDs)
-            courses.list()
+            courses.list().toMutableSet()
         } catch (e: Exception) {
             println(e.message)
-            listOf()
+            emptySet<Course>() as MutableSet<Course>
         }
     }
 }
