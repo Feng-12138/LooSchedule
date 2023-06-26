@@ -32,8 +32,8 @@ import com.example.androidapp.ViewModels.SelectDegreeVM
 @SuppressLint("StateFlowValueCalledInComposition")
 
 @Composable
-fun SelectDegree(navController: NavController, viewModel: SelectDegreeVM) {
-    val viewModel: SelectDegreeVM = viewModel
+fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
+    val viewModel: SelectDegreeVM = selectDegreeVM
     val context = LocalContext.current
     Box(
             Modifier
@@ -64,7 +64,6 @@ fun SelectDegree(navController: NavController, viewModel: SelectDegreeVM) {
 @Composable
 fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T, viewModel: SelectDegreeVM) {
     var expanded by remember { mutableStateOf(false) }
-    // var selectedText by remember { mutableStateOf(choices[0]) }
     var selectedText by remember { mutableStateOf(choices[enum.ordinal]) }
 
     Box(Modifier.padding(12.dp)) {
