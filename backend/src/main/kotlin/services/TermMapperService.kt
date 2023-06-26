@@ -4,37 +4,35 @@ import repositories.ParsedPrereqData
 import repositories.PrerequisiteRepo
 import javax.inject.Inject
 
-
-data class course(
-    var availability: String = "",
-    var courses : MutableList<MutableList<String>> = mutableListOf(),
-)
-
-data class courseDataClass(
+data class CourseDataClass(
     var numOfCoursesPerTerm: Int = 5,
     var takeCourseInWT: Boolean = false,
     var mathCourses: MutableSet<Course> = mutableSetOf(),
     var nonMathCourses: MutableSet<Course> = mutableSetOf(),
 )
 
-data class prereqDataClass(
-    var courseName: String = "",
-    var coursesString: String = "",
-    var minimumLevel: String = ""
-)
-
-class TermMapperService() {
+class TermMapperService {
     @Inject
     private lateinit var prerequisiteRepo: PrerequisiteRepo
     private var takeCourseInWT = false
 
     private var takenCourses : MutableList<String> = mutableListOf()
 
-    fun generateCourseForTerm(termName : String, season: String, numCourse: Int, mathCourse: MutableSet<Course>, nonMathCourse: MutableSet<Course>, prereqMap: MutableMap<String, ParsedPrereqData>) : MutableList<Course> {
+    fun generateCourseForTerm(
+        termName : String,
+        season: String,
+        numCourse: Int,
+        mathCourse: MutableSet<Course>,
+        nonMathCourse: MutableSet<Course>,
+        prereqMap: MutableMap<String, ParsedPrereqData>
+    ) : MutableList<Course> {
+        // non math courses have not taken
         val notTakenNonMathCourse = mutableListOf<Course>()
         val notTakenMathCourse = mutableListOf<Course>()
         val satisfyConstraintMathCourse = mutableListOf<Course>()
+        // non math courses could be taken this term
         val satisfyConstraintNonMathCourse = mutableListOf<Course>()
+        // non math courses could be taken this term online, DOES NOT DUPLICATE WITH satisfyConstraintNonMathCourse
         val satisfyConstraintOnlineNonMathCourse = mutableListOf<Course>()
         val retvalList = mutableListOf<Course>()
         for (course in mathCourse) {
@@ -47,13 +45,15 @@ class TermMapperService() {
                 notTakenNonMathCourse.add(course)
             }
         }
+
         for (course in notTakenMathCourse) {
             val parsedPrereqData = prereqMap[course.courseID]
             if (parsedPrereqData != null) {
                 for (requirement in parsedPrereqData.courses) {
                     var satisfy = true
                     for (prereqCourse in requirement) {
-                        if (prereqCourse !in takenCourses && course.availability!!.contains(season) && parsedPrereqData.minimumLevel <= termName) {
+                        if (prereqCourse !in takenCourses && course.availability!!.contains(season)
+                            && parsedPrereqData.minimumLevel <= termName) {
                             satisfy = false
                             break
                         }
@@ -64,13 +64,15 @@ class TermMapperService() {
                 }
             }
         }
+
         for (course in notTakenNonMathCourse) {
             val parsedPrereqData = prereqMap[course.courseID]
             if (parsedPrereqData != null) {
                 for (requirement in parsedPrereqData.courses) {
                     var satisfy = true
                     for (prereqCourse in requirement) {
-                        if (prereqCourse !in takenCourses && course.availability!!.contains(season) && parsedPrereqData.minimumLevel <= termName) {
+                        if (prereqCourse !in takenCourses && course.availability!!.contains(season)
+                            && parsedPrereqData.minimumLevel <= termName) {
                             satisfy = false
                             break
                         }
@@ -137,7 +139,7 @@ class TermMapperService() {
         return retvalList
     }
 
-    fun mapCoursesToSequence(courseData: courseDataClass, sequenceMap: Map<String, String>) : MutableMap<String, List<Course>> {
+    fun mapCoursesToSequence(courseData: CourseDataClass, sequenceMap: Map<String, String>) : MutableMap<String, List<Course>> {
         val list = courseData.mathCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.nonMathCourses.map { it.courseID })
         val prereqsData = prerequisiteRepo.getParsedPrereqData(list)
@@ -176,7 +178,16 @@ class TermMapperService() {
             }
         }
         for ((key, value) in sequenceMap) {
-            val courseList = generateCourseForTerm(mathCourse = courseData.mathCourses, nonMathCourse = courseData.nonMathCourses, numCourse = countCourseTerm[key]!!.toInt(), season = value, prereqMap = prereqsData, termName = key)
+            val courseList = generateCourseForTerm(
+                mathCourse = courseData.mathCourses,
+                nonMathCourse = courseData.nonMathCourses,
+                numCourse = countCourseTerm[key]!!.toInt(),
+                season = value,
+                prereqMap = prereqsData,
+                termName = key,
+            )
+            val coursesTakeThisTerm = courseList.map{it.courseID}
+            takenCourses.addAll(coursesTakeThisTerm)
             generatedSchedule[key] = courseList
         }
         return generatedSchedule
