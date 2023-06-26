@@ -50,8 +50,6 @@ class TermMapperService {
                 }
             }
         }
-        println("1111111111")
-        println(countCourseTerm)
         for ((key, value) in sequenceMap) {
             val courseList = generateCourseForTerm(
                 mathCourse = courseData.mathCourses,
@@ -62,9 +60,6 @@ class TermMapperService {
                 termName = key,
             )
             val coursesTakeThisTerm = courseList.map{it.courseID}
-            println("hereer")
-            println(coursesTakeThisTerm)
-            println("hereer2")
             takenCourses.addAll(coursesTakeThisTerm)
             generatedSchedule[key] = courseList
         }
@@ -123,7 +118,6 @@ class TermMapperService {
                             }
                         }
                         if (satisfyPrereq && satisfyTerm) {
-                            println(course.courseID)
                             satisfyConstraintMathCourse.add(course)
                             break
                         }
@@ -132,40 +126,39 @@ class TermMapperService {
             }
         }
 
-//        println("----------------")
-//        println(satisfyConstraintMathCourse.map { it.courseID })
-
         for (course in notTakenNonMathCourse) {
             val parsedPrereqData = prereqMap[course.courseID]
             if (parsedPrereqData != null) {
-                var satisfyTerm = true
+                var satisfyTerm = false
                 if (course.availability!!.contains(season)
                     && parsedPrereqData.minimumLevel <= termName) {
-                    satisfyTerm = false
+                    satisfyTerm = true
                 }
-                for (requirement in parsedPrereqData.courses) {
-                    var satisfyPrereq = true
-                    for (prereqCourse in requirement) {
-                        if (prereqCourse !in takenCourses) {
-                            satisfyPrereq = false
+                if (parsedPrereqData.courses.isEmpty() || parsedPrereqData.courses.all {it.isEmpty()}) {
+                    satisfyConstraintOnlineNonMathCourse.add(course)
+                } else {
+                    for (requirement in parsedPrereqData.courses) {
+                        var satisfyPrereq = true
+                        for (prereqCourse in requirement) {
+                            if (prereqCourse !in takenCourses) {
+                                satisfyPrereq = false
+                                break
+                            }
+                        }
+                        if (satisfyPrereq && satisfyTerm && course.onlineTerms!!.contains(season)) {
+                            satisfyConstraintOnlineNonMathCourse.add(course)
+                            break
+                        } else if (satisfyPrereq && satisfyTerm) {
+                            satisfyConstraintNonMathCourse.add(course)
                             break
                         }
-                    }
-                    if (satisfyPrereq && satisfyTerm && course.onlineTerms!!.contains(season)) {
-                        satisfyConstraintOnlineNonMathCourse.add(course)
-                        break
-                    } else if (satisfyPrereq && satisfyTerm) {
-                        satisfyConstraintNonMathCourse.add(course)
-                        break
                     }
                 }
             }
         }
 
-        println(satisfyConstraintMathCourse)
-
         var numCourseCounter = numCourse
-        for (i in 1 until numCourse - 1) {
+        for (i in 0 until numCourse - 1) {
             if (i - 1 >= satisfyConstraintMathCourse.size) {
                 break
             } else {
@@ -215,9 +208,6 @@ class TermMapperService {
                 i = counter
             }
         }
-        println("_____hhere")
-        println(retvalList)
-        println("_____hhere2")
         return retvalList
     }
 }
