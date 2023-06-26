@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.androidapp.Models.Course
 import com.example.androidapp.Screens.ApiPlayGround
 import com.example.androidapp.Screens.CourseScreen
-import com.example.androidapp.Screens.Greeting
+import com.example.androidapp.Screens.GetStartScreen
 import com.example.androidapp.Screens.MainScreen
 import com.example.androidapp.Screens.Screen
 import com.example.androidapp.Screens.SelectDegree
@@ -26,7 +26,7 @@ fun Navigation(){
 
     NavHost(navController = navController, startDestination = Screen.MainScreen.route){
         composable(route = Screen.MainScreen.route){
-            MainScreen (navController = navController) { Greeting(navController = navController) }
+            MainScreen (navController = navController) { GetStartScreen(navController = navController) }
         }
         composable(route = Screen.SelectDegree.route){
             MainScreen (navController = navController) { SelectDegree(navController = navController,

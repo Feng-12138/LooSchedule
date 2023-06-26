@@ -44,23 +44,29 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
                 drawerState = drawerState,
                 drawerContent = {
                     ModalDrawerSheet {
-                        Text("Menu", modifier = Modifier.padding(16.dp))
+                        Text("LooSchedule", modifier = Modifier.padding(16.dp))
                         Divider()
                         NavigationDrawerItem(
-                            label = { Text(text = "View Select Degree") },
+                            label = { Text(text = "Get Start") },
                             selected = false,
-                            onClick = { navController.navigate(Screen.SelectDegree.route) }
+                            onClick = { navController.navigate(Screen.MainScreen.route) }
                         )
                         NavigationDrawerItem(
-                            label = { Text(text = "View Schedule") },
+                            label = { Text(text = "My Current Schedule") },
                             selected = false,
                             onClick = { navController.navigate(Screen.ViewSchedule.route) }
                         )
                         NavigationDrawerItem(
-                            label = { Text(text = "PlayGround") },
+                            label = { Text(text = "Schedule My Course") },
                             selected = false,
-                            onClick = { navController.navigate(Screen.ApiPlayground.route) }
+                            onClick = { navController.navigate(Screen.SelectDegree.route) }
                         )
+                        // For testing purpose
+//                        NavigationDrawerItem(
+//                            label = { Text(text = "PlayGround") },
+//                            selected = false,
+//                            onClick = { navController.navigate(Screen.ApiPlayground.route) }
+//                        )
                     }
                 }
             ) {
@@ -86,12 +92,5 @@ fun MainScreen(navController: NavController, content: @Composable () -> Unit) {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(navController: NavController, modifier: Modifier = Modifier) {
-    Column() {
-        Text("Hello, please delete this page")
     }
 }
