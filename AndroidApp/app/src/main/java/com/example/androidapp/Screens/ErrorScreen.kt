@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun GetStartScreen(navController: NavController) {
+fun ErrorScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -27,17 +27,16 @@ fun GetStartScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Welcome to LooSchedule!",
+            text = "The schedule does not exist!",
             style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(bottom = 16.dp)
         )
-
         Button(
-            onClick = { navController.navigate(Screen.SelectDegree.route) },
+            onClick = { navController.navigate(Screen.ScheduleHistory.route) },
             modifier = Modifier
                 .height(48.dp)
         ) {
-            Text(text = "Schedule Your Courses!")
+            Text(text = "Go back!")
         }
     }
 }

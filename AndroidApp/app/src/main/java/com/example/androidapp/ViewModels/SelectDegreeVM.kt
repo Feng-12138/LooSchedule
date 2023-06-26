@@ -63,22 +63,7 @@ class SelectDegreeVM : ViewModel() {
             return
         }
 
-        val api = RetrofitClient.create()
-        val call = api.getCommunications()
-        call?.enqueue(object : Callback<List<Communication>>{
-            override fun onResponse(call: Call<List<Communication>>, response: Response<List<Communication>>) {
-                if (response.isSuccessful) {
-                    val comList = response.body()
-                    Toast.makeText(context, comList?.get(0)?.subject ?: "fail to read", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "response unSuccessful", Toast.LENGTH_SHORT).show()
-                }
-            }
-            override fun onFailure(call: Call<List<Communication>>, t: Throwable) {
-                Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
-                call.cancel()
-            }
-        })
+        getCommunications(context = context)
 
     }
 }
