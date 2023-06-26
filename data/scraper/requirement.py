@@ -1,6 +1,6 @@
 from requests import get
 from bs4 import BeautifulSoup
-from re import compile
+from re import compile, findall
 from sqlite3 import OperationalError
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from datetime import datetime
@@ -16,12 +16,13 @@ class Requirement(BASE):
     additionalRequirements = Column(String, nullable=True)
     link = Column(String, nullable=True)
 
-    def __init__(self, type, year, courses, additionalRequirements, link):
+    def __init__(self, requirementID, type, year, courses, additionalRequirements, link):
+        self.requirementID = requirementID
         self.type = type
         self.year = year
         self.courses = courses
         self.additionalRequirements = additionalRequirements
-        self.links = link
+        self.link = link
 
 
 class Major(BASE):
@@ -31,10 +32,10 @@ class Major(BASE):
     coopOnly = Column(Boolean, nullable=False)
     isDoubleDegree = Column(Boolean, nullable=False)
 
-    def __init__(self, requirementID, majorName, isCoop, isDoubleDegree):
+    def __init__(self, requirementID, majorName, coopOnly=False, isDoubleDegree=False):
         self.requirementID = requirementID
         self.majorName = majorName
-        self.isCoop = isCoop
+        self.coopOnly = coopOnly
         self.isDoubleDegree = isDoubleDegree
 
 
@@ -67,6 +68,8 @@ class Joint(BASE):
         self.requirementID = requirementID
         self.jointName = jointName
 
+
+requirementIDCounter = 1
 
 def getAcademicPrograms(start=2019):
     url = 'http://ugradcalendar.uwaterloo.ca/group/MATH-Academic-Plans-and-Requirements'
@@ -121,9 +124,9 @@ def getRequirement(name, url, year):
     choices = list(filter(lambda c: c != '\n', choices))
     for choice in choices:
         res, courses = updateRequirement(res, courses, choice)
-    print(res, courses)
-    return res
-
+    courses, addReq = parseRequirement(res)
+    addRequirement(name, year, courses, addReq, url)
+    
 
 def getTable2Courses(year):
     param = '?ActiveDate=9/1/' + str(year)
@@ -139,10 +142,18 @@ def getTable2Courses(year):
     return res, courses
 
 
+def getPlanType(planName):
+    name = planName.lower()
+    if 'minor' in name: return 'minor'
+    elif 'specialization' in name: return 'specialization'
+    elif 'joint' in name: return 'joint'
+    else: return 'major'
+
+
 def updateRequirement(requirement, courses, choice):
     r, c, a = parseChoice(choice)
-    if a: 
-        requirement.append(r)
+    if a:
+        requirement += r
         courses = courses.union(c)
         return requirement, courses
     for (n, options) in r:
@@ -162,24 +173,39 @@ def updateRequirement(requirement, courses, choice):
                 if duplicated:
                     requirement.remove(req)
                     m = min(n, req[0])
-                    requirement.append((m, list(set(req[1]).intersection(duplicates))))
-                    print((m, list(set(req[1]).intersection(duplicates))))
+                    requirement.append((m, req[1].intersection(duplicates)))
                     if n - req[0] != 0:
-                        reduced.append((abs(n - req[0]), list(set(req[1]).symmetric_difference(duplicates))))
+                        reduced.append((abs(n - req[0]), req[1].symmetric_difference(duplicates)))
             requirement += reduced
         else:
             requirement.append((n, options))
-            courses = courses.union(set(options))
+            courses = courses.union(options)
     return requirement, courses
 
 
 def parseChoice(choice):
     logic = choice.contents[0].lower()
-    options = [course.find('a').get_text() for course in choice.find_all('li')]
-    n, res, additional = 0, [], False
+    n, additional = 0, False
+    options, res = [], []
     if 'additional' in logic: additional = True
+    if choice.find_all('li') == []:
+        if 'level' in logic:
+            levels = []
+            if additional: levels = findall(r'\b\d+\b', logic.split('level')[0].split('additional')[1])
+            else: levels = findall(r'\b\d+\b', logic.split('level')[0])
+            subjects = [a.get_text() for a in choice.find_all('a')]
+            for subject in subjects:
+                for level in levels:
+                    options.append(subject + ' ' + level[0] + 'xx')
+            print(options)
+        elif 'from' in logic:
+            print(choice.contents)
+            # print(choice.contents[0].split('from')[1])
+            print(choice.find_all('a'))
+    else:
+        options = [course.find('a').get_text() for course in choice.find_all('li')]
     if 'all' in logic:
-        for option in options: res.append((1, [option]))
+        for option in options: res.append((1, set([option])))
         return res, options, additional
     elif 'one' in logic: n = 1
     elif 'two' in logic: n = 2
@@ -194,9 +220,44 @@ def parseChoice(choice):
     else: 
         print(f'Invalid number for:\n{logic}')
         return res
-    res.append((n, options))
+    res.append((n, set(options)))
     return res, options, additional
     
+
+def parseRequirement(requirement):
+    res = ''
+    additionalReq = ''
+    for r in requirement:
+        res += str(r[0]) + ':'
+        for option in sorted(list(r[1])):
+            res += option + ','
+        res = res[:-1] + ';'
+    return res[:-1], additionalReq
+
+
+def addRequirement(planName, year, courses, addReq, link, coopOnly=False, isDD=False):
+    global requirementIDCounter
+    r = Requirement(requirementIDCounter, getPlanType(planName), year, courses, addReq, UndergradCalendarBaseURL + link)
+    requirementIDCounter += 1
+    p = None
+    if r.type == 'major':
+        p = Major(r.requirementID, planName, coopOnly, isDD)
+    elif r.type == 'minor':
+        p = Minor(r.requirementID, planName)
+    elif r.type == 'specilization':
+        p = Specialization(r.requirementID, planName)
+    elif r.type == 'joint':
+        p = Joint(r.requirementID, planName)
+    else:
+        print('Invalid requirement type: ' + r.type + '!')
+        return
+    try:
+        SESSION.add(r)
+        SESSION.add(p)
+        SESSION.commit()
+        SESSION.close()
+    except OperationalError as msg:
+        print("Error: ", msg)
 
 if __name__ == '__main__':
     # print(getTable2Courses(2023))
