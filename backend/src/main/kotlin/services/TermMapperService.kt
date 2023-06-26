@@ -50,6 +50,8 @@ class TermMapperService {
                 }
             }
         }
+        println(countCourseTerm)
+        println(courseData.mathCourses.map{it.courseID})
         for ((key, value) in sequenceMap) {
             val courseList = generateCourseForTerm(
                 mathCourse = courseData.mathCourses,
@@ -159,7 +161,7 @@ class TermMapperService {
 
         var numCourseCounter = numCourse
         for (i in 0 until numCourse - 1) {
-            if (i - 1 >= satisfyConstraintMathCourse.size) {
+            if (i >= satisfyConstraintMathCourse.size) {
                 break
             } else {
                 retvalList.add(satisfyConstraintMathCourse[i])
