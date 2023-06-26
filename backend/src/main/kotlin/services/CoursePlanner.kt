@@ -80,6 +80,17 @@ class CoursePlanner {
 
         selectCommunication(startYear, nonMathCourses)
 
+        // Always prefer MATH136 over MATH146
+        for (mathCourse in mathCourses) {
+            if (mathCourse.courseID == "MATH 146") {
+                mathCourses.remove(mathCourse)
+                var math136 = courseRepo.getById("MATH 136")
+                if (math136 != null) {
+                    mathCourses.add(math136)
+                    break
+                }
+            }
+        }
         return Pair(mathCourses, nonMathCourses)
     }
 }
