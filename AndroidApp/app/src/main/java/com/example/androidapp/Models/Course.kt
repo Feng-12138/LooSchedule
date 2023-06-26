@@ -16,7 +16,7 @@ class Course(var courseId: String) : Parcelable {
     var subject : String = ""
 
     @SerializedName("code")
-    var code : Int = 0
+    var code : String = ""
 
     @SerializedName("description")
     var description : String = ""
@@ -44,4 +44,6 @@ class Course(var courseId: String) : Parcelable {
 
     @SerializedName("usefulRating")
     var usefulRating: Float = 0.0f
+
+    lateinit var prereqs: Prerequisite
 }
