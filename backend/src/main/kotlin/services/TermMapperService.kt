@@ -15,8 +15,7 @@ class TermMapperService {
         val list = courseData.mathCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.nonMathCourses.map { it.courseID })
         val prereqsData = prerequisiteRepo.getParsedPrereqData(list)
-//        println(";;;;;;;;;;;;;;;")
-//        println(prereqsData)
+        print("here")
         val countCourseTerm = mutableMapOf<String, Int>()
         val generatedSchedule = mutableMapOf<String, List<Course>>()
         val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
@@ -37,7 +36,7 @@ class TermMapperService {
         }
         for ((key, _) in sequenceMap) {
             if (key.contains("WT")) {
-                if (courseData.takeCourseInWT) {
+                if (takeCourseInWT) {
                     countCourseTerm[key] = 0
                 } else {
                     countCourseTerm[key] = 0
@@ -62,8 +61,10 @@ class TermMapperService {
                 prereqMap = prereqsData,
                 termName = key,
             )
-            break
             val coursesTakeThisTerm = courseList.map{it.courseID}
+            println("hereer")
+            println(coursesTakeThisTerm)
+            println("hereer2")
             takenCourses.addAll(coursesTakeThisTerm)
             generatedSchedule[key] = courseList
         }
@@ -131,8 +132,8 @@ class TermMapperService {
             }
         }
 
-        println("----------------")
-        println(satisfyConstraintMathCourse.map { it.courseID })
+//        println("----------------")
+//        println(satisfyConstraintMathCourse.map { it.courseID })
 
         for (course in notTakenNonMathCourse) {
             val parsedPrereqData = prereqMap[course.courseID]
@@ -214,6 +215,9 @@ class TermMapperService {
                 i = counter
             }
         }
+        println("_____hhere")
+        println(retvalList)
+        println("_____hhere2")
         return retvalList
     }
 }
