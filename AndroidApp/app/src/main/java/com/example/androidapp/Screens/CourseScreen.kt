@@ -7,14 +7,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 import com.example.androidapp.models.Course
 
@@ -28,7 +31,7 @@ fun CourseScreen(course: Course?) {
         course?.courseID?.let {
             Text(
                 text = it,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.displayLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -53,18 +56,21 @@ fun RatingBar(rating: Float) {
     Column {
         Text(
             text = "Rating",
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 4.dp)
         )
 
         Row {
             repeat(5) {index ->
-                Icon(
-                    imageVector = if (index < rating.toInt()) Icons.Filled.Star else Icons.Outlined.Star,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
+                if (index < rating.toInt()){
+                    Icon(
+                        imageVector = Icons.Outlined.Star,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
             }
         }
     }
