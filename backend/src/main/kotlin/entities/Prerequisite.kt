@@ -4,7 +4,6 @@ import javax.persistence.*
 
 typealias CourseID = String
 typealias Courses = String
-typealias MinimumLevel = String
 typealias OnlyOpenTo = String
 typealias NotOpenTo = String
 
@@ -22,7 +21,7 @@ class Prerequisite {
     var courses: Courses? = null
 
     @Column(name = "minimumLevel")
-    var minimumLevel: MinimumLevel? = null
+    var minimumLevel: String? = null
 
     @Column(name = "onlyOpenTo")
     var onlyOpenTo: OnlyOpenTo? = null
