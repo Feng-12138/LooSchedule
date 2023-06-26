@@ -1,7 +1,9 @@
 package services
 import entities.Course
+import repositories.ParsedPrereqData
+import repositories.PrerequisiteRepo
+import javax.inject.Inject
 
-import entities.MinimumLevel
 
 data class course(
     var availability: String = "",
@@ -21,54 +23,122 @@ data class prereqDataClass(
     var minimumLevel: String = ""
 )
 
-data class parsedPrereqDataClass(
-    var coursesString: String = "",
-    var courses : MutableList<MutableList<String>> = mutableListOf(),
-    var minimumLevel: String = ""
-)
+class termMapperService() {
+    @Inject
+    private lateinit var prerequisiteRepo: PrerequisiteRepo
 
-class termMapperService(prereqData: MutableList<prereqDataClass>) {
+
     private var takenCourses : MutableList<String> = mutableListOf()
-    private val prereqDataPrivate = prereqData
 
-//    private fun filterNeededCourses(courseData: courseDataClass) : MutableMap<String, prereqDataClass> {
-//        var retval = mutableMapOf<String, prereqDataClass>()
-//        for (singlePrereqData in prereqDataPrivate) {
-//            for (course in courseData.mathCourses) {
-//                if (course == singlePrereqData.courseName) {
-//                    retval[course] = singlePrereqData
-//                }
-//            }
-//        }
-//        return retval
-//    }
-
-    fun generateCourseForTerm(termName : String, season: String, number: Int, mathCourse: MutableList<Course>, nonMathCourse: MutableList<Course>) {
+    fun generateCourseForTerm(termName : String, season: String, numCourse: Int, mathCourse: MutableSet<Course>, nonMathCourse: MutableSet<Course>, prereqMap: MutableMap<String, ParsedPrereqData>) : MutableList<Course> {
         val notTakenNonMathCourse = mutableListOf<Course>()
         val notTakenMathCourse = mutableListOf<Course>()
         val satisfyConstraintMathCourse = mutableListOf<Course>()
         val satisfyConstraintNonMathCourse = mutableListOf<Course>()
-        for (Course in mathCourse) {
-            if (Course.courseID !in takenCourses) {
-                notTakenMathCourse.add(Course)
+        val satisfyConstraintOnlineNonMathCourse = mutableListOf<Course>()
+        val retvalList = mutableListOf<Course>()
+        for (course in mathCourse) {
+            if (course.courseID !in takenCourses) {
+                notTakenMathCourse.add(course)
             }
         }
-        for (Course in nonMathCourse) {
-            if (Course.courseID !in takenCourses) {
-                notTakenNonMathCourse.add(Course)
+        for (course in nonMathCourse) {
+            if (course.courseID !in takenCourses) {
+                notTakenNonMathCourse.add(course)
             }
         }
-
-        for (Course in notTakenMathCourse)
-        if (termName.contains("WT")) {
-
+        for (course in notTakenMathCourse) {
+            val parsedPrereqData = prereqMap[course.courseID]
+            if (parsedPrereqData != null) {
+                for (requirement in parsedPrereqData.courses) {
+                    var satisfy = true
+                    for (prereqCourse in requirement) {
+                        if (prereqCourse !in takenCourses && course.availability!!.contains(season) && parsedPrereqData.minimumLevel <= termName) {
+                            satisfy = false
+                            break
+                        }
+                    }
+                    if (satisfy) {
+                        satisfyConstraintMathCourse.add(course)
+                    }
+                }
+            }
         }
+        for (course in notTakenNonMathCourse) {
+            val parsedPrereqData = prereqMap[course.courseID]
+            if (parsedPrereqData != null) {
+                for (requirement in parsedPrereqData.courses) {
+                    var satisfy = true
+                    for (prereqCourse in requirement) {
+                        if (prereqCourse !in takenCourses && course.availability!!.contains(season) && parsedPrereqData.minimumLevel <= termName) {
+                            satisfy = false
+                            break
+                        }
+                    }
+                    if (satisfy && course.onlineTerms!!.contains(season)) {
+                        satisfyConstraintOnlineNonMathCourse.add(course)
+                    } else if (satisfy) {
+                        satisfyConstraintNonMathCourse.add(course)
+                    }
+                }
+            }
+        }
+        var numCourseCounter = numCourse
+        for (i in 1 until numCourse - 1) {
+            if (i - 1 >= satisfyConstraintMathCourse.size) {
+                break
+            } else {
+                retvalList.add(satisfyConstraintMathCourse[i])
+            }
+            numCourseCounter--
+        }
+        var i = 0
 
+        while (i < numCourseCounter) {
+            var counter = i
+            if (termName.contains("WT")) {
+                for (item in satisfyConstraintOnlineNonMathCourse) {
+                    retvalList.add(item)
+                    counter++
+                    if (counter >= numCourseCounter) {
+                        break
+                    }
+                }
+                for (item in satisfyConstraintNonMathCourse) {
+                    retvalList.add(item)
+                    counter++
+                    if (counter >= numCourseCounter) {
+                        break
+                    }
+                }
+                i = counter
+            } else {
+                for (item in satisfyConstraintNonMathCourse) {
+                    retvalList.add(item)
+                    counter++
+                    if (counter >= numCourseCounter) {
+                        break
+                    }
+                }
+                for (item in satisfyConstraintOnlineNonMathCourse) {
+                    retvalList.add(item)
+                    counter++
+                    if (counter >= numCourseCounter) {
+                        break
+                    }
+                }
+                i = counter
+            }
+        }
+        return retvalList
     }
 
-    fun mapCoursesToSequence(courseData: courseDataClass, sequenceMap: Map<String, String>) : MutableMap<String, MutableList<Course>> {
-        val neededPrereqs : MutableMap<String, parsedPrereqDataClass> = mutableMapOf()
+    fun mapCoursesToSequence(courseData: courseDataClass, sequenceMap: Map<String, String>) : MutableMap<String, List<Course>> {
+        val list = courseData.mathCourses.map { it.courseID }.toMutableList()
+        list.addAll(courseData.nonMathCourses.map { it.courseID })
+        val prereqsData = prerequisiteRepo.getParsedPrereqData(list)
         var countCourseTerm = mutableMapOf<String, Int>()
+        var generatedSchedule = mutableMapOf<String, List<Course>>()
         if (courseData.takeCourseInWT) {
             if ("WT1" !in sequenceMap) {
                 println("impossible to achieve")
@@ -87,6 +157,10 @@ class termMapperService(prereqData: MutableList<prereqDataClass>) {
             }
         }
 
-
+        for ((key, value) in sequenceMap) {
+            val courseList = generateCourseForTerm(mathCourse = courseData.mathCourses, nonMathCourse = courseData.nonMathCourses, numCourse = countCourseTerm[key]!!.toInt(), season = value, prereqMap = prereqsData, termName = key)
+            generatedSchedule[key] = courseList
+        }
+        return generatedSchedule
     }
 }
