@@ -41,6 +41,6 @@ class PrerequisiteRepo {
 
 data class ParsedPrereqData (
     val courseID: String = "",
-    val courses: MutableList<MutableList<String>> = mutableListOf(),
+    var courses: MutableList<MutableList<String>> = mutableListOf(),
     val minimumLevel: String = ""
 )
