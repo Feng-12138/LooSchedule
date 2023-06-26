@@ -12,7 +12,7 @@ class CoursePlanner {
     @Inject
     private lateinit var communicationRepo: CommunicationRepo
 
-    private val mathSubjects = listOf<String>("MATH", "STAT", "CS", "CO", "ACTSC")
+    private val mathSubjects = listOf("MATH", "STAT", "CS", "CO", "ACTSC")
 
     private val courseComparator = Comparator<Course> { course1, course2 ->
         val averageRating1 = (course1.likedRating!!.plus(course1.easyRating!!.plus(course1.usefulRating!!))) / 3.0
@@ -45,10 +45,10 @@ class CoursePlanner {
     )
 
     fun getCoursesPlanToTake(startYear: Year, requirements: Requirements): Pair<MutableSet<Course>, MutableSet<Course>> {
-        var mathCourses: MutableSet<Course> = emptySet<Course>() as MutableSet<Course>
-        var nonMathCourses: MutableSet<Course> = emptySet<Course>() as MutableSet<Course>
-        var mandatoryCourses: MutableSet<Course> = courseRepo.getBySubjectCode(requirements.mandatoryCourses)
-        var optionalCourses: MutableSet<OptionalCourses> = requirements.optionalCourses.map {
+        val mathCourses: MutableSet<Course> = emptySet<Course>() as MutableSet<Course>
+        val nonMathCourses: MutableSet<Course> = emptySet<Course>() as MutableSet<Course>
+        val mandatoryCourses: MutableSet<Course> = courseRepo.getBySubjectCode(requirements.mandatoryCourses)
+        val optionalCourses: MutableSet<OptionalCourses> = requirements.optionalCourses.map {
             OptionalCourses(it.nOf, courseRepo.getBySubjectCode(it.courses))
         }.toMutableSet()
 

@@ -1,11 +1,7 @@
 package services
 
-class SequenceGenerator(year: String, sequence: String) {
-
-    val entryYear = year
-    val sequence = sequence
-
-    fun generateSequence(): MutableMap<String, String> {
+class SequenceGenerator {
+    fun generateSequence(sequence: String): MutableMap<String, String> {
         val generatedSequence = mutableMapOf<String, String>()
         generatedSequence["1A"] = "F"
         generatedSequence["1B"] = "W"
