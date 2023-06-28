@@ -5,12 +5,12 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class Course(var courseId: String) : Parcelable {
+class Course(var courseId: String, var name: String, var rating: Float, var descript: String) : Parcelable {
     @SerializedName("courseID")
     var courseID : String = courseId
 
     @SerializedName("courseName")
-    var courseName : String = ""
+    var courseName : String = name
 
     @SerializedName("subject")
     var subject : String = ""
@@ -19,7 +19,7 @@ class Course(var courseId: String) : Parcelable {
     var code : String = ""
 
     @SerializedName("description")
-    var description : String = ""
+    var description : String = descript
 
     @SerializedName("credit")
     var credit : Float = 0.0f
@@ -37,7 +37,7 @@ class Course(var courseId: String) : Parcelable {
     var antireqs : String = ""
 
     @SerializedName("likeRating")
-    var likeRating : Float = 0.0f
+    var likeRating : Float = rating
 
     @SerializedName("easyRating")
     var easyRating : Float = 0.0f

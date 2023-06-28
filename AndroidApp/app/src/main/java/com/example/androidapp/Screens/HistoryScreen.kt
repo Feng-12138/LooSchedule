@@ -28,13 +28,13 @@ import com.example.androidapp.models.Schedule
 fun HistoryScreen(scheduleItems: List<Schedule>, navController: NavController) {
     LazyColumn {
         itemsIndexed(scheduleItems) { index, item ->
-            CourseScheduleItem(scheduleItem = item, navController = navController, index = index)
+            CourseScheduleItem(scheduleItem = item, navController = navController, index = index, listSize = scheduleItems.size)
         }
     }
 }
 
 @Composable
-fun CourseScheduleItem(scheduleItem: Schedule, navController: NavController, index : Int) {
+fun CourseScheduleItem(scheduleItem: Schedule, navController: NavController, index : Int, listSize: Int) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -50,7 +50,7 @@ fun CourseScheduleItem(scheduleItem: Schedule, navController: NavController, ind
             shape = RoundedCornerShape(0.dp),
         ) {
             Column() {
-                Text(text = "Schedule: $index")
+                Text(text = "Schedule: ${listSize - index}")
                 Text(text = "Time: ${scheduleItem.time}")
             }
 

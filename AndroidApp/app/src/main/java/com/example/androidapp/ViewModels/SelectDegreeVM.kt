@@ -93,7 +93,11 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
                     val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
                     val scheduleList =
                         (existingList?.map { Gson().fromJson(it, Schedule::class.java) } ?: emptyList()).toMutableList()
-                    scheduleList += schedule
+                    var position = 0
+                    if(scheduleList.size > 0){
+                        position = scheduleList.size
+                    }
+                    scheduleList.add(position , schedule)
                     val editor = sharedPreferences.edit()
                     val jsonList = scheduleList.map { Gson().toJson(it) }.toSet()
                     editor.putStringSet("scheduleList", jsonList)

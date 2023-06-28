@@ -2,9 +2,12 @@ package com.example.androidapp.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Clear
@@ -27,6 +30,7 @@ fun CourseScreen(course: Course?) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         course?.courseID?.let {
             Text(
@@ -37,16 +41,22 @@ fun CourseScreen(course: Course?) {
             )
         }
 
+        course?.courseName?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+
         if (course != null) {
             RatingBar(rating = course.easyRating)
         }
 
+        Spacer(modifier = Modifier.size(16.dp))
+
         if (course != null) {
-            Text(
-                text = course.description,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 16.dp)
-            )
+            Description(description = course.description)
         }
     }
 }
@@ -63,7 +73,7 @@ fun RatingBar(rating: Float) {
 
         Row {
             repeat(5) {index ->
-                if (index < rating.toInt()){
+                if (index < (rating * 5).toInt()){
                     Icon(
                         imageVector = Icons.Outlined.Star,
                         contentDescription = null,
@@ -73,5 +83,23 @@ fun RatingBar(rating: Float) {
 
             }
         }
+    }
+}
+
+@Composable
+fun Description(description: String) {
+    Column {
+        Text(
+            text = "Course Description",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 0.dp)
+        )
+        
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 16.dp)
+        )
     }
 }

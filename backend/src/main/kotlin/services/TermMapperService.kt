@@ -22,7 +22,7 @@ class TermMapperService {
     fun mapCoursesToSequence(courseData: CourseDataClass, sequenceMap: Map<String, String>): MutableMap<String, MutableList<Course>> {
         val list = courseData.mathCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.nonMathCourses.map { it.courseID })
-        val prereqsData = prerequisiteRepo.getParsedPrereqData(list)
+        var prereqsData = prerequisiteRepo.getParsedPrereqData(list)
         val countCourseTerm = mutableMapOf<String, Int>()
         val generatedSchedule = mutableMapOf<String, MutableList<Course>>()
         val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
@@ -41,7 +41,13 @@ class TermMapperService {
         if (coursePerTerm > 5) {
             takeCourseInWT = true
         }
+        for ((key, value) in prereqsData) {
+            if (key == "CO 250") {
+                value.courses = mutableListOf(mutableListOf("MATH 136"), mutableListOf("MATH 146"))
+            }
+        }
         coursePerTerm = 5
+        remainder = 0
         for ((key, _) in sequenceMap) {
             if (key.contains("WT")) {
                 if (takeCourseInWT) {
@@ -71,9 +77,9 @@ class TermMapperService {
             takenCourses.addAll(coursesTakeThisTerm)
             generatedSchedule[key] = courseList
         }
-        var finalSchedule: MutableMap<String, MutableList<Course>> = finalizeSchedule(generatedSchedule, countCourseTerm, sequenceMap, prereqsData)
+//        var finalSchedule: MutableMap<String, MutableList<Course>> = finalizeSchedule(generatedSchedule, countCourseTerm, sequenceMap, prereqsData)
         takenCourses.clear()
-        return finalSchedule
+        return generatedSchedule
     }
 
     private fun checkMathCourseConstraint(course: Course, termName : String, season: String,
