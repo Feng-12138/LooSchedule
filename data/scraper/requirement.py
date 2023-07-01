@@ -356,4 +356,3 @@ if __name__ == '__main__':
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
     getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
     getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2023)
-    
