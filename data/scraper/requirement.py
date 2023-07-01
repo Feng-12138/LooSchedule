@@ -120,13 +120,15 @@ def getRequirement(name, url, year):
     # print(contents)
     aList = [a.get_text() for a in contents.find_all('a')]
     res, courses = [], set()
+    table2Courses = []
     if 'Table 2' in aList: 
         res, courses = getTable2Courses(year)
+        table2Courses = courses
     choices = contents.find_next('ul').contents
     choices = list(filter(lambda c: c != '\n', choices))
     # print(choices)
     for choice in choices:
-        res, courses = updateRequirement(res, courses, choice)
+        res, courses = updateRequirement(res, courses, choice, table2Courses)
     courses, addReq = parseRequirement(res)
     addRequirement(name, year, courses, addReq, url)
     
@@ -153,7 +155,7 @@ def getPlanType(planName):
     else: return 'major'
 
 
-def updateRequirement(requirement, courses, choice):
+def updateRequirement(requirement, courses, choice, table2Courses):
     r, c, a = parseChoice(choice)
     if a:
         requirement += r
@@ -162,7 +164,7 @@ def updateRequirement(requirement, courses, choice):
     for (n, options) in r:
         duplicates = set()
         for option in options:
-            if option in courses:
+            if option in table2Courses:
                 duplicates.add(option)
             else: courses.add(option)
         if len(duplicates) > 0:
@@ -187,32 +189,79 @@ def updateRequirement(requirement, courses, choice):
 
 
 def parseChoice(choice):
+    if choice.name == 'ul': return [], set(), False
     logic = choice.contents[0].lower()
     n, additional = 0, False
     options, res = [], []
-    if 'additional' in logic: additional = True
+    if 'additional' in logic: 
+        additional = True
+        logic = logic.replace('additional', '')
     if choice.find_all('li') == []:
+        # print(choice, logic)
+        if 'concentration' in logic: return [], [], False # TODO:
         if 'level' in logic:
             levels = []
-            if additional: levels = findall(r'\b\d+\b', logic.split('level')[0].split('additional')[1])
-            else: levels = findall(r'\b\d+\b', logic.split('level')[0])
+            levels = findall(r'\b\d+\b', logic.split('level')[0])
             subjects = [a.get_text() for a in choice.find_all('a')]
             for subject in subjects:
+                if len(levels) == 0: options.append(subject + ' xxx')
                 for level in levels:
                     options.append(subject + ' ' + level[0] + 'xx')
-            #print(options)
         elif 'from' in logic:
-            print(choice.contents)
+            # TODO:
             # print(choice.contents[0].split('from')[1])
-            print(choice.find_all('a'))
+            # print(choice.find_all('a'))
+            courses = [a.get_text() for a in choice.find_all('a')]
+            for course in courses:
+                if any(char.isdigit() for char in course): options.append(course)
+                else: options.append(course + ' xxx')
+        elif choice.find_next_sibling() and choice.find_next_sibling().name == 'ul':
+            for course in choice.find_next_sibling().find_all('li'):
+                if 'level' in course.get_text():
+                    levels = findall(r'\b\d+\b', course.get_text().split('level')[0])
+                    subjects = [a.get_text() for a in course.find_all('a')]
+                    for subject in subjects:
+                        if len(levels) == 0: options.append(subject + ' xxx')
+                        for level in levels:
+                            options.append(subject + ' ' + level[0] + 'xx')
+                else:
+                    options.append(course.find('a').get_text())
+        elif 'unit' in logic:
+            logic = ''
+            for c in choice.contents: logic += str(c)
+            if additional: logic = logic.replace('additional', '')
+            subjects = [a.get_text() for a in choice.find_all('a')]
+            totalUnits = float(logic.split('unit')[0])
+            atLeastUnits, levels = 0, []
+            courses = []
+            if 'at least' in logic:
+                atLeastUnits = float(logic.split('at least')[1].split('unit')[0])
+                levels = findall(r'\b\d+\b', logic.split('at least')[1].split('unit')[1].split('level')[0])
+                totalUnits -= atLeastUnits
+                for level in levels:
+                    for subject in subjects:
+                        options.append(subject + ' ' + level[0] + 'xx')
+                        courses.append(subject + ' ' + level[0] + 'xx')
+                res.append((int(atLeastUnits * 2), set(options)))
+                options = []
+            for subject in subjects: 
+                options.append(subject + ' xxx')
+                courses.append(subject + ' xxx')
+            res.append((int(totalUnits * 2), set(options)))
+            return res, courses, additional
     else:
         for course in choice.find_all('li'):
-            if 'level' in course.get_text():
+            if 'level' in course.get_text().lower():
                 levels = findall(r'\b\d+\b', course.get_text().split('level')[0])
                 subjects = [a.get_text() for a in course.find_all('a')]
                 for subject in subjects:
+                    if len(levels) == 0: options.append(subject + ' xxx')
                     for level in levels:
                         options.append(subject + ' ' + level[0] + 'xx')
+            # elif 'any' in course.get_text().lower():
+            #     subjects = [a.get_text() for a in course.find_all('a')]
+            #     for subject in subjects: options.append(subject + ' xxx')
+            #     print('options',course,options)
             else:
                 options.append(course.find('a').get_text())
     if 'all' in logic:
@@ -228,12 +277,38 @@ def parseChoice(choice):
     elif 'eight' in logic: n = 8
     elif 'nine' in logic: n = 9
     elif 'ten' in logic: n = 10
-    else: 
-        print(f'Invalid number for:\n{logic}')
+    elif 'unit' in logic:
+        totalUnits = float(logic.split('unit')[0])
+        atLeastUnits, levels = 0, []
+        courses = []
+        if 'at least' in logic:
+            atLeastUnits = float(logic.split('at least')[1].split('unit')[0])
+            levels = findall(r'\b\d+\b', logic.split('at least')[1].split('unit')[1].split('level')[0])
+            subjects, satisfiedCourses = [], []
+            for option in options:
+                if any(char.isdigit() for char in option):
+                    code = int(findall(r'\b\d+\b', option)[0])
+                    if code >= min([int(level) for level in levels]):
+                        satisfiedCourses.append(option)
+                    courses.append(option)
+                else: subjects.append(option)
+            for level in levels:
+                for subject in subjects:
+                    satisfiedCourses.append(subject + ' ' + level[0] + 'xx')
+                    courses.append(subject + ' ' + level[0] + 'xx')
+            res.append((int(atLeastUnits * 2), set(satisfiedCourses)))
+            additionalCourses = set(courses).difference(set(satisfiedCourses))
+            for subject in subjects:
+                additionalCourses.add(subject + ' xxx')
+            res.append((int(totalUnits - atLeastUnits) * 2, additionalCourses))
+            return res, courses, additional
+        n = int(totalUnits * 2)
+    else:
+        print(f'Invalid number for:\n{choice.contents}')
         return res, options, additional
     res.append((n, set(options)))
     return res, options, additional
-    
+
 
 def parseRequirement(requirement):
     print(requirement)
@@ -264,13 +339,13 @@ def addRequirement(planName, year, courses, addReq, link, coopOnly=False, isDD=F
     else:
         print('Invalid requirement type: ' + r.type + '!')
         return
-    # try:
-    #     SESSION.add(r)
-    #     SESSION.add(p)
-    #     SESSION.commit()
-    #     SESSION.close()
-    # except OperationalError as msg:
-    #     print("Error: ", msg)
+    try:
+        SESSION.add(r)
+        SESSION.add(p)
+        SESSION.commit()
+        SESSION.close()
+    except OperationalError as msg:
+        print("Error: ", msg)
 
 if __name__ == '__main__':
     # print(getTable2Courses(2023))
@@ -279,5 +354,6 @@ if __name__ == '__main__':
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
-    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
+    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
     getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2023)
+    
