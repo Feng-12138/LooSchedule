@@ -339,13 +339,13 @@ def addRequirement(planName, year, courses, addReq, link, coopOnly=False, isDD=F
     else:
         print('Invalid requirement type: ' + r.type + '!')
         return
-    # try:
-    #     SESSION.add(r)
-    #     SESSION.add(p)
-    #     SESSION.commit()
-    #     SESSION.close()
-    # except OperationalError as msg:
-    #     print("Error: ", msg)
+    try:
+        SESSION.add(r)
+        SESSION.add(p)
+        SESSION.commit()
+        SESSION.close()
+    except OperationalError as msg:
+        print("Error: ", msg)
 
 if __name__ == '__main__':
     # print(getTable2Courses(2023))
@@ -354,5 +354,8 @@ if __name__ == '__main__':
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
-    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
+    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
     getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2023)
+    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
+    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2023)
+    # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2023)
