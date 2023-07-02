@@ -10,6 +10,9 @@ class ScheduleViewModel(input: Schedule) : ViewModel() {
     private val _schedule = input
     val schedule: Map<String, List<Course>> get() = _schedule.term
 
+    private val _termList = schedule.keys.toList()
+    val termList : List<String> get() = _termList
+
     private val _currentTerm = MutableStateFlow(schedule.keys.first())
     val currentTerm: String get() = _currentTerm.value
 
