@@ -72,8 +72,7 @@ class Joint(BASE):
 
 requirementIDCounter = 1
 
-class Error(Enum):
-    BreadthAndDepth = 1
+ADDITIONAL_REQS = {'breadth and depth required', 'concentration required'}
 
 def getAcademicPrograms(start=2019):
     url = 'http://ugradcalendar.uwaterloo.ca/group/MATH-Academic-Plans-and-Requirements'
@@ -132,12 +131,14 @@ def getRequirement(name, url, year):
     choices = contents.find_next('ul').contents
     choices = list(filter(lambda c: c != '\n', choices))
     # print(choices)
+    addReq = None
     for choice in choices:
         try:
             res, courses = updateRequirement(res, courses, choice, table2Courses)
-        except:
-            addReq = 'breadth and depth required'
-    courses, addReq = parseRequirement(res)
+        except Exception as msg:
+            if str(msg) in ADDITIONAL_REQS: addReq = str(msg)
+            else: raise msg
+    courses = parseRequirement(res)
     addRequirement(name, year, courses, addReq, url)
     
 
@@ -198,19 +199,21 @@ def updateRequirement(requirement, courses, choice, table2Courses):
 
 def parseChoice(choice):
     if choice.name == 'ul': return [], set(), False
-    logic = choice.contents[0].lower()
-    if 'breadth and depth' in logic: raise Exception(Error.BreadthAndDepth)
+    logic = choice.contents[0].get_text().lower()
+    if 'breadth and depth' in logic or '5.0 non-math units' in logic: 
+        raise Exception('breadth and depth required')
     n, additional = 0, False
     options, res = [], []
     if 'additional' in logic: 
         additional = True
         logic = logic.replace('additional', '')
     if choice.find_all('li') == []:
-        if 'concentration' in logic: return [], [], False # TODO:
+        if 'concentration' in choice.get_text(): raise Exception('concentration required')
         if 'level' in logic:
             levels = []
             levels = findall(r'\b\d+\b', logic.split('level')[0])
             subjects = [a.get_text() for a in choice.find_all('a')]
+            subjects = list(filter(lambda s: 'advisor' not in s, subjects))
             for subject in subjects:
                 if len(levels) == 0: options.append(subject + ' xxx')
                 for level in levels:
@@ -364,13 +367,12 @@ def parseRequirement(requirement):
     print(requirement)
     print()
     res = ''
-    additionalReq = ''
     for r in requirement:
         res += str(r[0]) + ':'
         for option in sorted(list(r[1])):
             res += option + ','
         res = res[:-1] + ';'
-    return res[:-1], additionalReq
+    return res[:-1]
 
 
 def addRequirement(planName, year, courses, addReq, link, coopOnly=False, isDD=False):
@@ -390,13 +392,13 @@ def addRequirement(planName, year, courses, addReq, link, coopOnly=False, isDD=F
     else:
         print('Invalid requirement type: ' + r.type + '!')
         return
-    # try:
-    #     SESSION.add(r)
-    #     SESSION.add(p)
-    #     SESSION.commit()
-    #     SESSION.close()
-    # except OperationalError as msg:
-    #     print("Error: ", msg)
+    try:
+        SESSION.add(r)
+        SESSION.add(p)
+        SESSION.commit()
+        SESSION.close()
+    except OperationalError as msg:
+        print("Error: ", msg)
 
 if __name__ == '__main__':
     # print(getTable2Courses(2023))
@@ -405,8 +407,8 @@ if __name__ == '__main__':
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
-    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
-    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2023)
-    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
-    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2023)
+    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
+    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2023)
+    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
+    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2023)
     getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2023)
