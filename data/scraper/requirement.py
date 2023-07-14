@@ -102,6 +102,7 @@ def getProgramRequirements(name, url, year):
         parentTag = a.find_previous()
         if parentTag and parentTag.next_sibling and parentTag.next_sibling.name == 'ul':
             planUrl = parentTag.next_sibling.find('a', text='Degree Requirements')['href']
+        print(planName, planUrl)
         getRequirement(planName, planUrl, year)
 
 
@@ -117,6 +118,8 @@ def validatePlan(planName):
 def getRequirement(name, url, year):
     param = '?ActiveDate=9/1/' + str(year)
     html = get(UndergradCalendarBaseURL + url + param).text
+    if name == 'Joint Computer Science (Bachelor of Mathematics)':
+        html = get(UndergradCalendarBaseURL + '/page/MATH-Joint-Bachelor-of-Computer-Science-1' + param).text
     soup = BeautifulSoup(html, features='html.parser')
     contents = soup.find('span', id='ctl00_contentMain_lblContent')
     # print(contents)
@@ -215,6 +218,17 @@ def parseChoice(choice):
         elif 'from' in logic:
             if choice.find('a') is None:
                 options = choice.get_text().split('from ')[1].split(', ')
+                if 'with at least' in logic:
+                    logics = choice.get_text().split('with at least')
+                    total, atLeast = stringToNum(logics[0].lower()), stringToNum(logics[1].lower())
+                    atLeastOptions = [o.replace('.', '') for o in logics[1].split('from ')[1].split(', ')]
+                    atLeastOptions = list(filter(lambda o: o != '', atLeastOptions))
+                    restOptions = logics[0].split('from ')[1].split(', ')
+                    restOptions = list(filter(lambda o: o != '', restOptions))
+                    res.append((atLeast, atLeastOptions))
+                    res.append((total - atLeast, restOptions))
+                    options = set(atLeastOptions + restOptions)
+                    return res, options, additional  
             else:
                 courses = [a.get_text() for a in choice.find_all('a')]
                 for course in courses:
@@ -281,24 +295,24 @@ def parseChoice(choice):
                     for level in levels:
                         options.append(subject + ' ' + level[0] + 'xx')
             elif course.find('a') is None:
-                options += [course.get_text()]
+                if 'BUS' in course.get_text(): continue
+                if 'from' in course.get_text():
+                    options += course.get_text().split('from ')[1].split(', ')
+                else: options += [course.get_text()]
             else:
                 options += [a.get_text() for a in course.find_all('a')]
     if 'all' in logic:
-        for course in choice.find_all('li'):
-            option = [a.get_text() for a in course.find_all('a')]
-            res.append((1, set(option)))
+        if choice.find('li') is None:
+            if choice.find_next_sibling() and choice.find_next_sibling().name == 'ul':
+                for course in choice.find_next_sibling().find_all('li'):
+                    option = [a.get_text() for a in course.find_all('a')]
+                    res.append((1, set(option)))
+        else:
+            for course in choice.find_all('li'):
+                option = [a.get_text() for a in course.find_all('a')]
+                res.append((1, set(option)))
         return res, options, additional
-    elif 'one' in logic: n = 1
-    elif 'two' in logic: n = 2
-    elif 'three' in logic: n = 3
-    elif 'four' in logic: n = 4
-    elif 'five' in logic: n = 5
-    elif 'six' in logic: n = 6
-    elif 'seven' in logic: n = 7
-    elif 'eight' in logic: n = 8
-    elif 'nine' in logic: n = 9
-    elif 'ten' in logic: n = 10
+    elif stringToNum(logic): n = stringToNum(logic)
     elif 'unit' in logic:
         totalUnits = float(findall(r'\b\d+\b', logic.split('unit')[0])[0])
         atLeastUnits, levels = 0, []
@@ -330,6 +344,20 @@ def parseChoice(choice):
         return res, options, additional
     res.append((n, set(options)))
     return res, options, additional
+
+
+def stringToNum(s):
+    if 'one' in s: return 1
+    elif 'two' in s: return 2
+    elif 'three' in s: return 3
+    elif 'four' in s: return 4
+    elif 'five' in s: return 5
+    elif 'six' in s: return 6
+    elif 'seven' in s: return 7
+    elif 'eight' in s: return 8
+    elif 'nine' in s: return 9
+    elif 'ten' in s: return 10
+    return 0
 
 
 def parseRequirement(requirement):
