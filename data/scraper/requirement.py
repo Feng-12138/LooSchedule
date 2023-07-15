@@ -101,6 +101,8 @@ def getProgramRequirements(name, url, year):
         parentTag = a.find_previous()
         if parentTag and parentTag.next_sibling and parentTag.next_sibling.name == 'ul':
             planUrl = parentTag.next_sibling.find('a', text='Degree Requirements')['href']
+        if 'Overview and Degree Requirements' in planName:
+            planName = planName.replace(' Overview and Degree Requirements', '')
         print(planName, planUrl)
         getRequirement(planName, planUrl, year)
 
@@ -249,10 +251,16 @@ def parseChoice(choice):
                 else:
                     options.append(course.find('a').get_text())
         elif 'unit' in logic:
-            logic = ''
+            logic, totalUnits = '', 0
             for c in choice.contents: logic += str(c)
             if additional: logic = logic.replace('additional', '')
             subjects = [a.get_text() for a in choice.find_all('a')]
+            if stringToNum(logic.lower()): 
+                total = stringToNum(logic.lower())
+                if len(subjects) == 0: 
+                    res.append((total, {'xx xxx'}))
+                    return res, options, additional
+                totalUnits = float(total * 2)
             totalUnits = float(logic.split('unit')[0])
             atLeastUnits, levels = 0, []
             courses = []
@@ -271,6 +279,11 @@ def parseChoice(choice):
                 courses.append(subject + ' xxx')
             res.append((int(totalUnits * 2), set(options)))
             return res, courses, additional
+        elif len(choice.find_all('a')) == 1:
+            course = choice.find('a').get_text()
+            res.append((1, course))
+            options.append(course)
+            return res, options, additional
     elif 'excluding' in choice.get_text():
         levels = []
         if 'level' in logic:
@@ -412,3 +425,9 @@ if __name__ == '__main__':
     getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
     getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2023)
     getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2023)
+    getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2023)
+    getProgramRequirements('Mathematics/Business', '/group/MATH-Mathematics-or-Business', 2023)
+    getProgramRequirements('Mathematical Optimization', '/group/MATH-Mathematical-Optimization1', 2023)
+    getProgramRequirements('Mathematics/Teaching', '/group/MATH-Mathematics-or-Teaching', 2023)
+    getProgramRequirements('Pure Mathematics', '/group/MATH-Pure-Mathematics-1', 2023)
+    getProgramRequirements('Statistics', '/group/MATH-Statistics-1', 2023)
