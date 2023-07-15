@@ -133,7 +133,7 @@ def getRequirement(name, url, year):
     choices = contents.find_next('ul').contents
     choices = list(filter(lambda c: c != '\n', choices))
     # print(choices)
-    addReq = None
+    addReq, coopOnly, isDD = None, False, False
     for choice in choices:
         try:
             res, courses = updateRequirement(res, courses, choice, table2Courses)
@@ -141,7 +141,9 @@ def getRequirement(name, url, year):
             if str(msg) in ADDITIONAL_REQS: addReq = str(msg)
             else: raise msg
     courses = parseRequirement(res)
-    addRequirement(name, year, courses, addReq, url)
+    if 'co-op only' in name.lower(): coopOnly = True
+    if 'double degree' in name.lower(): isDD = True
+    addRequirement(name, year, courses, addReq, url, coopOnly, isDD)
     
 
 def getTable2Courses(year):
@@ -388,7 +390,7 @@ def parseRequirement(requirement):
     return res[:-1]
 
 
-def addRequirement(planName, year, courses, addReq, link, coopOnly=False, isDD=False):
+def addRequirement(planName, year, courses, addReq, link, coopOnly, isDD):
     global requirementIDCounter
     schoolYear = str(year) + '-' + str(year + 1)
     r = Requirement(requirementIDCounter, getPlanType(planName), schoolYear, courses, addReq, UndergradCalendarBaseURL + link)
