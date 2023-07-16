@@ -71,8 +71,8 @@ class Joint(BASE):
 
 
 requirementIDCounter = 1
-
 ADDITIONAL_REQS = {'breadth and depth required', 'concentration required'}
+MATH_COURSE_CODES = ['ACTSC', 'AMATH', 'CO', 'CS', 'MATBUS', 'MATH', 'PMATH', 'STAT']
 
 def getAcademicPrograms(start=2019):
     url = 'http://ugradcalendar.uwaterloo.ca/group/MATH-Academic-Plans-and-Requirements'
@@ -83,13 +83,16 @@ def getAcademicPrograms(start=2019):
         name = plan.get_text()
         if name == 'Plans for Students outside the Mathematics Faculty': continue
         url = plan.find('a')['href']
-        print(name, url)
         today = datetime.today()
-        # for year in range(start, today.year + 1):
-        #     getPlanRequirements(name, url, year)
+        for year in range(start, today.year + 1):
+            getProgramRequirements(name, url, year)
 
 
 def getProgramRequirements(name, url, year):
+    if not validatePlan(name): return
+    print('-----------------------------------------------------------------')
+    print(name, '|', year)
+    print('-----------------------------------------------------------------')
     param = '?ActiveDate=9/1/' + str(year)
     html = get(UndergradCalendarBaseURL + url + param).text
     soup = BeautifulSoup(html, features='html.parser')
@@ -99,7 +102,7 @@ def getProgramRequirements(name, url, year):
         planName, planUrl = a.get_text(), a['href']
         if not validatePlan(planName): continue
         parentTag = a.find_previous()
-        if parentTag and parentTag.next_sibling and parentTag.next_sibling.name == 'ul':
+        if parentTag and parentTag.next_sibling and parentTag.next_sibling.name == 'ul' and parentTag.next_sibling.find('a', text='Degree Requirements'):
             planUrl = parentTag.next_sibling.find('a', text='Degree Requirements')['href']
         if 'Overview and Degree Requirements' in planName:
             planName = planName.replace(' Overview and Degree Requirements', '')
@@ -113,6 +116,8 @@ def validatePlan(planName):
     if planName == 'Specializations': return False
     if planName == 'Overview': return False
     if planName == 'Degree Requirements': return False
+    if planName == 'Software Engineering': return False
+    if 'Master' in planName: return False
     return True
 
 
@@ -218,6 +223,11 @@ def parseChoice(choice):
             levels = findall(r'\b\d+\b', logic.split('level')[0])
             subjects = [a.get_text() for a in choice.find_all('a')]
             subjects = list(filter(lambda s: 'advisor' not in s, subjects))
+            if len(subjects) == 0 and 'math course' in logic: 
+                subjects = MATH_COURSE_CODES
+                if 'other than' in logic:
+                    exclude = set(choice.get_text().split('other than ')[1].split(', '))
+                    subjects = list(set(subjects).difference(exclude))
             for subject in subjects:
                 if len(levels) == 0: options.append(subject + ' xxx')
                 for level in levels:
@@ -286,6 +296,9 @@ def parseChoice(choice):
             res.append((1, course))
             options.append(course)
             return res, options, additional
+        elif len(choice.find_all('a')) == 0 and 'math courses' in logic:
+            subjects = MATH_COURSE_CODES
+            for subject in subjects: options.append(subject + ' xxx')
     elif 'excluding' in choice.get_text():
         levels = []
         if 'level' in logic:
@@ -407,13 +420,13 @@ def addRequirement(planName, year, courses, addReq, link, coopOnly, isDD):
     else:
         print('Invalid requirement type: ' + r.type + '!')
         return
-    try:
-        SESSION.add(r)
-        SESSION.add(p)
-        SESSION.commit()
-        SESSION.close()
-    except OperationalError as msg:
-        print("Error: ", msg)
+    # try:
+    #     SESSION.add(r)
+    #     SESSION.add(p)
+    #     SESSION.commit()
+    #     SESSION.close()
+    # except OperationalError as msg:
+    #     print("Error: ", msg)
 
 if __name__ == '__main__':
     # print(getTable2Courses(2023))
@@ -422,14 +435,16 @@ if __name__ == '__main__':
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
-    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
-    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2023)
+    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
+    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2022)
+    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2022)
     getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
-    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2023)
-    getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2023)
-    getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2023)
-    getProgramRequirements('Mathematics/Business', '/group/MATH-Mathematics-or-Business', 2023)
-    getProgramRequirements('Mathematical Optimization', '/group/MATH-Mathematical-Optimization1', 2023)
-    getProgramRequirements('Mathematics/Teaching', '/group/MATH-Mathematics-or-Teaching', 2023)
-    getProgramRequirements('Pure Mathematics', '/group/MATH-Pure-Mathematics-1', 2023)
-    getProgramRequirements('Statistics', '/group/MATH-Statistics-1', 2023)
+    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2023)
+    # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2023)
+    # getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2023)
+    # getProgramRequirements('Mathematics/Business', '/group/MATH-Mathematics-or-Business', 2023)
+    # getProgramRequirements('Mathematical Optimization', '/group/MATH-Mathematical-Optimization1', 2023)
+    # getProgramRequirements('Mathematics/Teaching', '/group/MATH-Mathematics-or-Teaching', 2023)
+    # getProgramRequirements('Pure Mathematics', '/group/MATH-Pure-Mathematics-1', 2023)
+    # getProgramRequirements('Statistics', '/group/MATH-Statistics-1', 2023)
+    # getAcademicPrograms(2022)
