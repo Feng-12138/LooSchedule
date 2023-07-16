@@ -59,7 +59,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                             onClick = { navController.navigate(Screen.ViewSchedule.route) }
                         )
                         NavigationDrawerItem(
-                            label = { Text(text = "Schedule My Course") },
+                            label = { Text(text = "Create My Schedule") },
                             selected = false,
                             shape = RoundedCornerShape(0.dp),
                             onClick = { navController.navigate(Screen.SelectDegree.route) }

@@ -2,6 +2,7 @@ package com.example.androidapp.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,6 +13,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,27 +38,37 @@ fun HistoryScreen(scheduleItems: List<Schedule>, navController: NavController) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CourseScheduleItem(scheduleItem: Schedule, navController: NavController, index : Int, listSize: Int) {
-    Surface(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 20.dp)
-            .height(60.dp)
-    ) {
-        Button(
-            onClick = {
-                navController.currentBackStackEntry?.arguments?.putParcelable("schedule", scheduleItem)
-                navController.currentBackStackEntry?.arguments?.putInt("index", index)
-                navController.navigate(Screen.OldSchedule.route)
-            },
-            shape = RoundedCornerShape(0.dp),
-        ) {
-            Column() {
-                Text(text = "Schedule: ${listSize - index}")
-                Text(text = "Time: ${scheduleItem.time}")
+            .padding(10.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation =  5.dp,
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor =  MaterialTheme.colorScheme.surface,
+        ),
+        onClick = {
+            navController.currentBackStackEntry?.arguments?.putParcelable("schedule", scheduleItem)
+            navController.currentBackStackEntry?.arguments?.putInt("index", index)
+            navController.currentBackStackEntry?.arguments?.putInt("listSize", listSize)
+            navController.navigate(Screen.OldSchedule.route)
+        },
+        content = {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Schedule: ${listSize - index}",
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+                Text(
+                    text = "Time: ${scheduleItem.time}",
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
-
         }
-    }
+    )
 }

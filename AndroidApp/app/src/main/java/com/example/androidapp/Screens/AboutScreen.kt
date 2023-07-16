@@ -9,8 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -28,25 +31,44 @@ fun AboutScreen() {
         )
 
         Text(
-            text = "App Version: 1.0.0",
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("App Version: ")
+                }
+                append("1.0.1")
+            },
+            style = TextStyle(fontSize = 20.sp),
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
+        Text(
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Group: ")
+                }
+                append("20")
+            },
             style = TextStyle(fontSize = 20.sp),
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
         Text(
-            text = "Group: 20",
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Developers: ")
+                }
+                append("Joyce Dai, Kevin Jin, Kevin Ke, Michael Zhang, Steven Tian, Yiran Sun")
+            },
             style = TextStyle(fontSize = 20.sp),
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
         Text(
-            text = "Developers: Joyce Dai, Kevin Jin, Kevin Ke, Michael Zhang, Steven Tian, Yiran Sun",
-            style = TextStyle(fontSize = 20.sp),
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
-
-        Text(
-            text = "Email: tian_ruian@163.com",
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Email: ")
+                }
+                append("tian_ruian@163.com")
+            },
             style = TextStyle(fontSize = 20.sp),
             modifier = Modifier.padding(bottom = 24.dp)
         )

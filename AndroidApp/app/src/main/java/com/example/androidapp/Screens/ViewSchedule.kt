@@ -1,6 +1,7 @@
 package com.example.androidapp.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
@@ -45,52 +49,51 @@ import com.example.androidapp.viewModels.ScheduleViewModel
 import kotlinx.coroutines.launch
 import java.lang.Integer.min
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CourseDescription(course: Course, navController: NavController) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 12.dp)
-            .height(150.dp)
+    Card(
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.padding(10.dp,5.dp,10.dp,10.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation =  10.dp,
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor =  MaterialTheme.colorScheme.primaryContainer,
+        ),
+        onClick = {
+            navController.currentBackStackEntry?.arguments?.putParcelable("course", course)
+            navController.navigate(Screen.CourseDetail.route)
+        },
     ) {
-        Button(
-            onClick = {
-                navController.currentBackStackEntry?.arguments?.putParcelable("course", course)
-                navController.navigate(Screen.CourseDetail.route)
-            },
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.LightGray
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = course.courseID,
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-        ) {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()) {
-                Text(
-                    text = course.courseID,
-                    Modifier.align(Alignment.TopStart),
-                    style = MaterialTheme.typography.displaySmall,
-                    color = Color.Black
-                )
-                Text(
-                    text = course.courseName,
-                    Modifier.align(Alignment.CenterStart),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Black
-                )
-                Text(
-                    text = course.description,
-                    Modifier.align(Alignment.BottomStart),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 2,
-                    color = Color.Black
-                )
-            }
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+                text = course.courseName,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(
+                text = course.description,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
