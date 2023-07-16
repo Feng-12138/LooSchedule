@@ -182,8 +182,7 @@ def updateRequirement(requirement, courses, choice, table2Courses):
     for (n, options) in r:
         duplicates = set()
         for option in options:
-            if option in table2Courses:
-                duplicates.add(option)
+            if option in table2Courses: duplicates.add(option)
             else: courses.add(option)
         if len(duplicates) > 0:
             reduced = []
@@ -299,7 +298,7 @@ def parseChoice(choice):
         elif len(choice.find_all('a')) == 0 and 'math courses' in logic:
             subjects = MATH_COURSE_CODES
             for subject in subjects: options.append(subject + ' xxx')
-    elif 'excluding' in choice.get_text():
+    elif 'excluding' in choice.get_text() and all('excluding' not in c.get_text() for c in choice.find_all('li')):
         levels = []
         if 'level' in logic:
             levels = findall(r'\b\d+\b', logic.split('level')[0])
@@ -331,7 +330,15 @@ def parseChoice(choice):
                     options += course.get_text().split('from ')[1].split(', ')
                 else: options += [course.get_text()]
             else:
-                options += [a.get_text() for a in course.find_all('a')]
+                if 'Note:' in course.contents[0].get_text(): continue
+                elif 'Note:' in course.get_text():
+                    contents = course.contents
+                    for content in contents:
+                        if 'Note:' in content.get_text(): break
+                        if content.name == 'a': options += [content.get_text()]
+                elif len(course.find_all('a')) == 3 and 'to' in course.get_text() and 'excluding' in course.get_text():
+                    options += [course.find_all('a')[0].get_text() + '-' + course.find_all('a')[1].get_text()]
+                else: options += [a.get_text() for a in course.find_all('a')]
     if 'all' in logic:
         if choice.find('li') is None:
             if choice.find_next_sibling() and choice.find_next_sibling().name == 'ul':
@@ -438,7 +445,7 @@ if __name__ == '__main__':
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
     # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2022)
     getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2022)
-    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
+    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
     # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2023)
     # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2023)
     # getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2023)
