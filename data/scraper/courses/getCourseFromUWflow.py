@@ -205,12 +205,13 @@ def wrapperCourseDataFunc(curYear: int):
             continue
         parsedCoreq = parseByBracket(coreq, key, keys)
         courseDict[key].coreqs = parsedCoreq
+    antireqStr = ""
     for key in keys:
         antireq = courseDict[key].antireqs
         if antireq == None:
             continue
-        parseAntireq = parseByBracket(antireq, key, keys)
-        courseDict[key].antireqs = parseAntireq
+        # parseAntireq = parseByBracket(antireq, key, keys)
+        # courseDict[key].antireqs = parseAntireq
     return courseDict.values()
     
 
