@@ -121,7 +121,7 @@ def validatePlan(planName):
     return True
 
 
-def getRequirement(name, url, year):
+def getRequirement(name, url, year, add=True):
     param = '?ActiveDate=9/1/' + str(year)
     html = get(UndergradCalendarBaseURL + url + param).text
     if name == 'Joint Computer Science (Bachelor of Mathematics)':
@@ -131,24 +131,30 @@ def getRequirement(name, url, year):
     # print(contents)
     aList = [a.get_text() for a in contents.find_all('a')]
     res, courses = [], set()
-    table2Courses = []
+    additionalCourses = []
     if 'Table 2' in aList: 
         res, courses = getTable2Courses(year)
-        table2Courses = courses
+        additionalCourses = courses
+    elif name == 'Bachelor of Computer Science (Data Science)':
+        res, courses = getRequirement('Bachelor of Computer Science', '/page/MATH-Bachelor-of-Computer-Science-1', year, False)
+        additionalCourses = courses
     choices = contents.find_next('ul').contents
     choices = list(filter(lambda c: c != '\n', choices))
     # print(choices)
     addReq, coopOnly, isDD = None, False, False
     for choice in choices:
         try:
-            res, courses = updateRequirement(res, courses, choice, table2Courses)
+            res, courses = updateRequirement(res, courses, choice, additionalCourses)
         except Exception as msg:
             if str(msg) in ADDITIONAL_REQS: addReq = str(msg)
             else: raise msg
-    courses = parseRequirement(res)
-    if 'co-op only' in name.lower(): coopOnly = True
-    if 'double degree' in name.lower(): isDD = True
-    addRequirement(name, year, courses, addReq, url, coopOnly, isDD)
+    if add:
+        requiredCourses = parseRequirement(res)
+        if 'co-op only' in name.lower(): coopOnly = True
+        if 'double degree' in name.lower(): isDD = True
+        addRequirement(name, year, requiredCourses, addReq, url, coopOnly, isDD)
+    return res, courses
+    
     
 
 def getTable2Courses(year):
@@ -173,7 +179,7 @@ def getPlanType(planName):
     else: return 'major'
 
 
-def updateRequirement(requirement, courses, choice, table2Courses):
+def updateRequirement(requirement, courses, choice, additionalCourses):
     r, c, a = parseChoice(choice)
     if a:
         requirement += r
@@ -182,7 +188,7 @@ def updateRequirement(requirement, courses, choice, table2Courses):
     for (n, options) in r:
         duplicates = set()
         for option in options:
-            if option in table2Courses: duplicates.add(option)
+            if option in additionalCourses: duplicates.add(option)
             else: courses.add(option)
         if len(duplicates) > 0:
             reduced = []
@@ -196,9 +202,14 @@ def updateRequirement(requirement, courses, choice, table2Courses):
                     requirement.remove(req)
                     m = min(n, req[0])
                     requirement.append((m, req[1].intersection(duplicates)))
-                    if n - req[0] != 0:
-                        reduced.append((abs(n - req[0]), req[1].symmetric_difference(duplicates)))
+                    diff = req[1].symmetric_difference(duplicates)
+                    if n - req[0] != 0 and len(diff) > 0:
+                        reduced.append((abs(n - req[0]), diff))
+                    else:
+                        for d in diff: courses.remove(d)
             requirement += reduced
+            if n - abs(n - req[0]) > 0 and len(options - duplicates) > 0:
+                requirement.append((n - abs(n - req[0]), options - duplicates))
         else:
             requirement.append((n, options))
             courses = courses.union(options)
@@ -298,7 +309,7 @@ def parseChoice(choice):
         elif len(choice.find_all('a')) == 0 and 'math courses' in logic:
             subjects = MATH_COURSE_CODES
             for subject in subjects: options.append(subject + ' xxx')
-    elif 'excluding' in choice.get_text() and all('excluding' not in c.get_text() for c in choice.find_all('li')):
+    elif 'excluding the following' in choice.get_text():
         levels = []
         if 'level' in logic:
             levels = findall(r'\b\d+\b', logic.split('level')[0])
@@ -328,7 +339,7 @@ def parseChoice(choice):
                 if 'BUS' in course.get_text(): continue
                 if 'from' in course.get_text():
                     options += course.get_text().split('from ')[1].split(', ')
-                else: options += [course.get_text()]
+                else: options += [course.get_text().strip()]
             else:
                 if 'Note:' in course.contents[0].get_text(): continue
                 elif 'Note:' in course.get_text():
@@ -444,9 +455,10 @@ if __name__ == '__main__':
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
     # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2022)
-    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2022)
+    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2022)
     # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
-    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2023)
+    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2022)
+    # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2022)
     # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2023)
     # getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2023)
     # getProgramRequirements('Mathematics/Business', '/group/MATH-Mathematics-or-Business', 2023)
@@ -454,4 +466,4 @@ if __name__ == '__main__':
     # getProgramRequirements('Mathematics/Teaching', '/group/MATH-Mathematics-or-Teaching', 2023)
     # getProgramRequirements('Pure Mathematics', '/group/MATH-Pure-Mathematics-1', 2023)
     # getProgramRequirements('Statistics', '/group/MATH-Statistics-1', 2023)
-    # getAcademicPrograms(2022)
+    getAcademicPrograms(2022)
