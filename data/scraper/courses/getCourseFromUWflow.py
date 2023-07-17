@@ -44,9 +44,7 @@ def parseCourseUrl(data: str, yearList: list):
 
 def getAllCoursePage(urlList: list):
     pool = Pool(6)
-    print(len(urlList))
     retval = pool.map(getUrl, urlList)
-    print(len(retval))
     return retval
 
 def parseCourses(coursePages: list):
@@ -144,14 +142,23 @@ def wrapperCourseDataFunc(curYear: int):
                 splitIdx = idx
                 break
         courseNum = courseNum[:splitIdx] + " " + courseNum[splitIdx:]
-        if courseDict.get(courseNum) != None:
+        if courseDict.get(courseNum) != None or courseNum.find("BUS ") != -1:
+            if (courseNum.find("BUS ") != -1):
+                courseDict[courseNum] = Course()
+                courseDict[courseNum].credit = 0.5
+                courseDict[courseNum].courseID = courseNum
+                courseDict[courseNum].subject = courseNum.split(" ")[0]
+                courseDict[courseNum].code = courseNum.split(" ")[-1]
             courseDict[courseNum].courseName = course["name"]
-            courseDict[courseNum].description = course["description"]
+            if course["description"] == None:
+                courseDict[courseNum].description = ""
+            else:
+                courseDict[courseNum].description = course["description"]
             courseDict[courseNum].easyRating = course["rating"]["easy"]
             courseDict[courseNum].likedRating = course["rating"]["liked"]
             courseDict[courseNum].usefulRating = course['rating']['useful']
             courseDict[courseNum].antireqs = course['antireqs']
-            courseDict[courseNum].coreqs = course['coreqs']
+            courseDict[courseNum].coreqs = course["coreqs"]
             courseDict[courseNum].antireqs = course['antireqs']
             # courseDict[courseNum].prereqs = course['prereqs']
             if len(course['sections']) == 0:
@@ -191,146 +198,72 @@ def wrapperCourseDataFunc(curYear: int):
             keyList.append(key)
     for key in keyList:
         courseDict.pop(key)
+    keys = courseDict.keys()
+    for key in keys:
+        coreq = courseDict[key].coreqs
+        if coreq == None:
+            continue
+        parsedCoreq = parseByBracket(coreq, key, keys)
+        courseDict[key].coreqs = parsedCoreq
+    for key in keys:
+        antireq = courseDict[key].antireqs
+        if antireq == None:
+            continue
+        parseAntireq = parseByBracket(antireq, key, keys)
+        courseDict[key].antireqs = parseAntireq
     return courseDict.values()
     
-# def wrapperCourseDataFunc(curYear: int):
-#     enterYear = curYear - 6
-#     for year in range(enterYear, curYear + 1):
-#         startYear = str(year)[-2:]
-#         endYear = str(year + 1)[-2:]
-#         yearList.append(startYear + endYear)
-#     data = getUrl(os.environ["CourseIndexUrl"])
-#     urlList = parseCourseUrl(data, yearList)
-#     coursePages = getAllCoursePage(urlList)
-#     # get all the courses first
-#     courseInfoStrList = []
-#     for coursePage in coursePages:
-#         # if (coursePage.find("PD 8") != -1):
-#         #     print("here5")
-#         ex = "<center>.*</center>"
-#         # courseInfo = re.findall(ex, coursePage)
-#         courseInfo = coursePage.split("<center>")
-#         # if (coursePage.find("PD 9") != -1):
-#         courseInfoStrList.append(courseInfo)
-#     for courseInfoLst in courseInfoStrList:
-#         for courseInfo in courseInfoLst:
-#             exNumName = "<strong>.*</strong>"
-#             # NumName = re.findall(exNumName, courseInfo)
-#             NumName = courseInfo.split('<strong>')
-#             # if len(NumName) == 0:
-#             #     continue
-#             NumNameList = []
-#             infoList = []
-#             courseNum = ""
-#             credit = ""
-#             if (courseInfo.find('<img src=') != -1):
-#                 continue
-#             if len(NumName) == 0:
-#                 exNumName = "<td align=left><B><a name =.*</b></td><td align=right>"
-#                 # NumName = re.findall(exNumName, courseInfo)
-#                 NumName = courseInfo.split("<td align=left><B><a name =")
-#                 print(NumName, "here454")
-#                 infoList = NumName[0].split('</a>')[-1].split('</b></td><td align=right>')[0].split(" ")
-#                 courseNum = (infoList[0] + ' ' + infoList[1]).upper()
-#                 credit = infoList[-1].strip()
-#             else:
-#                 NumNameList = NumName[0].split('</strong>')
-#                 print(NumNameList)
-#                 infoList = NumNameList[0].split('</a>')[-1].split(' ')
-#                 courseNum = (infoList[0] + ' ' + infoList[1]).upper()
-#                 credit = infoList[-1].strip()
-#             credit = float(credit)
-#             if courseNum == "PD 9":
-#                 print("here1")
-#             if courseDict.get(courseNum) == None:
-#                 courseDict[courseNum] = Course()
-#                 courseDict[courseNum].courseID = courseNum
-#                 courseDict[courseNum].subject = infoList[0]
-#                 courseDict[courseNum].code = infoList[1]
-#                 courseDict[courseNum].credit = credit
-#     uwFlowCourseList = getUrl(os.environ['uwflowUrl'], query="""query Course {
-#     course {
-#         antireqs
-#         code
-#         coreqs
-#         description
-#         id
-#         name
-#         prereqs
-#         rating {
-#             easy
-#             liked
-#             useful
-#         }
-#         sections {
-#             term_id
-#             meetings {
-#                 location
-#             }
-#         }
-#     }
-# }
-# """)["data"]["course"]
-#     for course in uwFlowCourseList:
-#         courseNum = course["code"]
-#         separateIdx = 0
-#         for idx, char in enumerate(courseNum):
-#             if char <= "9" and char >= "0":
-#                 separateIdx = idx
-#                 break
-#         courseNum = courseNum[:separateIdx].upper() + " " + courseNum[separateIdx:]
-#         if courseDict.get(courseNum) != None:
-#             courseDict[courseNum].courseName = course["name"]
-#             courseDict[courseNum].description = course["description"]
-#             courseDict[courseNum].easyRating = course["rating"]["easy"]
-#             courseDict[courseNum].likedRating = course["rating"]["liked"]
-#             courseDict[courseNum].usefulRating = course['rating']['useful']
-#             courseDict[courseNum].antireqs = course['antireqs']
-#             courseDict[courseNum].coreqs = course['coreqs']
-#             courseDict[courseNum].antireqs = course['antireqs']
-#             # courseDict[courseNum].prereqs = course['prereqs']
-#             if len(course['sections']) == 0:
-#                 courseDict[courseNum].availability = ""
-#                 courseDict[courseNum].onlineTerms = ""
-#             else:
-#                 availableStr = ""
-#                 onlineStr = ""
-#                 for section in course['sections']:
-#                     termId = str(section["term_id"])
-#                     if termId[-1] == "5" and availableStr.find("S") == -1:
-#                         availableStr += "S"
-#                         if (len(section["meetings"]) > 0):
-#                             for obj in section["meetings"]:
-#                                 if obj['location'].find("ONLN") != -1 and onlineStr.find("S") == -1:
-#                                     onlineStr += "S"
-#                     elif termId[-1] == "1" and availableStr.find("W") == -1:
-#                         availableStr += "W"
-#                         if (len(section["meetings"]) > 0):
-#                             for obj in section["meetings"]:
-#                                 if obj['location'].find("ONLN") != -1 and onlineStr.find("W") == -1:
-#                                     onlineStr += "W"
-#                     elif termId[-1] == "9" and availableStr.find("F") == -1:
-#                         availableStr += "F"
-#                         if (len(section["meetings"]) > 0):
-#                             for obj in section["meetings"]:
-#                                 if obj['location'].find("ONLN") != -1 and onlineStr.find("F") == -1:
-#                                     onlineStr += "F"
-#                 courseDict[courseNum].availability = availableStr
-#                 courseDict[courseNum].onlineTerms = onlineStr
-#             coursePrereqDict[courseNum] = course['prereqs']
-#             # coursePrereq = Prerequisite()
-#             # coursePrereq.courseID = courseNum
-#             # coursePrereq.consentRequired = False
-#             # if courseDict[courseNum].prereqs.find("Level at least") != -1:
-#             #     coursePrereq.minimumLevel = courseDict[courseNum].prereqs.split("Level at least")[-1].strip()[:2]   
-#         else:
-#             if courseNum.find("CS") != -1:
-#                 print(courseNum) 
-#             pass
-#     return courseDict.values()
 
-
-def handleOneOf(prereq: str) -> str:
+def modifyStr(courseStr: str, replacedStr: str) -> str:
+    retval = ""
+    start = ""
+    if replacedStr == "One of":
+        retval = courseStr.replace("One of", "1:")
+        retval = retval.replace("one of", "1:")
+        start = "1:"
+    elif replacedStr == "Two of":
+        retval = courseStr.replace("Two of", "2:")
+        retval = retval.replace("two of", "2:")
+        start = "2:"
+    elif replacedStr == "Three of":
+        retval = courseStr.replace("Three of", "3:")
+        retval = retval.replace("three of", "3:")
+        start = "3:"
+        
+    retval = retval.replace(" ", '')
+    retval = retval.replace("/", ",")
+    retval = retval.replace("or", ",")
+    retval = retval.replace(")", "")
+    retval = retval.replace("(", "")
+    retval = retval.replace(";", "")
+    retval = retval.replace(".", "")
+    curStrList = retval[2:].split(",")
+    retvalStrList = []
+    for item in curStrList:
+        encounterNum = False
+        breakingIndex = len(item)
+        for idx, char in enumerate(item):
+            if (char >= "A" and char <= "Z"):
+                continue
+            elif char >= "0" and char <= "9":
+                encounterNum = True
+                continue
+            if encounterNum:
+                breakingIndex = idx
+                break
+        retvalStrList.append(item[:breakingIndex])
+    retval = ""
+    retval += start
+    for val in retvalStrList:
+        retval += f"{val},"
+    retval = retval[:-1] + ';'
+    return retval
+            
+            
+        
+    
+def handleOneOf(prereq: str) -> tuple:
+    oneOfOr = False
     oneOfStr = ""
     if (prereq):
         oneOfIdxArr = []
@@ -365,17 +298,12 @@ def handleOneOf(prereq: str) -> str:
                     closebracketIdx = closeBracket
                     break
             betterIdx = min(closeSemiIdx, closebracketIdx)
-            
+            if prereq[betterIdx:betterIdx + 4].find("or") != -1 or prereq[betterIdx:betterIdx + 4].find("/") != -1:
+                oneOfOr = True
+                
             curStr = prereq[oneIdx:betterIdx]             
-            curStr = curStr.replace("One of", "1:")
-            curStr = curStr.replace("one of", "1:")
-            curStr = curStr.replace(" ", '')
-            curStr = curStr.replace("/", ",")
-            curStr = curStr.replace("or", ",")
-            curStr = curStr.replace(")", "")
-            curStr = curStr.replace(";", "")
-            curStr = curStr.replace(".", "")
-            oneOfStr += curStr + ";"
+            curStr = modifyStr(curStr, "One of")
+            oneOfStr += curStr
         
         for oneIdx in twoOfIdxArr:
             closeSemiIdx = 99999
@@ -390,15 +318,8 @@ def handleOneOf(prereq: str) -> str:
                     break
             betterIdx = min(closeSemiIdx, closebracketIdx)
             curStr = prereq[oneIdx:betterIdx]             
-            curStr = curStr.replace("Two of", "2:")
-            curStr = curStr.replace("two of", "2:")
-            curStr = curStr.replace(" ", '')
-            curStr = curStr.replace("/", ",")
-            curStr = curStr.replace("or", ",")
-            curStr = curStr.replace(")", "")
-            curStr = curStr.replace(";", "")
-            curStr = curStr.replace(".", "")
-            oneOfStr += curStr + ";"
+            curStr = modifyStr(curStr, "Two of")
+            oneOfStr += curStr
             
         
         for oneIdx in threeOfIdxArr:
@@ -413,17 +334,10 @@ def handleOneOf(prereq: str) -> str:
                     closebracketIdx = closeBracket
                     break
             betterIdx = min(closeSemiIdx, closebracketIdx)
-            curStr = prereq[oneIdx:betterIdx]           
-            curStr = curStr.replace("Three of", "3:")
-            curStr = curStr.replace("three of", "3:")
-            curStr = curStr.replace(" ", '')
-            curStr = curStr.replace("/", ",")
-            curStr = curStr.replace("or", ",")
-            curStr = curStr.replace(")", "")
-            curStr = curStr.replace(";", "")
-            curStr = curStr.replace(".", "")
-            oneOfStr += curStr + ";"
-    return oneOfStr
+            curStr = prereq[oneIdx:betterIdx]        
+            curStr = modifyStr(curStr, "Three of")
+            oneOfStr += curStr
+    return oneOfOr, oneOfStr
     
     
 def parseStrCourses(prereq: str, oneOfCourseList = [], courseList = []):
@@ -433,21 +347,21 @@ def parseStrCourses(prereq: str, oneOfCourseList = [], courseList = []):
     retvalList = []
     for course in courseList:
         course = course.replace(" ", "")
-        if course == "ACTSC232" and prereq.find('or a corequisite of STAT230 or STAT240); Level at least 2A; Not open to students who have received credit for ACTSC232.') != -1:
-            continue
+        # if course == "ACTSC232" and prereq.find('or a corequisite of STAT230 or STAT240); Level at least 2A; Not open to students who have received credit for ACTSC232.') != -1:
+        #     continue
         startIdx = prereq.find(course)
         if startIdx != -1:
             if startIdx == 0:
                 endIdx = startIdx + len(course)
                 if (endIdx < len(prereq)):
-                    if prereq[endIdx] <= 'Z' and prereq[endIdx] >= 'A':
+                    if (prereq[endIdx] <= 'Z' and prereq[endIdx] >= 'A') or (prereq[endIdx] <= "9" and prereq[endIdx] >= "0"):
                         continue
             else:
                 endIdx = startIdx + len(course)
                 if (endIdx < len(prereq)):
-                    if prereq[endIdx] <= 'Z' and prereq[endIdx] >= 'A':
+                    if (prereq[endIdx] <= 'Z' and prereq[endIdx] >= 'A') or (prereq[endIdx] <= "9" and prereq[endIdx] >= "0"):
                         continue
-                if prereq[startIdx - 1] >= "A" and prereq[startIdx - 1] <= "Z":
+                if prereq[startIdx - 1] >= "A" and prereq[startIdx - 1] <= "Z" or (prereq[startIdx - 1] <= "9" and prereq[startIdx - 1] >= "0"):
                     continue
                     
             included = oneOfCourseList.count(course)
@@ -491,11 +405,10 @@ def parseStrCourses(prereq: str, oneOfCourseList = [], courseList = []):
                 
                 
                 
-
+# produce list for one of, two of, three of
 def produceStr(strList: list, courseList: list):
     retvalList = []
     initial = True
-    
     for item in strList:
         if item == "":
             continue
@@ -569,11 +482,131 @@ def addSpaceToStr(strList: list):
         courseStrNoSpace = item[:splitIdx] + ' ' + item[splitIdx:]
         retval.append(courseStrNoSpace.strip())
     return retval
-            
-                
-                        
 
-def parsePrereqs():
+def produceCourseStrList(courseStr: str):
+    oneOfcourseList = []
+    firstCourseList = []
+    if courseStr != "":
+        firstCourseList = courseStr.split(";")
+        for item in firstCourseList:
+            item = item.replace("1:", "")
+            item = item.replace("2:", "")
+            item = item.replace("3:", "")
+            curList = item.split(",")
+            for item2 in curList:
+                if len(item2) > 1:
+                    oneOfcourseList.append(item2)
+    return oneOfcourseList
+    
+
+# parse the prereq according to precedence of bracket, or, and
+def parseByBracket(prereq: str, courseCode: str, courseList: list):
+    invalidCourseList = []
+    if prereq.find("Not open") != -1:
+        notOpenStr = prereq.split("Not open")[-1]
+        for course in courseList:
+            course = course.replace(" ", "")
+            if notOpenStr.find(course) != -1:
+                invalidCourseList.append(course)
+    
+    parsedByBracketList = prereq.split(')')
+    parsedByOpenBracket = False
+    if len(parsedByBracketList) > 2:
+        for idx, item in enumerate(parsedByBracketList):
+            if item == "" and idx != len(parsedByBracketList) - 1:
+                parsedByOpenBracket = True
+                break
+    parsedBySemiColon = False
+    if len(parsedByBracketList) == 1:
+        parsedBySemiColon = True
+        parsedByBracketList = prereq.split(';')
+    if parsedByOpenBracket:
+        parsedByBracketList = prereq.split('(')
+        
+    orConnectionsBetweenBracket = []
+    andConnectionBetweeenBracket = []
+    parsedStrList = []
+    parsedBracketStrList = []
+    for idx, item in enumerate(parsedByBracketList):
+        item = item.strip()
+        if not parsedByOpenBracket:
+            if item[:2] == "or" or item[:1] == "/":
+                orConnectionsBetweenBracket.append(idx)
+            elif item[:3] == "and" or item[:1] == ";" or parsedBySemiColon:
+                andConnectionBetweeenBracket.append(idx)
+        else:
+            if item[-2:] == "or" or item[-1:] == "/":
+                orConnectionsBetweenBracket.append(idx + 1)
+            elif item[-3:] == "and" or item[-1:] == ";":
+                andConnectionBetweeenBracket.append(idx + 1)
+            
+        oneofOr, courseStr = handleOneOf(item)
+        oneOfcourseList = produceCourseStrList(courseStr=courseStr)
+        oneOfcourseList.extend(invalidCourseList)
+        retvalStr = parseStrCourses(prereq=item, oneOfCourseList=oneOfcourseList, courseList=courseList)
+        courseListNoSpace = []
+        for course in courseList:
+            courseListNoSpace.append(course.replace(' ', ""))
+        orConnection = False
+        if item.find("or one of") != -1:
+            orConnection = True
+        # courseStr is the list of courses which has one of in it.
+        retvalStrList = retvalStr.split(';')[:-1]
+        retvalStrListCombined = []
+        if courseStr != "":
+            retvalList = produceStr(courseStr.split(";"), courseListNoSpace)
+            if (orConnection):
+                for val in retvalList:
+                    retvalStrList.append(val)
+            else:
+                if len(retvalStrList) == 0:
+                    retvalStrListCombined = retvalList[:]
+                elif (len(retvalList) == 0):
+                    retvalStrListCombined = retvalStrList[:]
+                else:
+                    for item in retvalStrList:
+                        for val in retvalList:
+                            retvalStrListCombined.append(item + "," + val)
+        else:
+            retvalStrListCombined = retvalStrList[:]
+        parsedBracketStrList.append(retvalStrListCombined)
+    finalReturnList = []
+    finalReturnStr = ""
+    for idx, parsedList in enumerate(parsedBracketStrList):
+        if parsedList == []:
+            continue
+        if len(finalReturnList) == 0:
+            finalReturnList.extend(parsedList)
+            continue
+        if idx in orConnectionsBetweenBracket:
+            for item in parsedList:
+                finalReturnList.append(item)
+        elif (idx in andConnectionBetweeenBracket):
+            newfinalList = []
+            for item in parsedList:
+                for existedItem in finalReturnList:
+                    newfinalList.append(existedItem + "," + item)
+            finalReturnList = newfinalList[:]
+    for item in finalReturnList:
+        finalReturnStr += f"{item};"
+    # add space between code and course:
+    finalReturnStrList = finalReturnStr.split(";")
+    addedPlaceStr = ""
+    for item in finalReturnStrList:
+        if item == "":
+            continue
+        courseList = item.split(",")
+        newCourseList = addSpaceToStr(courseList)
+        newCourseStr = ""
+        for modifiedCourse in newCourseList:
+            newCourseStr += f"{modifiedCourse},"
+        newCourseStr =  newCourseStr[:-1] + ";"
+        addedPlaceStr += newCourseStr
+    return addedPlaceStr
+    
+                
+
+def parsePrereqs(programList: list):
     courseList = []
     prereqList = []
     for key in coursePrereqDict.keys():
@@ -586,72 +619,163 @@ def parsePrereqs():
         prereqList[-1].courseID = key
         prereqList[-1].consentRequired = False
         if (prereq):
-            courseStr += handleOneOf(prereq)
-            oneOfcourseList = []
-            firstCourseList = []
-            if courseStr != "":
-                firstCourseList = courseStr.split(";")
-                for item in firstCourseList:
-                    item = item.replace("1:", "")
-                    item = item.replace("2:", "")
-                    item = item.replace("3:", "")
-                    curList = item.split(",")
-                    for item2 in curList:
-                        if len(item2) > 1:
-                            oneOfcourseList.append(item2)
-                
-            retvalStr = parseStrCourses(prereq=prereq, oneOfCourseList=oneOfcourseList, courseList=courseList)
-            courseListNoSpace = []
-            for course in courseList:
-                courseListNoSpace.append(course.replace(' ', ""))
-            
-            if courseStr != "":
-                retvalList = produceStr(courseStr.split(";"), courseListNoSpace)
-                retvalStrList = retvalStr.split(';')
-                newResultList = []
-                if len(retvalList) != 0:
-                    for existItem in retvalStrList:
-                        for newItem in retvalList:
-                            if existItem == "":
-                                newResultList.append(newItem)
-                            else:
-                                newResultList.append(existItem + "," + newItem)
-                else:
-                     for newItem in retvalStrList:
-                         newResultList.append(newItem)
-                    
-                retvalStr = ""
-                for item in newResultList:
-                    retvalStr += f"{item};"
-            newStr = ""
-            for item in retvalStr.split(';'):
-                itemList = item.split(',')
-                newStrVal = addSpaceToStr(itemList)
-                curStr = ""
-                for item in newStrVal:
-                    if item == "":
-                        continue
-                    curStr += f'{item},'
-                if curStr != "":
-                    curStr = curStr[:-1]
-                    curStr += ";"
-                    newStr += curStr
+            newStr = parseByBracket(prereq=prereq, courseCode=key, courseList=courseList)
             prereqList[-1].courses = newStr
             levelAtLeast = ""
+            onlyPattern = ""
+            onlyOpenToStr = ""
+            notOpenToStr = ""
+            if (prereq.find(" Only ") != -1):
+                onlyPattern = " Only "
+            if (prereq.find(" only ") != -1):
+                onlyPattern = " only "
+            if (prereq.find(" only.") != -1):
+                onlyPattern = " only."
+            notOpenPattern = ""
+            if (prereq.find("Not open") != -1):
+                notOpenPattern = "Not open"
+            if (prereq.find("not open") != -1):
+                notOpenPattern = "not open"
+            if (onlyPattern != "" and notOpenPattern != ""):
+                pass
+            elif (onlyPattern != ""):
+                onlyList = prereq.split(onlyPattern)
+                for item in onlyList:
+                    for program in programList:
+                        if item.find(program) != -1:
+                            if program == "Engineering Students":
+                                if onlyOpenToStr.find("Engineering") != -1:
+                                    continue
+                                else:
+                                    program = "Faculty of Engineering"
+                            if program == "Arts students":
+                                if onlyOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Arts"
+                            if program == "Science students":
+                                if onlyOpenToStr.find("Science") != -1:
+                                    continue
+                                program = "Faculty of Science"
+                            if program == "Environment students":
+                                if onlyOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Environment"
+                            if program == "Health students":
+                                if onlyOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Health"
+                            if program == "Mathematics students":
+                                if onlyOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Mathematics"
+                            onlyOpenToStr += f"{program},"
+                onlyOpenToStr = onlyOpenToStr[:-1]
+            elif (notOpenPattern != ""):
+                notOpenList = prereq.split(notOpenPattern)
+                for item in notOpenList:
+                    for program in programList:
+                        if item.find(program) != -1:
+                            if program == "Engineering Students":
+                                if notOpenToStr.find("Engineering") != -1:
+                                    continue
+                                else:
+                                    program = "Faculty of Engineering"
+                            if program == "Arts students":
+                                if notOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Arts"
+                            if program == "Science students":
+                                if notOpenToStr.find("Science") != -1:
+                                    continue
+                                program = "Faculty of Science"
+                            if program == "Environment students":
+                                if notOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Environment"
+                            if program == "Health students":
+                                if notOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Health"
+                            if program == "Mathematics students":
+                                if notOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Mathematics"
+                            notOpenToStr += f"{program},"
+                notOpenToStr = notOpenToStr[:-1]
+            else:
+                for program in programList:
+                    if item.find(program) != -1:
+                        if program == "Engineering Students":
+                            if onlyOpenToStr.find("Engineering") != -1:
+                                continue
+                            else:
+                                program = "Faculty of Engineering"
+                        if program == "Arts students":
+                            if onlyOpenToStr.find(program) != -1:
+                                continue
+                            program = "Faculty of Arts"
+                        if program == "Science students":
+                            if onlyOpenToStr.find("Science") != -1:
+                                continue
+                            program = "Faculty of Science"
+                        if program == "Environment students":
+                            if onlyOpenToStr.find(program) != -1:
+                                continue
+                            program = "Faculty of Environment"
+                        if program == "Health students":
+                            if onlyOpenToStr.find(program) != -1:
+                                continue
+                            program = "Faculty of Health"
+                        if program == "Mathematics students":
+                            if onlyOpenToStr.find(program) != -1:
+                                continue
+                            program = "Faculty of Mathematics"
+                        onlyOpenToStr += f"{program},"
+                onlyOpenToStr = onlyOpenToStr[:-1]
+            prereqList[-1].notOpenTo = notOpenToStr
+            prereqList[-1].onlyOpenTo = onlyOpenToStr
+                
             if (prereq.find("Level at least ") != -1 or prereq.find("level at least ") != -1):
                 level = prereq.split("evel at least ")[-1][0:2]
                 if level in levels:
                     prereqList[-1].minimumLevel = level
     return prereqList
             
-                
+def parsePrograms():
+    retvalList = []
+    htmlStr = getUrl(os.environ["programListUrl"])
+    contentStr = htmlStr.split('<div> class="content">')[-1]
+    contentStr = contentStr.split('<table class="tablesaw tablesaw-stack"')[0]
+    contentStrList = contentStr.split("<li><a")
+    for item in contentStrList:
+        item = item.split('</a></li>')[0].split(">")[-1]
+        if item.find("\n") != -1:
+            continue
+        retvalList.append(item)
+    retvalList = retvalList[8:]
+    retvalList.append("Faculty of Mathematics")
+    retvalList.append("Faculty of Arts")
+    retvalList.append("Faculty of Health")
+    retvalList.append("Faculty of Engineering")
+    retvalList.append("Faculty of Environment")
+    retvalList.append("Faculty of Science")
+    retvalList.append("Mathematics students")
+    retvalList.append("Arts students")
+    retvalList.append("Health students")
+    retvalList.append("Engineering students ")
+    retvalList.append("Environment students")
+    retvalList.append("Science students")
+    return retvalList
+    
+    
         
         
                 
 def getCourseFromUWflow(year: int):
     try:
         courseData = wrapperCourseDataFunc(year)
-        prereqList = parsePrereqs()
+        program_list = parsePrograms()
+        prereqList = parsePrereqs(programList=program_list)
         Session.add_all(courseData)
         Session.commit()
         Session.close()
