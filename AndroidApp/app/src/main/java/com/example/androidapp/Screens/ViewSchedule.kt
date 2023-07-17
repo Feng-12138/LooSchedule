@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -100,13 +101,17 @@ private fun CourseDescription(course: Course, navController: NavController) {
 fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewModel){
     var currentTerm by remember { mutableStateOf(scheduleViewModel.currentTerm) }
     var pagerPage by remember { mutableStateOf(scheduleViewModel.selectedTabIndex) }
+    println("pagerPage: $pagerPage")
+    println("selectedtab: ${scheduleViewModel.selectedTabIndex}")
     var termList = scheduleViewModel.termList
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
-    val pagerCourses = remember { mutableStateListOf<List<Course>>() }
+    val pagerCourses = remember { mutableStateMapOf<Int, List<Course>>() }
 
-    LaunchedEffect(key1 = scheduleViewModel.selectedTabIndex) {
-        pagerPage = scheduleViewModel.selectedTabIndex
+
+    LaunchedEffect(key1 = pagerState.currentPage) {
+        pagerPage = pagerState.currentPage
+        scheduleViewModel.setSelectedTabIndex(pagerPage)
     }
 
     Surface(
@@ -141,12 +146,10 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                 state = pagerState,
                 verticalAlignment = Alignment.Top
             ) { page ->
-                val courses = pagerCourses.getOrElse(page) {
-                    val term = termList[page]
-                    val courses = scheduleViewModel.schedule[term] ?: emptyList()
-                    pagerCourses.add(page, courses)
-                    courses
-                }
+                val courses = pagerCourses[page]
+                    ?: scheduleViewModel.schedule[termList[page]].also {
+                        it?.let { pagerCourses[page] = it }
+                    } ?: emptyList()
                 CourseSchedulePage(courses = courses, navController = navController)
             }
         }
