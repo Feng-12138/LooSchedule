@@ -13,8 +13,6 @@ yearList = []
 courseDict = {}
 levels = ['1A', '1B', '2A', '2B', '3A', "3B", "4A", "4B"]
 
-program_list = ["Computer Science", "Actuarial Science", "Mathematical Finance", "Mathematical Economics", "Accounting and Financial Management", ""]
-
 coursePrereqDict = {}
 
 config = dotenv_values(".env")
@@ -207,6 +205,12 @@ def wrapperCourseDataFunc(curYear: int):
             continue
         parsedCoreq = parseByBracket(coreq, key, keys)
         courseDict[key].coreqs = parsedCoreq
+    for key in keys:
+        antireq = courseDict[key].antireqs
+        if antireq == None:
+            continue
+        parseAntireq = parseByBracket(antireq, key, keys)
+        courseDict[key].antireqs = parseAntireq
     return courseDict.values()
     
 
@@ -600,16 +604,9 @@ def parseByBracket(prereq: str, courseCode: str, courseList: list):
         addedPlaceStr += newCourseStr
     return addedPlaceStr
     
-    
-            
-        
-        
-        
-        
-            
-                        
+                
 
-def parsePrereqs():
+def parsePrereqs(programList: list):
     courseList = []
     prereqList = []
     for key in coursePrereqDict.keys():
@@ -625,13 +622,151 @@ def parsePrereqs():
             newStr = parseByBracket(prereq=prereq, courseCode=key, courseList=courseList)
             prereqList[-1].courses = newStr
             levelAtLeast = ""
+            onlyPattern = ""
+            onlyOpenToStr = ""
+            notOpenToStr = ""
+            if (prereq.find(" Only ") != -1):
+                onlyPattern = " Only "
+            if (prereq.find(" only ") != -1):
+                onlyPattern = " only "
+            if (prereq.find(" only.") != -1):
+                onlyPattern = " only."
+            notOpenPattern = ""
+            if (prereq.find("Not open") != -1):
+                notOpenPattern = "Not open"
+            if (prereq.find("not open") != -1):
+                notOpenPattern = "not open"
+            if (onlyPattern != "" and notOpenPattern != ""):
+                pass
+            elif (onlyPattern != ""):
+                onlyList = prereq.split(onlyPattern)
+                for item in onlyList:
+                    for program in programList:
+                        if item.find(program) != -1:
+                            if program == "Engineering Students":
+                                if onlyOpenToStr.find("Engineering") != -1:
+                                    continue
+                                else:
+                                    program = "Faculty of Engineering"
+                            if program == "Arts students":
+                                if onlyOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Arts"
+                            if program == "Science students":
+                                if onlyOpenToStr.find("Science") != -1:
+                                    continue
+                                program = "Faculty of Science"
+                            if program == "Environment students":
+                                if onlyOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Environment"
+                            if program == "Health students":
+                                if onlyOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Health"
+                            if program == "Mathematics students":
+                                if onlyOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Mathematics"
+                            onlyOpenToStr += f"{program},"
+                onlyOpenToStr = onlyOpenToStr[:-1]
+            elif (notOpenPattern != ""):
+                notOpenList = prereq.split(notOpenPattern)
+                for item in notOpenList:
+                    for program in programList:
+                        if item.find(program) != -1:
+                            if program == "Engineering Students":
+                                if notOpenToStr.find("Engineering") != -1:
+                                    continue
+                                else:
+                                    program = "Faculty of Engineering"
+                            if program == "Arts students":
+                                if notOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Arts"
+                            if program == "Science students":
+                                if notOpenToStr.find("Science") != -1:
+                                    continue
+                                program = "Faculty of Science"
+                            if program == "Environment students":
+                                if notOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Environment"
+                            if program == "Health students":
+                                if notOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Health"
+                            if program == "Mathematics students":
+                                if notOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Mathematics"
+                            notOpenToStr += f"{program},"
+                notOpenToStr = notOpenToStr[:-1]
+            else:
+                for program in programList:
+                    if item.find(program) != -1:
+                        if program == "Engineering Students":
+                            if onlyOpenToStr.find("Engineering") != -1:
+                                continue
+                            else:
+                                program = "Faculty of Engineering"
+                        if program == "Arts students":
+                            if onlyOpenToStr.find(program) != -1:
+                                continue
+                            program = "Faculty of Arts"
+                        if program == "Science students":
+                            if onlyOpenToStr.find("Science") != -1:
+                                continue
+                            program = "Faculty of Science"
+                        if program == "Environment students":
+                            if onlyOpenToStr.find(program) != -1:
+                                continue
+                            program = "Faculty of Environment"
+                        if program == "Health students":
+                            if onlyOpenToStr.find(program) != -1:
+                                continue
+                            program = "Faculty of Health"
+                        if program == "Mathematics students":
+                            if onlyOpenToStr.find(program) != -1:
+                                continue
+                            program = "Faculty of Mathematics"
+                        onlyOpenToStr += f"{program},"
+                onlyOpenToStr = onlyOpenToStr[:-1]
+            prereqList[-1].notOpenTo = notOpenToStr
+            prereqList[-1].onlyOpenTo = onlyOpenToStr
+                
             if (prereq.find("Level at least ") != -1 or prereq.find("level at least ") != -1):
                 level = prereq.split("evel at least ")[-1][0:2]
                 if level in levels:
                     prereqList[-1].minimumLevel = level
-            
     return prereqList
             
+def parsePrograms():
+    retvalList = []
+    htmlStr = getUrl(os.environ["programListUrl"])
+    contentStr = htmlStr.split('<div> class="content">')[-1]
+    contentStr = contentStr.split('<table class="tablesaw tablesaw-stack"')[0]
+    contentStrList = contentStr.split("<li><a")
+    for item in contentStrList:
+        item = item.split('</a></li>')[0].split(">")[-1]
+        if item.find("\n") != -1:
+            continue
+        retvalList.append(item)
+    retvalList = retvalList[8:]
+    retvalList.append("Faculty of Mathematics")
+    retvalList.append("Faculty of Arts")
+    retvalList.append("Faculty of Health")
+    retvalList.append("Faculty of Engineering")
+    retvalList.append("Faculty of Environment")
+    retvalList.append("Faculty of Science")
+    retvalList.append("Mathematics students")
+    retvalList.append("Arts students")
+    retvalList.append("Health students")
+    retvalList.append("Engineering students ")
+    retvalList.append("Environment students")
+    retvalList.append("Science students")
+    return retvalList
+    
     
         
         
@@ -639,13 +774,14 @@ def parsePrereqs():
 def getCourseFromUWflow(year: int):
     try:
         courseData = wrapperCourseDataFunc(year)
-        prereqList = parsePrereqs()
-        # Session.add_all(courseData)
-        # Session.commit()
-        # Session.close()
-        # Session.add_all(prereqList)
-        # Session.commit()
-        # Session.close()
+        program_list = parsePrograms()
+        prereqList = parsePrereqs(programList=program_list)
+        Session.add_all(courseData)
+        Session.commit()
+        Session.close()
+        Session.add_all(prereqList)
+        Session.commit()
+        Session.close()
     except OperationalError as msg:
         print("Error: ", msg)
 
