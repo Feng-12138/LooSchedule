@@ -19,8 +19,12 @@ class ScheduleViewModel(input: Schedule) : ViewModel() {
     private val _courseList = MutableStateFlow(schedule.getValue(schedule.keys.first()))
     val courseList: List<Course> get() = _courseList.value
 
-    private val _selectedTabIndex = MutableStateFlow(0)
+    private var _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex: Int get() = _selectedTabIndex.value
+
+    fun setSelectedTabIndex(pagerPage : Int) {
+        _selectedTabIndex.value = pagerPage
+    }
 
     init {
         updateCourseList()

@@ -25,6 +25,7 @@ class TermMapperService {
         val countCourseTerm = mutableMapOf<String, Int>()
         val generatedSchedule = mutableMapOf<String, MutableList<Course>>()
         val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
+        println(courseData.mathCourses.map { it.courseID })
         var coursePerTerm : Int
         var remainder: Int
         if (takeCourseInWT) {
