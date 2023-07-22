@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.androidapp.enum.CoopSequence
@@ -44,13 +45,27 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
     )
     {
         Column(
-                modifier = Modifier
-                        .align(Alignment.TopCenter),
-                horizontalAlignment = Alignment.CenterHorizontally) {
+                modifier = Modifier.align(Alignment.TopCenter),
+        ) {
+            Text("Degree: ",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 12.dp))
             SelectList(MyMajor.values().map { it.major }.toTypedArray(), context, viewModel.uiState.value.major, viewModel)
+            Text("Academic Year: ",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 12.dp))
             SelectList(MyYear.values().map { it.year }.toTypedArray(), context, viewModel.uiState.value.year, viewModel)
+            Text("Coop Sequence: ",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 12.dp))
             SelectList(CoopSequence.values().map { it.sequence }.toTypedArray(), context, viewModel.uiState.value.sequence, viewModel)
+            Text("Minor: ",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 12.dp))
             SelectList(MyMinor.values().map { it.minor }.toTypedArray(), context, viewModel.uiState.value.minor, viewModel)
+            Text("Specialization: ",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 12.dp))
             SelectList(MySpecialization.values().map { it.specialization }.toTypedArray(), context, viewModel.uiState.value.specialization, viewModel)
         }
         Button(onClick =
