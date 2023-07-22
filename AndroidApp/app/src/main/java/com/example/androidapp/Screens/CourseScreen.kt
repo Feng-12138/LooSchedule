@@ -15,6 +15,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Star
@@ -141,6 +145,13 @@ fun SwapAndDelete(modifier: Modifier = Modifier) {
                 modifier = Modifier.height(56.dp),
                 onClick = { /* Handle button 1 click */ }
             ) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = "Swap"
+                )
+
+                Spacer(modifier = Modifier.size(8.dp))
+
                 Text("Swap Course")
             }
 
@@ -150,6 +161,13 @@ fun SwapAndDelete(modifier: Modifier = Modifier) {
                 modifier = Modifier.height(56.dp),
                 onClick = { /* Handle button 2 click */ }
             ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete"
+                )
+
+                Spacer(modifier = Modifier.size(8.dp))
+
                 Text("Delete Course")
             }
 
