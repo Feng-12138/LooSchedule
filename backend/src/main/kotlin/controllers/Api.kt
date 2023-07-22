@@ -29,20 +29,6 @@ class Api {
     }
 
     @GET
-    @Path("api/Courses")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun getCourses(): Response {
-        try{
-            val message = service.allCourses()
-            return Response.ok(message).build()
-        }
-        catch (e: Exception){
-            println(e.message)
-        }
-        return Response.serverError().build()
-    }
-
-    @GET
     @Path("api/Communications")
     @Produces(MediaType.APPLICATION_JSON)
     fun getCommunications(): Response {
@@ -63,6 +49,20 @@ class Api {
     fun getSchedule(academicPlan: AcademicPlan): Response {
         try {
             val message = service.generateSchedule(academicPlan)
+            return Response.ok(message).build()
+        }
+        catch (e: Exception){
+            println(e.message)
+        }
+        return Response.serverError().build()
+    }
+
+    @POST
+    @Path("plans")
+    @Produces(MediaType.APPLICATION_JSON)
+    fun getAllPlans(): Response {
+        try{
+            val message = service.allPlanNames()
             return Response.ok(message).build()
         }
         catch (e: Exception){

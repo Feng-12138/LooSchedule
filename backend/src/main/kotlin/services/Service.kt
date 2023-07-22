@@ -55,6 +55,20 @@ class Service: IService {
     }
 
     @Override
+    override fun allPlanNames(): Plans {
+        val majors = majorRepo.getAllMajorNames()
+        val minors = minorRepo.getAllMinorNames()
+        val specializations = specializationRepo.getAllSpecializationsNames()
+        val courses = courseRepo.getAllIdAndNames()
+        return Plans(
+            majors = majors,
+            minors = minors,
+            specializations = specializations,
+            courses = courses,
+        )
+    }
+
+    @Override
     override fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>> {
         val requirements: Requirements = getRequirements(plan)
         val selectedCourses = coursePlanner.getCoursesPlanToTake(plan.startYear, requirements)
