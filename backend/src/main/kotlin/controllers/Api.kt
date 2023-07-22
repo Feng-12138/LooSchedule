@@ -58,7 +58,7 @@ class Api {
     }
 
     @GET
-    @Path("plans")
+    @Path("api/everything")
     @Produces(MediaType.APPLICATION_JSON)
     fun getAllPlans(): Response {
         try{
