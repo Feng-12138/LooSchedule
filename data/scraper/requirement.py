@@ -1,6 +1,6 @@
 from requests import get
 from bs4 import BeautifulSoup
-from re import compile, findall, search
+from re import compile, findall, search, finditer
 from sqlite3 import OperationalError
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from datetime import datetime
@@ -128,7 +128,6 @@ def getRequirement(name, url, year, add=True):
         html = get(UndergradCalendarBaseURL + '/page/MATH-Joint-Bachelor-of-Computer-Science-1' + param).text
     soup = BeautifulSoup(html, features='html.parser')
     contents = soup.find('span', id='ctl00_contentMain_lblContent')
-    # print(contents)
     aList = [a.get_text() for a in contents.find_all('a')]
     res, courses = [], set()
     additionalCourses = []
@@ -140,7 +139,10 @@ def getRequirement(name, url, year, add=True):
         additionalCourses = courses
     choices = contents.find_next('ul').contents
     choices = list(filter(lambda c: c != '\n', choices))
-    # print(choices)
+    if (name == 'Business Administration & Computer Science Double Degree'):
+        WLUchoices = contents.find_next('ul').find_next_sibling('ul')
+        WLUchoices = list(filter(lambda c: c != '\n', WLUchoices))
+        choices += WLUchoices
     addReq, coopOnly, isDD = None, False, False
     for choice in choices:
         try:
@@ -233,11 +235,17 @@ def parseChoice(choice):
             levels = findall(r'\b\d+\b', logic.split('level')[0])
             subjects = [a.get_text() for a in choice.find_all('a')]
             subjects = list(filter(lambda s: 'advisor' not in s, subjects))
-            if len(subjects) == 0 and 'math course' in logic: 
-                subjects = MATH_COURSE_CODES
-                if 'other than' in logic:
-                    exclude = set(choice.get_text().split('other than ')[1].split(', '))
-                    subjects = list(set(subjects).difference(exclude))
+            if len(subjects) == 0:
+                if 'math course' in logic: 
+                    subjects = MATH_COURSE_CODES
+                    if 'other than' in logic:
+                        exclude = set(choice.get_text().split('other than ')[1].split(', '))
+                        subjects = list(set(subjects).difference(exclude))
+                elif 'BUS' in choice.get_text(): subjects.append('BUS')
+                elif 'COMM' in choice.get_text(): subjects.append('COMM')
+                elif 'ENTR' in choice.get_text(): subjects.append('ENTR')
+                elif 'STAT' in choice.get_text(): subjects.append('STAT')
+                
             for subject in subjects:
                 if len(levels) == 0: options.append(subject + ' xxx')
                 for level in levels:
@@ -309,6 +317,9 @@ def parseChoice(choice):
         elif len(choice.find_all('a')) == 0 and 'math courses' in logic:
             subjects = MATH_COURSE_CODES
             for subject in subjects: options.append(subject + ' xxx')
+        elif len(choice.find_all('a')) > 0 and 'courses' in choice.get_text():
+            subject = choice.find('a').get_text()
+            options.append(subject + 'xxx')
     elif 'excluding the following' in choice.get_text():
         levels = []
         if 'level' in logic:
@@ -336,10 +347,22 @@ def parseChoice(choice):
                     for level in levels:
                         options.append(subject + ' ' + level[0] + 'xx')
             elif course.find('a') is None:
-                if 'BUS' in course.get_text(): continue
+                if 'BUS' in course.get_text():
+                    starts = [c.start() for c in finditer('BUS', course.get_text())]
+                    for start in starts:
+                        substr = course.get_text()[start:]
+                        end = substr.find(' ', substr.find(' ') + 1)
+                        options += [course.get_text()[start:start + end]]
+                if 'ECON' in course.get_text():
+                    starts = [c.start() for c in finditer('ECON', course.get_text())]
+                    for start in starts:
+                        substr = course.get_text()[start:]
+                        end = substr.find(' ', substr.find(' ') + 1)
+                        options += [course.get_text()[start:start + end]]
                 if 'from' in course.get_text():
                     options += course.get_text().split('from ')[1].split(', ')
-                else: options += [course.get_text().strip()]
+                elif 'BUS' not in course.get_text() and 'ECON' not in course.get_text():
+                    options += [course.get_text().strip()]
             else:
                 if 'Note:' in course.contents[0].get_text(): continue
                 elif 'Note:' in course.get_text():
@@ -359,6 +382,18 @@ def parseChoice(choice):
         else:
             for course in choice.find_all('li'):
                 option = [a.get_text() for a in course.find_all('a')]
+                if 'BUS' in course.get_text():
+                    starts = [c.start() for c in finditer('BUS', course.get_text())]
+                    for start in starts:
+                        substr = course.get_text()[start:]
+                        end = substr.find(' ', substr.find(' ') + 1)
+                        option += [course.get_text()[start:start + end]]
+                if 'ECON' in course.get_text():
+                    starts = [c.start() for c in finditer('ECON', course.get_text())]
+                    for start in starts:
+                        substr = course.get_text()[start:]
+                        end = substr.find(' ', substr.find(' ') + 1)
+                        option += [course.get_text()[start:start + end]]
                 res.append((1, set(option)))
         return res, options, additional
     elif stringToNum(logic): n = stringToNum(logic)
@@ -396,16 +431,16 @@ def parseChoice(choice):
 
 
 def stringToNum(s):
-    if 'one' in s: return 1
-    elif 'two' in s: return 2
-    elif 'three' in s: return 3
-    elif 'four' in s: return 4
-    elif 'five' in s: return 5
-    elif 'six' in s: return 6
-    elif 'seven' in s: return 7
-    elif 'eight' in s: return 8
-    elif 'nine' in s: return 9
-    elif 'ten' in s: return 10
+    if 'one ' in s: return 1
+    elif 'two ' in s: return 2
+    elif 'three ' in s: return 3
+    elif 'four ' in s: return 4
+    elif 'five ' in s: return 5
+    elif 'six ' in s: return 6
+    elif 'seven ' in s: return 7
+    elif 'eight ' in s: return 8
+    elif 'nine ' in s: return 9
+    elif 'ten ' in s: return 10
     return 0
 
 
