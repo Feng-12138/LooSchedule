@@ -24,6 +24,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -174,12 +179,14 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
 private fun CourseSchedulePage(courses: List<Course>, navController: NavController) {
     if (courses.isEmpty()) {
         Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
+            contentAlignment = Alignment.TopCenter,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 56.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
-                    imageVector = Icons.Default.Warning,
+                    imageVector = Icons.Default.Lock,
                     contentDescription = "No courses warning",
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     modifier = Modifier.size(64.dp)
@@ -188,7 +195,7 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "No courses selected for this term.",
+                    text = "No courses selected for this term",
                     style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)),
                     textAlign = TextAlign.Center
                 )
@@ -197,11 +204,15 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
         return
     }
 
-    LazyColumn(
-        state = rememberLazyListState()
+    Box(
+       modifier = Modifier.fillMaxSize()
     ) {
-        items(courses) { course ->
-            CourseDescription(course = course, navController = navController)
+        LazyColumn(
+            state = rememberLazyListState()
+        ) {
+            items(courses) { course ->
+                CourseDescription(course = course, navController = navController)
+            }
         }
     }
 }
@@ -212,7 +223,7 @@ fun AddButton() {
     Box(
         contentAlignment = Alignment.BottomEnd,
         modifier = Modifier
-            .padding(vertical = 66.dp)
+            .padding(vertical = 16.dp)
     ) {
         FloatingActionButton(
             containerColor = Color.LightGray,
