@@ -37,7 +37,6 @@ class MainActivity : ComponentActivity() {
                 if (response.isSuccessful) {
                     val dataManager = EverythingManager.getInstance()
                     response.body()?.let { dataManager.setEverything(it) }
-                    Toast.makeText(context, response.message(), Toast.LENGTH_SHORT).show()
                 }
                 else {
                     println(response.message())

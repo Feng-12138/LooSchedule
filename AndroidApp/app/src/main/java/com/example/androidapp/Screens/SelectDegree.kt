@@ -2,7 +2,6 @@ package com.example.androidapp.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,11 +28,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.androidapp.enum.CoopSequence
-import com.example.androidapp.enum.MyMajor
-import com.example.androidapp.enum.MyMinor
-import com.example.androidapp.enum.MySpecialization
-import com.example.androidapp.enum.MyYear
+import com.example.androidapp.EverythingManager
+import com.example.androidapp.enum.FieldType
 import com.example.androidapp.viewModels.SelectDegreeVM
 
 
@@ -43,7 +39,11 @@ import com.example.androidapp.viewModels.SelectDegreeVM
 fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
     var showAlert by remember { mutableStateOf(selectDegreeVM.showDialog) }
     val viewModel: SelectDegreeVM = selectDegreeVM
+    val everythingManager: EverythingManager = EverythingManager.getInstance()
+    val sequence: List<String> = listOf("Select your coop sequence", "Regular", "Sequence 1", "Sequence 2", "Sequence 3", "Sequence 4")
+    val year: List<String> = listOf("Select your academic year", "2023", "2022", "2021", "2020", "2019")
     val context = LocalContext.current
+
     Box(
         Modifier
             .fillMaxWidth()
@@ -56,23 +56,23 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
             Text("Degree: ",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
-            SelectList(MyMajor.values().map { it.major }.toTypedArray(), context, viewModel.uiState.value.major, viewModel)
+            SelectList(everythingManager.getMajors().toTypedArray(), context, FieldType.MAJOR, viewModel)
             Text("Academic Year: ",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
-            SelectList(MyYear.values().map { it.year }.toTypedArray(), context, viewModel.uiState.value.year, viewModel)
+            SelectList(year.toTypedArray(), context, FieldType.YEAR, viewModel)
             Text("Coop Sequence: ",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
-            SelectList(CoopSequence.values().map { it.sequence }.toTypedArray(), context, viewModel.uiState.value.sequence, viewModel)
+            SelectList(sequence.toTypedArray(), context, FieldType.SEQUENCE, viewModel)
             Text("Minor: ",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
-            SelectList(MyMinor.values().map { it.minor }.toTypedArray(), context, viewModel.uiState.value.minor, viewModel)
+            SelectList(everythingManager.getMinors().toTypedArray(), context, FieldType.MINOR, viewModel)
             Text("Specialization: ",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
-            SelectList(MySpecialization.values().map { it.specialization }.toTypedArray(), context, viewModel.uiState.value.specialization, viewModel)
+            SelectList(everythingManager.getSpecializations().toTypedArray(), context, FieldType.SPECIALIZATION, viewModel)
         }
         Button(onClick =
         {
@@ -127,9 +127,9 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T, viewModel: SelectDegreeVM) {
+fun SelectList(choices: Array<String>, context: Context, type: FieldType, viewModel: SelectDegreeVM) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(choices[enum.ordinal]) }
+    var selectedText by remember { mutableStateOf(choices.first()) }
 
     Box(Modifier.padding(12.dp)) {
         ExposedDropdownMenuBox(
@@ -139,13 +139,13 @@ fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T,
                 },
         ) {
             TextField(
-                    value = selectedText,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor()
+                value = selectedText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor()
             )
             ExposedDropdownMenu(
                     expanded = expanded,
@@ -158,22 +158,20 @@ fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T,
                         onClick = {
                             selectedText = item
                             expanded = false
-                            when(enum){
-                                is MyMajor ->{
-                                    viewModel.uiState.value.major = MyMajor.fromString(item)
-                                }
-                                is MyYear ->{
-                                    viewModel.uiState.value.year = MyYear.fromString(item)
-                                }
-                                is MyMinor ->{
-                                    viewModel.uiState.value.minor = MyMinor.fromString(item)
-                                }
-                                is MySpecialization ->{
-                                    viewModel.uiState.value.specialization = MySpecialization.fromString(item)
-                                }
-                                is CoopSequence ->{
-                                    viewModel.uiState.value.sequence = CoopSequence.fromString(item)
-                                }
+                            if(type == FieldType.MAJOR){
+                                viewModel.uiState.value.major = item
+                            }
+                            if(type == FieldType.MINOR){
+                                viewModel.uiState.value.minor = item
+                            }
+                            if(type == FieldType.SPECIALIZATION){
+                                viewModel.uiState.value.specialization = item
+                            }
+                            if(type == FieldType.YEAR){
+                                viewModel.uiState.value.year = item
+                            }
+                            if(type == FieldType.SEQUENCE){
+                                viewModel.uiState.value.sequence = item
                             }
                         }
                     )
@@ -182,3 +180,6 @@ fun <T : Enum<T>> SelectList(choices: Array<String>, context: Context, enum : T,
         }
     }
 }
+
+
+
