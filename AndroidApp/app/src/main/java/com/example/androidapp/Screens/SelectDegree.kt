@@ -5,15 +5,21 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
@@ -83,6 +89,13 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(16.dp)) {
+            Icon(
+                imageVector = Icons.Default.Create,
+                contentDescription = "Create"
+            )
+
+            Spacer(modifier = Modifier.size(8.dp))
+
             Text("Create Course Schedule")
         }
 
