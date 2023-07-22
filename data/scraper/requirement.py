@@ -473,13 +473,13 @@ def addRequirement(planName, year, courses, addReq, link, coopOnly, isDD):
     else:
         print('Invalid requirement type: ' + r.type + '!')
         return
-    # try:
-    #     SESSION.add(r)
-    #     SESSION.add(p)
-    #     SESSION.commit()
-    #     SESSION.close()
-    # except OperationalError as msg:
-    #     print("Error: ", msg)
+    try:
+        SESSION.add(r)
+        SESSION.add(p)
+        SESSION.commit()
+        SESSION.close()
+    except OperationalError as msg:
+        print("Error: ", msg)
 
 if __name__ == '__main__':
     # print(getTable2Courses(2023))
