@@ -1,5 +1,6 @@
 package com.example.androidapp.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -44,13 +45,16 @@ fun CourseScreen(course: Course?) {
         course?.courseName?.let {
             Text(
                 text = it,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+                style = MaterialTheme.typography.headlineSmall,
             )
         }
 
+        Spacer(modifier = Modifier.size(16.dp))
+
         if (course != null) {
-            RatingBar(rating = course.easyRating)
+            RatingBar(type = "Easy Rating", rating = course.easyRating)
+            Spacer(modifier = Modifier.size(16.dp))
+            RatingBar(type = "Like Rating", rating = course.likeRating)
         }
 
         Spacer(modifier = Modifier.size(16.dp))
@@ -62,22 +66,21 @@ fun CourseScreen(course: Course?) {
 }
 
 @Composable
-fun RatingBar(rating: Float) {
-    Column {
+fun RatingBar(type: String, rating: Float) {
+    Column{
         Text(
-            text = "Rating",
-            style = MaterialTheme.typography.headlineMedium,
+            text = type,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 4.dp)
         )
 
-        Row {
+        Row(horizontalArrangement = Arrangement.Center) {
             repeat(5) {index ->
                 if (index < (rating * 5).toInt()){
                     Icon(
                         imageVector = Icons.Outlined.Star,
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
 
@@ -91,15 +94,15 @@ fun Description(description: String) {
     Column {
         Text(
             text = "Course Description",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 0.dp)
         )
         
         Text(
             text = description,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 16.dp)
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(top = 20.dp)
         )
     }
 }
