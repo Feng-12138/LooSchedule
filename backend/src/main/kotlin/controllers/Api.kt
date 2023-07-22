@@ -57,7 +57,7 @@ class Api {
         return Response.serverError().build()
     }
 
-    @POST
+    @GET
     @Path("plans")
     @Produces(MediaType.APPLICATION_JSON)
     fun getAllPlans(): Response {
