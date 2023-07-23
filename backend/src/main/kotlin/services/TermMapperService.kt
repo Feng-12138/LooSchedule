@@ -19,10 +19,14 @@ class TermMapperService {
     private var takeCourseInWT = false
     private var takenCourses : MutableList<String> = mutableListOf()
 
-    fun mapCoursesToSequence(courseData: CourseDataClass, sequenceMap: Map<String, String>): MutableMap<String, MutableList<Course>> {
+    fun mapCoursesToSequence(
+        courseData: CourseDataClass,
+        sequenceMap: Map<String, String>,
+        currentTerm: String
+    ): MutableMap<String, MutableList<Course>> {
         val list = courseData.mathCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.nonMathCourses.map { it.courseID })
-        var prereqsData = prerequisiteRepo.getParsedPrereqData(list)
+        val prereqsData = prerequisiteRepo.getParsedPrereqData(list)
         val countCourseTerm = mutableMapOf<String, Int>()
         val generatedSchedule = mutableMapOf<String, MutableList<Course>>()
         val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size

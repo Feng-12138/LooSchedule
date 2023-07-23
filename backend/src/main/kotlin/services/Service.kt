@@ -3,15 +3,12 @@ package services
 import entities.Communication
 import entities.Course
 import jakarta.inject.Inject
-import okhttp3.Call
-import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import repositories.*
-import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class Service: IService {
@@ -132,14 +129,35 @@ class Service: IService {
 
     @Override
     override fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>> {
-        val requirements: Requirements = getRequirements(plan)
+        val requirements = getRequirements(plan)
+        val takenCourses = plan.coursesTaken
+        val currentTerm = plan.currentTerm
+
+        if (takenCourses.isNotEmpty()) {
+            requirements.mandatoryCourses.removeIf { mandatoryCourse ->
+                val course = mandatoryCourse.subject + " " + mandatoryCourse.code
+                takenCourses.contains(course)
+            }
+
+            for (optionalReq in requirements.optionalCourses) {
+                val commonCourses = optionalReq.courses.filter { it.subject + " " + it.code in takenCourses }
+                optionalReq.courses.removeAll(commonCourses.toSet())
+                optionalReq.nOf -= commonCourses.size
+                if (optionalReq.nOf <= 1) {
+                    requirements.mandatoryCourses.addAll(optionalReq.courses)
+                    requirements.optionalCourses.remove(optionalReq)
+                }
+            }
+        }
+
         val selectedCourses = coursePlanner.getCoursesPlanToTake(plan.startYear, requirements)
         println(selectedCourses.first.map { it.courseID })
         println(selectedCourses.second.map { it.courseID })
 
         return termMapperService.mapCoursesToSequence(
-            CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
-            sequenceGenerator.generateSequence(plan.sequence)
+            courseData = CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
+            sequenceMap = sequenceGenerator.generateSequence(plan.sequence),
+            currentTerm = currentTerm,
         )
     }
 
@@ -171,8 +189,17 @@ data class AcademicPlan(
     var startYear: String = "",
     var sequence: String = "Regular",
     var minors: List<String> = listOf(),
-    var specializations: List<String> = listOf()
+    var specializations: List<String> = listOf(),
+    var coursesTaken: List<String> = listOf(),
+    var currentTerm: String = "1A",
 ) {
     // Default constructor
-    constructor() : this(listOf(), "2023", "Regular", listOf(), listOf())
+    constructor() : this(listOf(), "2023", "Regular", listOf(), listOf(), listOf())
+}
+
+data class Message(
+    val position: String
+){
+    // Default constructor
+    constructor() : this("")
 }

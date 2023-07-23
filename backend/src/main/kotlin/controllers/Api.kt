@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import services.AcademicPlan
 import services.IService
+import services.Message
 
 @Path("/")
 class Api {
@@ -81,12 +82,5 @@ class Api {
             println(e.message)
         }
         return@runBlocking Response.serverError().build()
-    }
-
-    data class Message(
-        val position: String
-    ){
-        // Default constructor
-        constructor() : this("")
     }
 }
