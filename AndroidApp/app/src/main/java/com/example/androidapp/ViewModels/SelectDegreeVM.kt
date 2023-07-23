@@ -87,7 +87,7 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
             ) {
                 if (response.isSuccessful) {
                     val output = response.body()
-                    val schedule = output?.let { Schedule(it) }
+                    val schedule = output?.let { Schedule(it as MutableMap<String, List<Course>>) }
 
                     val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
                     val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
