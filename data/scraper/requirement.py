@@ -174,7 +174,17 @@ def getTable2Courses(year):
             courses = courses.union(set(c))
     else:
         contents, choices = [], []
-        for content in soup.find(string='Table 2 – Faculty Core Courses').find_all_next()[1:]:
+        tableContents = []
+        if year >= 2021:
+            tableContents = soup.find(string='Table 2 – Faculty Core Courses').find_all_next()[1:]
+        else:
+            headers = soup.find_all('h3')
+            for header in headers:
+                if 'Table II – Faculty Core Courses' == header.get_text():
+                    tableContents = header.find_all_next()[2:]
+                    break
+        for content in tableContents:
+            if content.name == 'h4': break
             if content.name == 'p' and 'Three-Year General degree' in content.get_text(): break
             if content.name == 'p' or content.name == 'blockquote': contents.append(content)
         i, n = 0, len(contents)
@@ -555,6 +565,9 @@ if __name__ == '__main__':
     # getProgramRequirements('Pure Mathematics', '/group/MATH-Pure-Mathematics-1', 2023)
     # getProgramRequirements('Statistics', '/group/MATH-Statistics-1', 2023)
     # getAcademicPrograms(2021)
+    getTable2Courses(2019)
+    getTable2Courses(2020)
     getTable2Courses(2021)
+    getTable2Courses(2022)
     getTable2Courses(2023)
     # getTable2Courses(2022)
