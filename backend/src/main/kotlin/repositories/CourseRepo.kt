@@ -48,4 +48,17 @@ class CourseRepo {
             emptySet<Course>() as MutableSet<Course>
         }
     }
+
+    fun getBySubject(courseSubjects: Set<String>): MutableSet<Course> {
+        return try {
+            val session = sessionFactory.openSession()
+            val hql = "FROM Course WHERE subject in :subjects"
+            val query = session.createQuery(hql, Course::class.java)
+            val courses = query.setParameterList("subjects", courseSubjects)
+            courses.list().toMutableSet()
+        } catch (e: Exception) {
+            println(e.message)
+            emptySet<Course>() as MutableSet<Course>
+        }
+    }
 }

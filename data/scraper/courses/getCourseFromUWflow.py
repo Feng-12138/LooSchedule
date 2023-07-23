@@ -107,7 +107,6 @@ def wrapperCourseDataFunc(curYear: int):
                 courseDict[courseNum].easyRating = ""
                 courseDict[courseNum].likedRating = ""
                 courseDict[courseNum].usefulRating = ""
-                courseDict[courseNum].antireqs = ""
                 courseDict[courseNum].coreqs = ""
                 courseDict[courseNum].antireqs = ""
     uwFlowCourseList = getUrl(os.environ['uwflowUrl'], query="""query Course {
@@ -157,7 +156,6 @@ def wrapperCourseDataFunc(curYear: int):
             courseDict[courseNum].easyRating = course["rating"]["easy"]
             courseDict[courseNum].likedRating = course["rating"]["liked"]
             courseDict[courseNum].usefulRating = course['rating']['useful']
-            courseDict[courseNum].antireqs = course['antireqs']
             courseDict[courseNum].coreqs = course["coreqs"]
             courseDict[courseNum].antireqs = course['antireqs']
             # courseDict[courseNum].prereqs = course['prereqs']
@@ -210,8 +208,18 @@ def wrapperCourseDataFunc(curYear: int):
         antireq = courseDict[key].antireqs
         if antireq == None:
             continue
-        # parseAntireq = parseByBracket(antireq, key, keys)
-        # courseDict[key].antireqs = parseAntireq
+        parseAntireq = antireq.split(",")
+        parseAntireq_slash = []
+        for course in parseAntireq:
+            lst = course.split('/')
+            parseAntireq_slash.extend(lst)
+        parseAntireq = addSpaceToStr(parseAntireq_slash)
+            
+        finalAntireqStr = ""
+        for item in parseAntireq:
+            finalAntireqStr += item.upper().strip()
+            finalAntireqStr += ","
+        courseDict[key].antireqs = finalAntireqStr[:-1]
     return courseDict.values()
     
 
@@ -733,6 +741,9 @@ def parsePrereqs(programList: list):
                             program = "Faculty of Mathematics"
                         onlyOpenToStr += f"{program},"
                 onlyOpenToStr = onlyOpenToStr[:-1]
+            # if key == "CS 136":
+            #     print("Here")
+            #     print(onlyOpenToStr)
             prereqList[-1].notOpenTo = notOpenToStr
             prereqList[-1].onlyOpenTo = onlyOpenToStr
                 

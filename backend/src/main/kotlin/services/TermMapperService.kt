@@ -19,6 +19,8 @@ class TermMapperService {
     private var takeCourseInWT = false
     private var takenCourses : MutableList<String> = mutableListOf()
 
+    val ListOneCourses = listOf("COMMST 100", "COMMST 223", "EMLS 101R", "EMLS 102R", "EMLS 129R", "ENGL 129R", "ENGL 109")
+
     fun mapCoursesToSequence(courseData: CourseDataClass, sequenceMap: Map<String, String>): MutableMap<String, MutableList<Course>> {
         val list = courseData.mathCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.nonMathCourses.map { it.courseID })
@@ -26,7 +28,6 @@ class TermMapperService {
         val countCourseTerm = mutableMapOf<String, Int>()
         val generatedSchedule = mutableMapOf<String, MutableList<Course>>()
         val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
-        println(courseData.mathCourses.map { it.courseID })
         var coursePerTerm : Int
         var remainder: Int
         if (takeCourseInWT) {
@@ -42,11 +43,11 @@ class TermMapperService {
         if (coursePerTerm > 5) {
             takeCourseInWT = true
         }
-        for ((key, value) in prereqsData) {
-            if (key == "CO 250") {
-                value.courses = mutableListOf(mutableListOf("MATH 136"), mutableListOf("MATH 146"))
-            }
-        }
+//        for ((key, value) in prereqsData) {
+//            if (key == "CO 250") {
+//                value.courses = mutableListOf(mutableListOf("MATH 136"), mutableListOf("MATH 146"))
+//            }
+//        }
         coursePerTerm = 5
         remainder = 0
         for ((key, _) in sequenceMap) {
@@ -187,6 +188,8 @@ class TermMapperService {
                 satisfyConstraintNonMathCourse.add(course)
             }
         }
+//        println(satisfyConstraintNonMathCourse.map { it.courseID })
+//        println(satisfyConstraintOnlineNonMathCourse.map{it.courseID})
         var newSatisfyConstraintMathCourse = satisfyConstraintMathCourse.sortedBy { it.courseID }
         var newSatisfyConstraintNonMathCourse = satisfyConstraintNonMathCourse.sortedBy { it.courseID }
         var newSatisfyConstraintOnlineNonMathCourse = satisfyConstraintOnlineNonMathCourse.sortedBy { it.courseID }
@@ -214,6 +217,7 @@ class TermMapperService {
                 if (counter >= numCourseCounter) {
                     break
                 }
+
                 for (item in newSatisfyConstraintNonMathCourse) {
                     retvalList.add(item)
                     counter++
@@ -223,6 +227,29 @@ class TermMapperService {
                 }
                 i = counter
             } else {
+                // Add communication course for the first term
+                if (termName == "1A") {
+                    var communicationCourseAdded = false
+                    for (item in newSatisfyConstraintNonMathCourse) {
+                        val courseID = item.courseID
+                        if (courseID in ListOneCourses) {
+                            retvalList.add(item)
+                            counter++
+                            communicationCourseAdded = true
+                            break
+                        }
+                    }
+                    if (!communicationCourseAdded) {
+                        for (item in newSatisfyConstraintOnlineNonMathCourse) {
+                            val courseID = item.courseID
+                            if (courseID in ListOneCourses) {
+                                retvalList.add(item)
+                                counter++
+                                break
+                            }
+                        }
+                    }
+                }
                 for (item in newSatisfyConstraintNonMathCourse) {
                     retvalList.add(item)
                     counter++
@@ -247,7 +274,6 @@ class TermMapperService {
                 i = counter
             }
         }
-        println(retvalList.map{it.courseID})
         return retvalList
     }
 
