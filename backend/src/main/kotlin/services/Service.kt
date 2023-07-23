@@ -39,6 +39,9 @@ class Service: IService {
     @Inject
     private lateinit var sequenceGenerator: SequenceGenerator
 
+    @Inject
+    private lateinit var scheduleValidator: ScheduleValidator
+
     @Override
     override fun helloWorld(): String {
         return testRepo.helloWorld()
@@ -65,6 +68,11 @@ class Service: IService {
             CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
             sequenceGenerator.generateSequence(plan.sequence)
         )
+    }
+
+    @Override
+    override fun validateSchedule(schedule: Schedule, degree: String): ScheduleValidationResult {
+        return scheduleValidator.validateSchedule(schedule, degree)
     }
 
     private fun getRequirements(plan: AcademicPlan): Requirements {

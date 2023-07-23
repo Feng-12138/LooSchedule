@@ -70,4 +70,7 @@ class Api {
         }
         return Response.serverError().build()
     }
+
+    // Need to add a function from front end to pass schedule and degree
+    // so that can be validated
 }

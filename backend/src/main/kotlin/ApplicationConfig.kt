@@ -66,6 +66,10 @@ class ApplicationConfig : ResourceConfig() {
                     .to(SequenceGenerator::class.java)
                     .`in`(Singleton::class.java)
 
+                bind(ScheduleValidator::class.java)
+                    .to(ScheduleValidator::class.java)
+                    .`in`(Singleton::class.java)
+
                 val sessionFactory = createSessionFactory()
                 bind(sessionFactory)
                     .to(SessionFactory::class.java)

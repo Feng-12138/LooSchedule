@@ -2,7 +2,6 @@ package services
 
 import entities.Communication
 import entities.Course
-import entities.Year
 
 //@Contract
 interface IService {
@@ -10,7 +9,9 @@ interface IService {
     fun allCourses(): List<Course>
     fun allCommunications(): List<Communication>
 
-    fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>>
+    fun generateSchedule(plan: AcademicPlan): Schedule
+
+    fun validateSchedule(schedule: Schedule, degree: String): ScheduleValidationResult
 }
 
 
