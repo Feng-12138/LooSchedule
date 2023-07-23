@@ -157,6 +157,37 @@ def getRequirement(name, url, year, add=True):
             addRequirement(name, year, requiredCourses, addReq, url, coopOnly, isDD)
         return res, courses
     else:
+        choices = []
+        if 'Table 2' in [a.get_text() for a in list(contents)[0].find_all('a')]:
+            res, courses = getTable2Courses(year)
+            additionalCourses = courses
+        contents = list(contents)[1:]
+        contents = list(filter(lambda c: c != '\n', contents))
+        i, n = 0, len(contents)
+        while i < n:
+            c = contents[i]
+            if c.name == compile('h') and 'Note' in c.get_text(): break
+            i += 1
+            if c.name == 'p':
+                choice = (c, [])
+                while i < n and contents[i].name == 'blockquote':
+                    choice[1].append(contents[i])
+                    i += 1
+                choices.append(choice)
+        for choice in choices:
+            # print(choice)
+            # print(' ---------- ')
+            try:
+                res, courses = updateRequirement(res, courses, choice, additionalCourses, year)
+            except Exception as msg:
+                if str(msg) in ADDITIONAL_REQS: addReq = str(msg)
+                else: raise msg
+        # if add:
+        #     requiredCourses = parseRequirement(res)
+        #     if 'co-op only' in name.lower(): coopOnly = True
+        #     if 'double degree' in name.lower(): isDD = True
+        #     addRequirement(name, year, requiredCourses, addReq, url, coopOnly, isDD)
+        print(res)
         return res, courses
     
 
@@ -196,12 +227,11 @@ def getTable2Courses(year):
                 while i < n and contents[i].name == 'blockquote':
                     choice[1].append(contents[i])
                     i += 1
-            choices.append(choice)
+                choices.append(choice)
         for choice in choices:
             r, c, _ = parseChoice(choice, year)
             res += r
             courses = courses.union(set(c))
-    print(res, courses)
     return res, courses
 
 
@@ -462,11 +492,12 @@ def parseChoice(choice, year):
         res.append((n, set(options)))
         return res, options, additional
     else:
+        n, additional = 0, False
+        options, res = [], []
         if len(choice[1]) == 0:
-            pass
+            # print(choice[0])
+            return res, options, additional
         else:
-            n, additional = 0, False
-            options, res = [], []
             logic = choice[0].get_text().lower()
             contents = choice[1][0].contents
             courses, i, n = [], 0, len(contents)
@@ -549,7 +580,7 @@ if __name__ == '__main__':
     # getAcademicPrograms()
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2019)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
-    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
+    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
     # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2022)
@@ -565,9 +596,9 @@ if __name__ == '__main__':
     # getProgramRequirements('Pure Mathematics', '/group/MATH-Pure-Mathematics-1', 2023)
     # getProgramRequirements('Statistics', '/group/MATH-Statistics-1', 2023)
     # getAcademicPrograms(2021)
-    getTable2Courses(2019)
-    getTable2Courses(2020)
-    getTable2Courses(2021)
-    getTable2Courses(2022)
-    getTable2Courses(2023)
+    # getTable2Courses(2019)
+    # getTable2Courses(2020)
+    # getTable2Courses(2021)
+    # getTable2Courses(2022)
+    # getTable2Courses(2023)
     # getTable2Courses(2022)
