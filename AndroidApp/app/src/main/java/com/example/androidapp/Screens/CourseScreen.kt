@@ -33,11 +33,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 
 import com.example.androidapp.models.Course
+import com.example.androidapp.viewModels.ScheduleViewModel
 
 @Composable
-fun CourseScreen(course: Course?) {
+fun CourseScreen(
+    course: Course?,
+    navController: NavController,
+    viewModel: ScheduleViewModel
+) {
     Box(
         Modifier
             .fillMaxWidth()
@@ -77,7 +84,14 @@ fun CourseScreen(course: Course?) {
 
         SwapAndDelete(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
+                .align(Alignment.BottomCenter),
+            onSwap = { /* handle swapping logic */ },
+            onDelete = {
+                course?.let {
+                    viewModel.deleteCourse(viewModel.currentTerm, it)
+                    navController.popBackStack() // to go back to previous screen
+                }
+            }
         )
     }
 }
@@ -127,7 +141,7 @@ fun Description(description: String) {
 
 
 @Composable
-fun SwapAndDelete(modifier: Modifier = Modifier) {
+fun SwapAndDelete(modifier: Modifier = Modifier, onSwap: () -> Unit, onDelete: () -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -159,7 +173,7 @@ fun SwapAndDelete(modifier: Modifier = Modifier) {
 
             Button(
                 modifier = Modifier.height(56.dp),
-                onClick = { /* Handle button 2 click */ }
+                onClick = { onDelete() }
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
