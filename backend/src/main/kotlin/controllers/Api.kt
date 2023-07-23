@@ -63,6 +63,7 @@ class Api {
     fun getAllPlans(): Response {
         try{
             val message = service.allPlanNames()
+            print(message)
             return Response.ok(message).build()
         }
         catch (e: Exception){
