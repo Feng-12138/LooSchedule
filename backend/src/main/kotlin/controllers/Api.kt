@@ -9,6 +9,7 @@ import okhttp3.*
 import services.AcademicPlan
 import services.IService
 import services.Message
+import services.Schedule
 
 @Path("/")
 class Api {
@@ -84,6 +85,17 @@ class Api {
         return@runBlocking Response.serverError().build()
     }
 
-    // Need to add a function from front end to pass schedule and degree
-    // so that can be validated
+    @POST
+    @Path("validate")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    fun validateSchedule(schedule: Schedule, degree: String): Response {
+        try {
+            val message = service.validateSchedule(schedule, degree)
+            return Response.ok(message).build()
+        } catch (e: Exception) {
+            println(e.message)
+        }
+        return Response.serverError().build()
+    }
 }
