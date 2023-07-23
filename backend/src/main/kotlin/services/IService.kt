@@ -11,6 +11,8 @@ interface IService {
     fun allCommunications(): List<Communication>
     fun allPlanNames(): Plans
 
+    suspend fun recommendCourses(position: String) :List<services.Course>
+
     fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>>
 }
 

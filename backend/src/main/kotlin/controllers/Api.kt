@@ -1,12 +1,11 @@
 package controllers
 
-import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import jakarta.inject.Inject
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import kotlinx.coroutines.runBlocking
+import okhttp3.*
 import services.AcademicPlan
 import services.IService
 
@@ -35,8 +34,7 @@ class Api {
         try {
             val message = service.allCommunications()
             return Response.ok(message).build()
-        }
-        catch (e: Exception){
+        } catch (e: Exception) {
             println(e.message)
         }
         return Response.serverError().build()
@@ -50,8 +48,7 @@ class Api {
         try {
             val message = service.generateSchedule(academicPlan)
             return Response.ok(message).build()
-        }
-        catch (e: Exception){
+        } catch (e: Exception) {
             println(e.message)
         }
         return Response.serverError().build()
@@ -61,14 +58,35 @@ class Api {
     @Path("api/everything")
     @Produces(MediaType.APPLICATION_JSON)
     fun getAllPlans(): Response {
-        try{
+        try {
             val message = service.allPlanNames()
             print(message)
             return Response.ok(message).build()
-        }
-        catch (e: Exception){
+        } catch (e: Exception) {
             println(e.message)
         }
         return Response.serverError().build()
+    }
+
+    @POST
+    @Path("gpt")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    fun tryGpt(request: Message): Response = runBlocking {
+        try {
+            println(request.position)
+            val message = service.recommendCourses(request.position)
+            return@runBlocking Response.ok(message).build()
+        } catch (e: Exception) {
+            println(e.message)
+        }
+        return@runBlocking Response.serverError().build()
+    }
+
+    data class Message(
+        val position: String
+    ){
+        // Default constructor
+        constructor() : this("")
     }
 }

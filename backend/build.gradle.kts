@@ -32,9 +32,11 @@ dependencies {
 
     // gson
     implementation("com.google.code.gson:gson:2.8.2")
+    implementation("org.json:json:20210307")
 
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
 
 }
 
