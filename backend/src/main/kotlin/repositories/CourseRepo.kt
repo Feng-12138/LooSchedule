@@ -21,6 +21,17 @@ class CourseRepo {
         }
     }
 
+    fun getAllIdAndNames(): List<String> {
+        return try {
+            val session = sessionFactory.openSession()
+            val courses = session.createQuery("FROM Course", Course::class.java)
+            courses.list().map { it.courseID +  " " + it.courseName}
+        } catch (e: Exception) {
+            println(e.message)
+            listOf()
+        }
+    }
+
     fun getById(id: CourseID): Course? {
         return try {
             val session = sessionFactory.openSession()

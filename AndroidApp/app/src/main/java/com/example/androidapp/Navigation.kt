@@ -21,6 +21,7 @@ import com.example.androidapp.screens.GetStartScreen
 import com.example.androidapp.screens.HistoryScreen
 import com.example.androidapp.screens.MainScreen
 import com.example.androidapp.screens.Screen
+import com.example.androidapp.screens.SearchCourseScreen
 import com.example.androidapp.screens.SelectDegree
 import com.example.androidapp.screens.ViewSchedule
 import com.example.androidapp.viewModels.ScheduleViewModel
@@ -32,6 +33,7 @@ import com.google.gson.Gson
 fun Navigation(){
     val navController = rememberNavController()
     val selectDegreeVM = SelectDegreeVM(LocalContext.current, navController = navController)
+    
 //    val courseList1A = listOf(
 //        Course("CS 135"), Course("MATH 135"),
 //        Course("MATH 137"), Course("EMLS 129R"), Course("PHYS 111")
@@ -109,6 +111,9 @@ fun Navigation(){
     }
 
     NavHost(navController = navController, startDestination = Screen.MainScreen.route){
+        composable(route = Screen.SearchCourse.route){
+            MainScreen (navController = navController, name = "SearchCourse") { SearchCourseScreen(navController = navController) }
+        }
         composable(route = Screen.About.route){
             MainScreen (navController = navController, name = "About") { AboutScreen() }
         }

@@ -5,11 +5,6 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.androidapp.dataClass.MyDegree
-import com.example.androidapp.enum.CoopSequence
-import com.example.androidapp.enum.MyMajor
-import com.example.androidapp.enum.MyMinor
-import com.example.androidapp.enum.MySpecialization
-import com.example.androidapp.enum.MyYear
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.screens.Screen
@@ -34,7 +29,15 @@ data class RequestData(
 )
 
 class SelectDegreeVM(context: Context, navController: NavController) : ViewModel() {
-    private val _uiState = MutableStateFlow(MyDegree())
+    private val _uiState = MutableStateFlow(
+        MyDegree(
+            major = "Select your degree",
+            minor = "Select your minor",
+            specialization = "Select your specialization",
+            year = "Select your academic year",
+            sequence = "Select your Coop sequence"
+        )
+    )
     val uiState: StateFlow<MyDegree> = _uiState.asStateFlow()
 
     private val _showDialog = MutableStateFlow(false)
@@ -49,15 +52,13 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
         minor: String,
         specialization: String
     ) {
-        var inputMajor = listOf(major)
-        var inputYear = year
-        var inputSequence = sequence
-        var inputMinor = if (minor != "Select your minor"){
+        val inputMajor = listOf(major)
+        val inputMinor = if (minor != "Select your minor"){
             listOf(minor)
         } else{
             emptyList()
         }
-        var inputSpecialization = if (specialization != "Select your specialization"){
+        val inputSpecialization = if (specialization != "Select your specialization"){
             listOf(minor)
         } else{
             emptyList()
@@ -65,8 +66,8 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
 
         val requestData = RequestData(
             majors = inputMajor,
-            startYear = inputYear,
-            sequence = inputSequence,
+            startYear = year,
+            sequence = sequence,
             minors = inputMinor,
             specializations = inputSpecialization
         )
@@ -80,7 +81,7 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
 
 
         val call = api.getCourseSchedule(requestBody)
-        call?.enqueue(object : Callback<Map<String, List<Course>>> {
+        call.enqueue(object : Callback<Map<String, List<Course>>> {
             override fun onResponse(
                 call: Call<Map<String, List<Course>>>,
                 response: Response<Map<String, List<Course>>>
@@ -123,21 +124,21 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
     }
 
     fun generateSchedule(
-        major: MyMajor,
-        year: MyYear,
-        sequence: CoopSequence,
-        minor: MyMinor,
-        specialization: MySpecialization,
+        major: String,
+        year: String,
+        sequence: String,
+        minor: String,
+        specialization: String,
         context: Context,
         navController: NavController
     ) {
-        if (major.major == "Select your degree" ||
-            year.year == "Select your academic year" ||
-            sequence.sequence == "Select your Coop sequence") {
+        if (major == "Select your degree" ||
+            year == "Select your academic year" ||
+            sequence == "Select your Coop sequence") {
             toggleDialog()
             return
         }
 
-        getCourseSchedule(context, navController, major.major, year.year, sequence.sequence, minor.minor, specialization.specialization)
+        getCourseSchedule(context, navController, major, year, sequence, minor, specialization)
     }
 }
