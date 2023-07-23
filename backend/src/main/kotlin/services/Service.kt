@@ -3,7 +3,13 @@ package services
 import entities.Communication
 import entities.Course
 import jakarta.inject.Inject
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import repositories.*
+import java.util.concurrent.TimeUnit
 
 class Service: IService {
     @Inject
@@ -58,15 +64,103 @@ class Service: IService {
     }
 
     @Override
+    override fun allPlanNames(): Plans {
+        val majors = majorRepo.getAllMajorNames()
+        val minors = minorRepo.getAllMinorNames()
+        val specializations = specializationRepo.getAllSpecializationsNames()
+        val courses = courseRepo.getAllIdAndNames()
+        return Plans(
+            majors = majors,
+            minors = minors,
+            specializations = specializations,
+            courses = courses,
+        )
+    }
+
+    @Override
+    override suspend fun recommendCourses(position: String): List<services.Course> {
+        val apiKey = System.getenv("API_KEY")
+        val modelEndpoint = "https://api.openai.com/v1/chat/completions"
+        val json = """
+                        {
+                          "model": "gpt-3.5-turbo",
+                          "messages": [
+                            {
+                              "role": "user",
+                              "content": "What courses should be taken to become an $position at University of Waterloo and what are the course number(only give me course number in answer with no other text, no intro and conclusion)"
+                            }
+                          ]
+                        }
+                        """.trimIndent()
+
+        val requestBody = json.toRequestBody("application/json".toMediaType())
+        val request = Request.Builder()
+            .url(modelEndpoint)
+            .post(requestBody)
+            .addHeader("Authorization", "Bearer $apiKey")
+            .build()
+
+        return fetchCourses(request)
+    }
+
+    private fun fetchCourses(request: Request): List<services.Course> {
+        val client = OkHttpClient().newBuilder()
+            .callTimeout(30, TimeUnit.SECONDS) // Set connection timeout
+            .readTimeout(30, TimeUnit.SECONDS) // Set read timeout
+            .build()
+
+        val response = client.newCall(request).execute()
+        val responseBody = response.body?.string()
+        val data = JSONObject(responseBody)
+        val courses = data.getJSONArray("choices")
+            .getJSONObject(0)
+            .getJSONObject("message")
+            .getString("content")
+            .replace("\n", ", ")
+            .split(",")
+            .map {
+                val parts = it.trim().split(" ")
+                println(parts)
+                Course(parts[0], parts[1])
+            }
+            .toList()
+
+        println(courses)
+
+        return courses
+    }
+
+    @Override
     override fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>> {
-        val requirements: Requirements = getRequirements(plan)
+        val requirements = getRequirements(plan)
+        val takenCourses = plan.coursesTaken
+        val currentTerm = plan.currentTerm
+
+        if (takenCourses.isNotEmpty()) {
+            requirements.mandatoryCourses.removeIf { mandatoryCourse ->
+                val course = mandatoryCourse.subject + " " + mandatoryCourse.code
+                takenCourses.contains(course)
+            }
+
+            for (optionalReq in requirements.optionalCourses) {
+                val commonCourses = optionalReq.courses.filter { it.subject + " " + it.code in takenCourses }
+                optionalReq.courses.removeAll(commonCourses.toSet())
+                optionalReq.nOf -= commonCourses.size
+                if (optionalReq.nOf <= 1) {
+                    requirements.mandatoryCourses.addAll(optionalReq.courses)
+                    requirements.optionalCourses.remove(optionalReq)
+                }
+            }
+        }
+
         val selectedCourses = coursePlanner.getCoursesPlanToTake(plan.startYear, requirements)
         println(selectedCourses.first.map { it.courseID })
         println(selectedCourses.second.map { it.courseID })
 
         return termMapperService.mapCoursesToSequence(
-            CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
-            sequenceGenerator.generateSequence(plan.sequence)
+            courseData = CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
+            sequenceMap = sequenceGenerator.generateSequence(plan.sequence),
+            currentTerm = currentTerm,
         )
     }
 
@@ -98,31 +192,22 @@ class Service: IService {
     }
 }
 
-data class CourseSchedule(
-    val term1ASchedule: Pair<String, List<Course>> = Pair("1A", listOf()),
-    val term1BSchedule: Pair<String, List<Course>> = Pair("1B", listOf()),
-    val term2ASchedule: Pair<String, List<Course>> = Pair("2A", listOf()),
-    val term2BSchedule: Pair<String, List<Course>> = Pair("2B", listOf()),
-    val term3ASchedule: Pair<String, List<Course>> = Pair("3A", listOf()),
-    val term3BSchedule: Pair<String, List<Course>> = Pair("3B", listOf()),
-    val term4ASchedule: Pair<String, List<Course>> = Pair("4A", listOf()),
-    val term4BSchedule: Pair<String, List<Course>> = Pair("4B", listOf()),
-    val term5ASchedule: Pair<String, List<Course>> = Pair("5A", listOf()),
-    val coop1Schedule: Pair<String, List<Course>> = Pair("WT1", listOf()),
-    val coop2Schedule: Pair<String, List<Course>> = Pair("WT2", listOf()),
-    val coop3Schedule: Pair<String, List<Course>> = Pair("WT3", listOf()),
-    val coop4Schedule: Pair<String, List<Course>> = Pair("WT4", listOf()),
-    val coop5Schedule: Pair<String, List<Course>> = Pair("WT5", listOf()),
-    val coop6Schedule: Pair<String, List<Course>> = Pair("WT6", listOf()),
-)
-
 data class AcademicPlan(
     var majors: List<String> = listOf(),
     var startYear: String = "",
     var sequence: String = "Regular",
     var minors: List<String> = listOf(),
-    var specializations: List<String> = listOf()
+    var specializations: List<String> = listOf(),
+    var coursesTaken: List<String> = listOf(),
+    var currentTerm: String = "1A",
 ) {
     // Default constructor
-    constructor() : this(listOf(), "2023", "Regular", listOf(), listOf())
+    constructor() : this(listOf(), "2023", "Regular", listOf(), listOf(), listOf())
+}
+
+data class Message(
+    val position: String
+){
+    // Default constructor
+    constructor() : this("")
 }
