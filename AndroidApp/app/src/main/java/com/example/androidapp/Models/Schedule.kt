@@ -8,10 +8,10 @@ import java.util.Date
 
 
 @Parcelize
-class Schedule(var terms: Map<String, List<Course>>) : Parcelable {
+class Schedule(var terms: MutableMap<String, List<Course>>) : Parcelable {
     @SerializedName("time")
     var time: Date = Date()
 
     @SerializedName("term")
-    var term: Map<String, List<Course>> = terms
+    var termSchedule: MutableMap<String, List<Course>> = terms
 }

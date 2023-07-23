@@ -115,18 +115,18 @@ private fun CourseDescription(course: Course, navController: NavController) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewModel){
-    var currentTerm by remember { mutableStateOf(scheduleViewModel.currentTerm) }
-    var pagerPage by remember { mutableStateOf(scheduleViewModel.selectedTabIndex) }
-    println("pagerPage: $pagerPage")
-    println("selectedtab: ${scheduleViewModel.selectedTabIndex}")
-    var termList = scheduleViewModel.termList
     val pagerState = rememberPagerState()
+    var pagerPage by remember { mutableStateOf(pagerState.currentPage) }
+    var currentTerm by remember { mutableStateOf(scheduleViewModel.termList[pagerPage]) }
+    scheduleViewModel.onTermSelected(currentTerm)
+    var termList = scheduleViewModel.termList
     val scope = rememberCoroutineScope()
     val pagerCourses = remember { mutableStateMapOf<Int, List<Course>>() }
 
     LaunchedEffect(key1 = pagerState.currentPage) {
         pagerPage = pagerState.currentPage
-        scheduleViewModel.setSelectedTabIndex(pagerPage)
+        currentTerm = scheduleViewModel.termList[pagerPage]
+        scheduleViewModel.onTermSelected(currentTerm)
     }
 
     Surface(
@@ -143,10 +143,13 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                     Tab(
                         selected = index == pagerPage,
                         onClick = {
+                            println("tabName: $tabName")
                             scheduleViewModel.onTermSelected(tabName)
                             currentTerm = scheduleViewModel.currentTerm
-                            pagerPage = scheduleViewModel.selectedTabIndex
-                            scope.launch { pagerState.animateScrollToPage(index) }
+                            pagerPage = scheduleViewModel.schedule.keys.indexOf(currentTerm)
+                            scope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
                         },
                         text = { Text(tabName) }
                     )
@@ -174,6 +177,7 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
         AddButton()
     }
 }
+
 
 @Composable
 private fun CourseSchedulePage(courses: List<Course>, navController: NavController) {

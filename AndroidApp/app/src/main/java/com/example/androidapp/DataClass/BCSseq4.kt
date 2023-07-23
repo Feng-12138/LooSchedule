@@ -103,12 +103,12 @@ class BCSseq4 {
 //        Course("4B 4"), Course("4B 5")
 //    )
 
-    val test = Schedule(mapOf("1A" to courseList1A, "1B" to courseList1B,
+    val test = Schedule(mutableMapOf("1A" to courseList1A, "1B" to courseList1B,
         "2A" to courseList2A, "2B" to courseList2B,
         "3A" to courseList3A, "3B" to courseList3B,
         "4A" to courseList4A))
 
-    val test2 = Schedule(mapOf("1A" to courseList1A, "1B" to courseList1B,
+    val test2 = Schedule(mutableMapOf("1A" to courseList1A, "1B" to courseList1B,
         "2A" to courseList2A, "2B" to courseList2B,
         "3A" to courseList3A, "3B" to courseList3B,
         "4A" to courseList4A))
