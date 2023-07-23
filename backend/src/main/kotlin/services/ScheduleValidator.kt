@@ -41,7 +41,7 @@ class ScheduleValidator {
         }
     }
 
-    fun checkCoursePrereq(course: Course, allCourses: List<String>,
+    private fun checkCoursePrereq(course: Course, allCourses: List<String>,
                           prerequisite: MutableMap<String, ParsedPrereqData>): ValidationResult {
         val coursePrereq = prerequisite[course.courseID] ?: return ValidationResult.NoSuchCourse
         if (coursePrereq.courses.isEmpty() || coursePrereq.courses.all {it.isEmpty()}) return ValidationResult.Success
@@ -58,21 +58,21 @@ class ScheduleValidator {
         return ValidationResult.Success
     }
 
-    fun checkCourseCoreq(course: Course, allCourses: List<String>,
+    private fun checkCourseCoreq(course: Course, allCourses: List<String>,
                          prerequisite: MutableMap<String, ParsedPrereqData>): ValidationResult {
         return ValidationResult.Success
     }
 
-    fun checkCourseAntireq(course: Course, allCourses: List<String>,
+    private fun checkCourseAntireq(course: Course, allCourses: List<String>,
                            prerequisite: MutableMap<String, ParsedPrereqData>): ValidationResult {
         return ValidationResult.Success
     }
 
-    fun checkList1CommunicationCourse(schedule: Schedule, degree: String): ValidationResult {
+    private fun checkList1CommunicationCourse(schedule: Schedule, degree: String): ValidationResult {
         return ValidationResult.Success
     }
     
-    fun checkOpenTo(course: Course, degree: String): ValidationResult {
+    private fun checkOpenTo(course: Course, degree: String): ValidationResult {
         // Check if course satisfies not open to and only open to
         return ValidationResult.Success
     }
@@ -81,9 +81,9 @@ class ScheduleValidator {
         val scheduleValidity = mutableMapOf<String, MutableSet<ValidationResult>>()
         val courseList: List<String> = schedule.values.flatten().map { it.courseID }
         val prerequisite = prerequisiteRepo.getParsedPrereqData(courseList)
-        for ((term, schedule) in schedule) {
+        for ((term, scheduledCourses) in schedule) {
             // Need to check if the schedule has communication course scheduled in 1A or 1B depending on the degree
-            for (course in schedule) {
+            for (course in scheduledCourses) {
                 if (prerequisite[course.courseID] == null) {
                     scheduleValidity[course.courseID] = mutableSetOf(ValidationResult.NoSuchCourse)
                     continue
