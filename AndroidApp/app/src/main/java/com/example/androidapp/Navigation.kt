@@ -18,6 +18,7 @@ import com.example.androidapp.screens.GetStartScreen
 import com.example.androidapp.screens.HistoryScreen
 import com.example.androidapp.screens.MainScreen
 import com.example.androidapp.screens.Screen
+import com.example.androidapp.screens.SearchCourseScreen
 import com.example.androidapp.screens.SelectDegree
 import com.example.androidapp.screens.ViewSchedule
 import com.example.androidapp.viewModels.ScheduleViewModel
@@ -31,6 +32,9 @@ fun Navigation(){
     val selectDegreeVM = SelectDegreeVM(LocalContext.current, navController = navController)
 
     NavHost(navController = navController, startDestination = Screen.MainScreen.route){
+        composable(route = Screen.SearchCourse.route){
+            MainScreen (navController = navController, name = "SearchCourse") { SearchCourseScreen(navController = navController) }
+        }
         composable(route = Screen.About.route){
             MainScreen (navController = navController, name = "About") { AboutScreen() }
         }
