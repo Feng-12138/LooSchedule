@@ -565,6 +565,8 @@ def parseChoice(choice, year):
                 res.append((int(totalUnits * 2), set(options)))
                 return res, courses, additional
             return res, options, additional
+        elif 'one of the following departments' in choice[0].get_text():
+            raise Exception('concentration required')
         else:
             contents = choice[1][0].contents
             courses, i, l = [], 0, len(contents)
@@ -610,6 +612,7 @@ def parseChoice(choice, year):
                                 satisfiedCourses.append(option)
                             courses.append(option)
                         else: subjects.append(option)
+                    subjects = [s.strip() for s in subjects]
                     for level in levels:
                         for subject in subjects:
                             satisfiedCourses.append(subject + ' ' + level[0] + 'xx')
@@ -622,9 +625,10 @@ def parseChoice(choice, year):
                     return res, courses, additional
                 n = int(totalUnits * 2)
             elif 'recommended' in logic or 'suggested' in logic: return [], set(), False
+            elif choice[0].get_text() == '): ': return [], set(), False
             else:
                 print(f'Invalid number for:\n{choice[0].contents}')
-                return res, options, additional
+                return [], set(), False
             res.append((n, set(options)))
             return res, options, additional
     
@@ -687,14 +691,16 @@ if __name__ == '__main__':
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
-    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2019)
-    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2020)
-    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2021)
+    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2019)
+    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2020)
+    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2021)
     getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2019)
     getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2020)
     getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2021)
     # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
-    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2022)
+    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2019)
+    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2020)
+    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2021)
     # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2022)
     # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2023)
     # getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2023)
