@@ -57,18 +57,23 @@ class Service: IService {
     @Override
     override fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>> {
         val requirements: Requirements = getRequirements(plan)
+        val sequenceMap = sequenceGenerator.generateSequence(plan.sequence)
         val selectedCourses = coursePlanner.getCoursesPlanToTake(
             plan.startYear,
             requirements,
             plan.majors,
+            sequenceMap
         )
-        println(selectedCourses.first.map { it.courseID })
-        println(selectedCourses.second.map { it.courseID })
+        println(plan.startYear)
+        println(selectedCourses["F"]!!.map { it.courseID })
+        println(selectedCourses["W"]!!.map { it.courseID })
+        println(selectedCourses["S"]!!.map { it.courseID })
 
-        return termMapperService.mapCoursesToSequence(
-            CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
-            sequenceGenerator.generateSequence(plan.sequence)
-        )
+//        return termMapperService.mapCoursesToSequence(
+//            CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
+//            sequenceMap
+//        )
+        return mutableMapOf()
     }
 
     private fun getRequirements(plan: AcademicPlan): Requirements {

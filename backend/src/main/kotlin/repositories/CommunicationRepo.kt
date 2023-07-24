@@ -37,7 +37,7 @@ class CommunicationRepo {
                 .setParameter("listNumber", listNumber)
             val communicationCourses = communicationQuery.list()
             val courseIDs = communicationCourses.map { it.courseID }
-            val courseHql = "From Course Where courseID in :courseIDs"
+            val courseHql = "From Course Where courseID in :courseIDs and availability != ''"
             val courseQuery = session.createQuery(courseHql, Course::class.java)
             val courses = courseQuery.setParameterList("courseIDs", courseIDs).list()
             courses.toMutableSet()

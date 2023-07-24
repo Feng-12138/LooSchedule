@@ -43,11 +43,6 @@ class TermMapperService {
         if (coursePerTerm > 5) {
             takeCourseInWT = true
         }
-//        for ((key, value) in prereqsData) {
-//            if (key == "CO 250") {
-//                value.courses = mutableListOf(mutableListOf("MATH 136"), mutableListOf("MATH 146"))
-//            }
-//        }
         coursePerTerm = 5
         remainder = 0
         for ((key, _) in sequenceMap) {
@@ -79,7 +74,6 @@ class TermMapperService {
             takenCourses.addAll(coursesTakeThisTerm)
             generatedSchedule[key] = courseList
         }
-//        var finalSchedule: MutableMap<String, MutableList<Course>> = finalizeSchedule(generatedSchedule, countCourseTerm, sequenceMap, prereqsData)
         takenCourses.clear()
         return generatedSchedule
     }

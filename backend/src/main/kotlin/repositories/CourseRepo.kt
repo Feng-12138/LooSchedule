@@ -49,10 +49,13 @@ class CourseRepo {
         }
     }
 
-    fun getBySubject(courseSubjects: Set<String>): MutableSet<Course> {
+    fun getBySubject(courseSubjects: Set<String>, include: Boolean = true): MutableSet<Course> {
         return try {
             val session = sessionFactory.openSession()
-            val hql = "FROM Course WHERE subject in :subjects"
+            var hql = "FROM Course WHERE subject in :subjects and availability != ''"
+            if (!include) {
+                hql = "FROM Course WHERE subject not in :subjects and availability != ''"
+            }
             val query = session.createQuery(hql, Course::class.java)
             val courses = query.setParameterList("subjects", courseSubjects)
             courses.list().toMutableSet()
