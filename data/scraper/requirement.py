@@ -311,6 +311,7 @@ def parseChoice(choice, year):
                         subjects = MATH_COURSE_CODES
                         if 'other than' in logic:
                             exclude = set(choice.get_text().split('other than ')[1].split(', '))
+                            exclude = [e.strip().strip('.') for e in exclude]
                             subjects = list(set(subjects).difference(exclude))
                     elif 'BUS' in choice.get_text(): subjects.append('BUS')
                     elif 'COMM' in choice.get_text(): subjects.append('COMM')
@@ -514,7 +515,8 @@ def parseChoice(choice, year):
                     if 'math course' in choice[0].get_text(): 
                         subjects = MATH_COURSE_CODES
                         if 'other than' in choice[0].get_text():
-                            exclude = set(choice.get_text().split('other than ')[1].split(', '))
+                            exclude = set(choice[0].get_text().split('other than ')[1].split(', '))
+                            exclude = [e.strip().strip('.') for e in exclude]
                             subjects = list(set(subjects).difference(exclude))
                     elif 'ACTSC' in choice[0].get_text(): subjects.append('ACTSC')
                     elif 'AMATH' in choice[0].get_text(): subjects.append('AMATH')
@@ -576,7 +578,17 @@ def parseChoice(choice, year):
                 courses.append(BeautifulSoup(cStr, features='html.parser'))
             for course in courses:
                 if 'Note:' in course.contents[0].get_text(): continue
-                options += [a.get_text() for a in course.find_all('a')]
+                elif 'Note:' in course.get_text():
+                    contents = course.contents
+                    for content in contents:
+                        if 'Note:' in content.get_text(): break
+                        if content.name == 'a': options += [content.get_text()]
+                elif course.get_text().strip()[0] == '(': 
+                    continue
+                elif len(course.find_all('a')) == 3 and 'to' in course.get_text() and 'excluding' in course.get_text():
+                    options += [course.find_all('a')[0].get_text() + '-' + course.find_all('a')[1].get_text()]
+                else: 
+                    options += [a.get_text() for a in course.find_all('a')]
             if 'all' in logic:
                 for course in courses:
                     option = [a.get_text() for a in course.find_all('a')]
@@ -675,10 +687,12 @@ if __name__ == '__main__':
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
-    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2019)
-    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2020)
-    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2021)
-    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2022)
+    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2019)
+    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2020)
+    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2021)
+    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2019)
+    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2020)
+    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2021)
     # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
     # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2022)
     # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2022)
