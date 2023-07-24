@@ -186,8 +186,6 @@ def getRequirement(name, url, year, add=True):
                     i += 1
                 choices.append(choice)
         for choice in choices:
-            # print(choice)
-            # print(' ---------- ')
             try:
                 res, courses = updateRequirement(res, courses, choice, additionalCourses, year)
             except Exception as msg:
@@ -502,9 +500,14 @@ def parseChoice(choice, year):
         return res, options, additional
     else:
         n, additional = 0, False
+        logic = choice[0].get_text().lower()
         options, res = [], []
+        if 'additional' in logic: 
+            additional = True
+            logic = logic.replace('additional', '')
         if len(choice[1]) == 0:
-            if 'level' in choice[0].get_text():
+            if 'concentration' in choice[0].get_text(): raise Exception('concentration required')
+            if 'level' in choice[0].contents[0].get_text():
                 levels = findall(r'\b\d+\b', choice[0].get_text().split('level')[0])
                 subjects = [a.get_text() for a in choice[0].find_all('a')]
                 if len(subjects) == 0:
@@ -514,21 +517,59 @@ def parseChoice(choice, year):
                             exclude = set(choice.get_text().split('other than ')[1].split(', '))
                             subjects = list(set(subjects).difference(exclude))
                     elif 'ACTSC' in choice[0].get_text(): subjects.append('ACTSC')
+                    elif 'AMATH' in choice[0].get_text(): subjects.append('AMATH')
+                    elif 'PHYS' in choice[0].get_text(): subjects.append('PHYS')
                 for subject in subjects:
                     if len(levels) == 0: options.append(subject + ' xxx')
                     for level in levels:
                         options.append(subject + ' ' + level[0] + 'xx')
                 n = stringToNum(choice[0].get_text().lower())
+                if not n: return [], set(), False
                 res.append((n, set(options)))
+            elif 'unit' in logic:
+                totalUnits = 0
+                subjects = [a.get_text() for a in choice[0].find_all('a')]
+                if len(subjects) == 0:
+                    if 'math course' in choice[0].get_text(): 
+                        subjects = MATH_COURSE_CODES
+                        if 'other than' in choice[0].get_text():
+                            exclude = set(choice.get_text().split('other than ')[1].split(', '))
+                            subjects = list(set(subjects).difference(exclude))
+                    elif 'ACTSC' in choice[0].get_text(): subjects.append('ACTSC')
+                    elif 'AMATH' in choice[0].get_text(): subjects.append('AMATH')
+                    elif 'PHYS' in choice[0].get_text(): subjects.append('PHYS')
+                if stringToNum(logic.lower()): 
+                    total = stringToNum(logic.lower())
+                    if len(subjects) == 0: 
+                        res.append((total, {'xx xxx'}))
+                        return res, options, additional
+                    totalUnits = float(total * 2)
+                totalUnits = float(logic.split('unit')[0])
+                atLeastUnits, levels = 0, []
+                courses = []
+                if 'at least' in logic:
+                    atLeastUnits = float(logic.split('at least')[1].split('unit')[0])
+                    levels = findall(r'\b\d+\b', logic.split('at least')[1].split('unit')[1].split('level')[0])
+                    totalUnits -= atLeastUnits
+                    for level in levels:
+                        for subject in subjects:
+                            options.append(subject + ' ' + level[0] + 'xx')
+                            courses.append(subject + ' ' + level[0] + 'xx')
+                    res.append((int(atLeastUnits * 2), set(options)))
+                    options = []
+                for subject in subjects: 
+                    options.append(subject + ' xxx')
+                    courses.append(subject + ' xxx')
+                res.append((int(totalUnits * 2), set(options)))
+                return res, courses, additional
             return res, options, additional
         else:
-            logic = choice[0].get_text().lower()
             contents = choice[1][0].contents
-            courses, i, n = [], 0, len(contents)
-            while i < n:
+            courses, i, l = [], 0, len(contents)
+            while i < l:
                 while contents[i].name == 'br': i += 1
                 cStr = '<li>'
-                while i < n and contents[i].name != 'br':
+                while i < l and contents[i].name != 'br':
                     if contents[i] != '\n': cStr += str(contents[i])
                     i += 1
                 cStr += '<\li>'
@@ -542,8 +583,35 @@ def parseChoice(choice, year):
                     if len(option) > 0: res.append((1, set(option)))
                 return res, options, additional
             elif stringToNum(logic): n = stringToNum(logic)
+            elif 'unit' in logic:
+                totalUnits = float(findall(r'\b\d+\b', logic.split('unit')[0])[0])
+                atLeastUnits, levels = 0, []
+                courses = []
+                if 'at least' in logic:
+                    atLeastUnits = float(findall(r'\b\d+\b', logic.split('at least')[1].split('unit')[0])[0])
+                    levels = findall(r'\b\d+\b', logic.split('at least')[1].split('unit')[1].split('level')[0])
+                    subjects, satisfiedCourses = [], []
+                    for option in options:
+                        if any(char.isdigit() for char in option):
+                            code = int(findall(r'\b\d+\b', option)[0])
+                            if code >= min([int(level) for level in levels]):
+                                satisfiedCourses.append(option)
+                            courses.append(option)
+                        else: subjects.append(option)
+                    for level in levels:
+                        for subject in subjects:
+                            satisfiedCourses.append(subject + ' ' + level[0] + 'xx')
+                            courses.append(subject + ' ' + level[0] + 'xx')
+                    res.append((int(atLeastUnits * 2), set(satisfiedCourses)))
+                    additionalCourses = set(courses).difference(set(satisfiedCourses))
+                    for subject in subjects:
+                        additionalCourses.add(subject + ' xxx')
+                    res.append((int(totalUnits - atLeastUnits) * 2, additionalCourses))
+                    return res, courses, additional
+                n = int(totalUnits * 2)
+            elif 'recommended' in logic or 'suggested' in logic: return [], set(), False
             else:
-                print(f'Invalid number for:\n{choice.contents}')
+                print(f'Invalid number for:\n{choice[0].contents}')
                 return res, options, additional
             res.append((n, set(options)))
             return res, options, additional
@@ -603,11 +671,13 @@ def addRequirement(planName, year, courses, addReq, link, coopOnly, isDD):
 if __name__ == '__main__':
     # getAcademicPrograms()
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2019)
-    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
-    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
+    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
+    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
-    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2022)
+    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2019)
+    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2020)
+    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2021)
     # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2022)
     # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
     # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2022)
