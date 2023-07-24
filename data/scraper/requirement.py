@@ -176,6 +176,7 @@ def getRequirement(name, url, year, add=True):
         i, n = 0, len(contents)
         while i < n:
             c = contents[i]
+            if c.name and 'b' == c.name and 'Note' in c.get_text(): break
             if c.name and 'h' in c.name and 'Note' in c.get_text(): break
             if c.name and 'h' in c.name and 'From Waterloo or Laurier' in c.get_text(): break
             i += 1
@@ -556,9 +557,18 @@ def parseChoice(choice, year):
                 if not n: return [], set(), False
                 res.append((n, set(options)))
             elif 'from' in logic:
+                if 'Note' in choice[0].get_text(): return [], set(), False
                 if choice[0].find('a') is None:
                     options = choice[0].get_text().split('from ')[1].split(', ')
                     options = [option.strip().strip('.') for option in options]
+                    for i, option in enumerate(options):
+                        if '.\n\r\nFive additional courses' in option:
+                            options[i] = option.strip('.\n\r\nFive additional courses')
+                            n = stringToNum(choice[0].get_text().lower())
+                            res.append((n, set(options)))
+                            res.append((5, set(['CS 240-CS 299', 'CS 340-CS 398', 'CS 440-CS 498'])))
+                            options.append('CS 240-CS 299')
+                            return res, options, additional
                     if 'with at least' in logic:
                         logics = choice[0].get_text().split('with at least')
                         total, atLeast = stringToNum(logics[0].lower()), stringToNum(logics[1].lower())
@@ -657,6 +667,7 @@ def parseChoice(choice, year):
                     else:
                         options += levelOptions
                 elif course.find('a') is None:
+                    if 'Note' in course.get_text(): break
                     if 'BUS' in course.get_text():
                         starts = [c.start() for c in finditer('BUS', course.get_text())]
                         for start in starts:
@@ -794,21 +805,21 @@ def addRequirement(planName, year, courses, addReq, link, coopOnly, isDD):
 
 if __name__ == '__main__':
     # getAcademicPrograms()
-    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2019)
-    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
-    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
+    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2019)
+    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
+    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
-    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2019)
-    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2020)
-    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2021)
-    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2019)
-    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2020)
-    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2021)
+    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2019)
+    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2020)
+    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2021)
+    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2019)
+    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2020)
+    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2021)
     # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
-    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2019)
-    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2020)
-    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2021)
+    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2019)
+    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2020)
+    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2021)
     getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2019)
     getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2020)
     getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2021)
