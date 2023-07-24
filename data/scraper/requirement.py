@@ -155,6 +155,7 @@ def getRequirement(name, url, year, add=True):
             if 'double degree' in name.lower(): 
                 isDD = True
                 res.append((4, {'xx xxx'}))
+            requiredCourses = parseRequirement(res)
             addRequirement(name, year, requiredCourses, addReq, url, coopOnly, isDD)
         return res, courses
     else:
@@ -173,6 +174,7 @@ def getRequirement(name, url, year, add=True):
         else: contents = list(contents)[1:]
         contents = list(filter(lambda c: c != '\n', contents))
         if name == 'Bachelor of Computer Science (Data Science)': contents = contents[3:]
+        if name == 'Computing and Financial Management': contents = contents[4:]
         i, n = 0, len(contents)
         while i < n:
             c = contents[i]
@@ -425,7 +427,7 @@ def parseChoice(choice, year):
                     elif len(subjects) == 0:
                         start = search(r'\W+', course.get_text()).start()
                         subjects = [course.get_text()[:start]]
-                        if 'AFM' in course.get_text(): subjects.append('AFM')
+                        if 'AFM' in course.get_text() and 'AFM' not in subjects: subjects.append('AFM')
                         subjects = list(filter(lambda s: s != '', subjects))
                     levelOptions = []
                     for subject in subjects:
@@ -549,6 +551,7 @@ def parseChoice(choice, year):
                     elif 'COMM' in choice[0].get_text(): subjects.append('COMM')
                     elif 'ENTR' in choice[0].get_text(): subjects.append('ENTR')
                     elif 'STAT' in choice[0].get_text(): subjects.append('STAT')
+                    elif 'AFM' in choice[0].get_text(): subjects.append('AFM')
                 for subject in subjects:
                     if len(levels) == 0: options.append(subject + ' xxx')
                     for level in levels:
@@ -582,6 +585,10 @@ def parseChoice(choice, year):
                         return res, options, additional
                 else:
                     courses = [a.get_text() for a in choice[0].find_all('a')]
+                    if len(choice[0].get_text().split('from ')[1].split(', ')) > len(courses):
+                        courses = choice[0].get_text().split('from ')[1].split(', ')
+                        courses = list(filter(lambda c: len(c) > 1, courses))
+                        courses = [c.strip().strip('.') for c in courses]
                     for course in courses:
                         if any(char.isdigit() for char in course): options.append(course)
                         else: options.append(course + ' xxx')
@@ -643,6 +650,7 @@ def parseChoice(choice, year):
             for course in courses:
                 if 'level' in course.get_text():
                     levels = findall(r'\b\d+\b', course.get_text().split('level')[0])
+                    levels = list(filter(lambda l: len(l) == 3, levels))
                     subjects = [a.get_text() for a in course.find_all('a')]
                     if 'Note:' in course.contents[0].get_text(): continue
                     elif 'Note:' in course.get_text():
@@ -651,9 +659,8 @@ def parseChoice(choice, year):
                     elif len(subjects) == 0:
                         start = search(r'\d+', course.get_text()).start()
                         subjects = [course.get_text()[:start]]
-                        if 'AFM' in course.get_text(): subjects.append('AFM')
-                        subjects = list(filter(lambda s: s != '', subjects))
-                    subjects = [s.strip() for s in subjects]
+                        if 'AFM' in course.get_text() and 'AFM' not in subjects: subjects.append('AFM')
+                        subjects = list(filter(lambda s: s != '' and len(s) <= 5, subjects))
                     levelOptions = []
                     for subject in subjects:
                         if len(subject) > 5: options.append(subject)
@@ -805,27 +812,30 @@ def addRequirement(planName, year, courses, addReq, link, coopOnly, isDD):
 
 if __name__ == '__main__':
     # getAcademicPrograms()
-    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2019)
-    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
-    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
-    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
-    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
-    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2019)
-    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2020)
-    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2021)
-    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2019)
-    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2020)
-    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2021)
-    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
-    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2019)
-    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2020)
-    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2021)
-    getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2019)
-    getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2020)
-    getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2021)
+    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2019)
+    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
+    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
+    # # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
+    # # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
+    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2019)
+    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2020)
+    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2021)
+    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2019)
+    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2020)
+    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2021)
+    # # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
+    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2019)
+    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2020)
+    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2021)
+    # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2019)
+    # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2020)
+    # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2021)
     # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2023)
-    # getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2022)
-    # getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2023)
+
+    getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2019)
+    getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2020)
+    getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2021)
+    getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2022)
     # getProgramRequirements('Mathematics/Business', '/group/MATH-Mathematics-or-Business', 2023)
     # getProgramRequirements('Mathematical Optimization', '/group/MATH-Mathematical-Optimization1', 2023)
     # getProgramRequirements('Mathematics/Teaching', '/group/MATH-Mathematics-or-Teaching', 2023)
