@@ -9,7 +9,7 @@ class RequirementsParser {
         return finalizeRequirements(initialReqParse(requirementsData))
     }
 
-    private fun parseBoundedRangeCourses(course: String, courses: MutableSet<CourseCode>): Unit {
+    private fun parseBoundedRangeCourses(course: String, courses: MutableSet<Course>): Unit {
         val courseRange = course.split("-")
         val courseLowerBound = courseRange[0].split(" ")
         val courseUpperBound = courseRange[1].split(" ")
@@ -19,7 +19,7 @@ class RequirementsParser {
         // Add all possible course codes now. Invalid ones will be filter out when querying DB.
         for (i in courseLowerCode..courseUpperCode) {
             courses.add(
-                CourseCode(
+                Course(
                     subject = courseSubject,
                     code = i.toString(),
                 )
@@ -29,8 +29,8 @@ class RequirementsParser {
 
     // Parse a single requirement clause. Eg. requirement = "1:CS 115,CS 135,CS 145"
     private fun parseSingleReqClause(requirement: String, optionalCourses: MutableSet<OptionalCourses>,
-                                     mandatoryCourses: MutableSet<CourseCode>): Unit {
-        val courses = mutableSetOf<CourseCode>()
+                                     mandatoryCourses: MutableSet<Course>): Unit {
+        val courses = mutableSetOf<Course>()
         val temp = requirement.split(":")
         val nOf = temp[0]
         val courseList = temp[1].split(",")
@@ -45,7 +45,7 @@ class RequirementsParser {
                     // Add all possible values of xx as course. These courses will be filtered when querying DB.
                     for (i in 0..9) {
                         courses.add(
-                            CourseCode(
+                            Course(
                                 subject = newCourse[0],
                                 code = newCourse[1][0] + "0" + i.toString(),
                             )
@@ -53,7 +53,7 @@ class RequirementsParser {
                     }
                     for (i in 10..99) {
                         courses.add(
-                            CourseCode(
+                            Course(
                                 subject = newCourse[0],
                                 code = newCourse[1][0] + i.toString(),
                             )
@@ -61,7 +61,7 @@ class RequirementsParser {
                     }
                 } else {
                     courses.add(
-                        CourseCode(
+                        Course(
                             subject = newCourse[0],
                             code = newCourse[1],
                         )
@@ -84,7 +84,7 @@ class RequirementsParser {
     // Extract all courses needed based on requirement.
     private fun initialReqParse(requirementsData: List<String>): Requirements {
         val optionalCourses = mutableSetOf<OptionalCourses>()
-        val mandatoryCourses = mutableSetOf<CourseCode>()
+        val mandatoryCourses = mutableSetOf<Course>()
         for (requirements in requirementsData) {
             val requirement = requirements.split(";")
             for (r in requirement) {
@@ -102,7 +102,7 @@ class RequirementsParser {
     private fun finalizeRequirements(requirements: Requirements): Requirements {
         val optionalCoursesList = requirements.optionalCourses.toMutableList()
         val mandatoryCourses = requirements.mandatoryCourses.toMutableList()
-        val commonTable: ConcurrentHashMap<CourseCode, Int> = ConcurrentHashMap()
+        val commonTable: ConcurrentHashMap<Course, Int> = ConcurrentHashMap()
 
         for (i in 0 until optionalCoursesList.size) {
             for (j in i + 1 until optionalCoursesList.size) {
@@ -140,17 +140,17 @@ class RequirementsParser {
         // add breadth and depth
         mandatoryCourses.addAll(
             listOf(
-                CourseCode("ECON", "101"),
-                CourseCode("ECON", "102"),
-                CourseCode("ECON", "371"),
+                Course("ECON", "101"),
+                Course("ECON", "102"),
+                Course("ECON", "371"),
             )
         )
 
         mandatoryCourses.addAll(
             listOf(
-                CourseCode("MUSIC", "116"),
-                CourseCode("PHYS", "111"),
-                CourseCode("CHEM", "102"),
+                Course("MUSIC", "116"),
+                Course("PHYS", "111"),
+                Course("CHEM", "102"),
             )
         )
 
@@ -162,17 +162,17 @@ class RequirementsParser {
 }
 
 
-data class CourseCode (
+data class Course (
     val subject: String,
     val code: String,
 )
 
 data class OptionalCourses (
     var nOf: Int = 1,
-    val courses: MutableSet<CourseCode> = mutableSetOf(),
+    val courses: MutableSet<Course> = mutableSetOf(),
 )
 
 data class Requirements (
     val optionalCourses: MutableSet<OptionalCourses> = mutableSetOf(),
-    val mandatoryCourses: MutableSet<CourseCode> = mutableSetOf(),
+    val mandatoryCourses: MutableSet<Course> = mutableSetOf(),
 )

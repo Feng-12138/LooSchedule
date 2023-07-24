@@ -6,10 +6,7 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import kotlinx.coroutines.runBlocking
 import okhttp3.*
-import services.AcademicPlan
-import services.IService
-import services.Message
-import services.Schedule
+import services.*
 
 @Path("/")
 class Api {
@@ -86,12 +83,12 @@ class Api {
     }
 
     @POST
-    @Path("validate")
+    @Path("api/validate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    fun validateSchedule(schedule: Schedule, degree: String): Response {
+    fun validateSchedule(scheduleToVerify: ScheduleValidator.ScheduleValidationInput): Response {
         try {
-            val message = service.validateSchedule(schedule, degree)
+            val message = service.validateSchedule(scheduleToVerify)
             return Response.ok(message).build()
         } catch (e: Exception) {
             println(e.message)

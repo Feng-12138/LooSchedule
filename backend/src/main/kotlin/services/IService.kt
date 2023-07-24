@@ -14,7 +14,7 @@ interface IService {
 
     fun generateSchedule(plan: AcademicPlan): Schedule
 
-    fun validateSchedule(schedule: Schedule, degree: String): ScheduleValidationResult
+    fun validateSchedule(input: ScheduleValidator.ScheduleValidationInput): ScheduleValidationResult
 }
 
 data class Plans (
