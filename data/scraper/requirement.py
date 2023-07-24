@@ -189,7 +189,9 @@ def getRequirement(name, url, year, add=True):
             try:
                 res, courses = updateRequirement(res, courses, choice, additionalCourses, year)
             except Exception as msg:
-                if str(msg) in ADDITIONAL_REQS: addReq = str(msg)
+                if str(msg) in ADDITIONAL_REQS: 
+                    addReq = str(msg)
+                    if str(msg) == 'breadth and depth required': break
                 else: raise msg
         if add:
             requiredCourses = parseRequirement(res)
@@ -337,6 +339,9 @@ def parseChoice(choice, year):
                         return res, options, additional  
                 else:
                     courses = [a.get_text() for a in choice.find_all('a')]
+                    if len(choice.get_text().split('from ')[1].split(', ')) > len(courses):
+                        courses = choice.get_text().split('from ')[1].split(', ')
+                        courses = list(filter(lambda c: len(c) > 1, courses))
                     for course in courses:
                         if any(char.isdigit() for char in course): options.append(course)
                         else: options.append(course + ' xxx')
@@ -405,6 +410,7 @@ def parseChoice(choice, year):
             for course in choice.find_all('li'):
                 if 'level' in course.get_text():
                     levels = findall(r'\b\d+\b', course.get_text().split('level')[0])
+                    levels = list(filter(lambda l: len(l) == 3, levels))
                     subjects = [a.get_text() for a in course.find_all('a')]
                     if 'Note:' in course.contents[0].get_text(): continue
                     elif 'Note:' in course.get_text():
@@ -413,10 +419,20 @@ def parseChoice(choice, year):
                     elif len(subjects) == 0:
                         start = search(r'\W+', course.get_text()).start()
                         subjects = [course.get_text()[:start]]
+                        if 'AFM' in course.get_text(): subjects.append('AFM')
+                        subjects = list(filter(lambda s: s != '', subjects))
+                    levelOptions = []
                     for subject in subjects:
-                        if len(levels) == 0: options.append(subject + ' xxx')
-                        for level in levels:
-                            options.append(subject + ' ' + level[0] + 'xx')
+                        if len(subject) > 5: options.append(subject)
+                        else:
+                            if len(levels) == 0: options.append(subject + ' xxx')
+                            for level in levels:
+                                levelOptions.append(subject + ' ' + level[0] + 'xx')
+                    if 'additional' in course.get_text() and stringToNum(course.get_text().lower()):
+                        n = stringToNum(course.get_text().lower())
+                        res.append((n, levelOptions))
+                    else:
+                        options += levelOptions
                 elif course.find('a') is None:
                     if 'BUS' in course.get_text():
                         starts = [c.start() for c in finditer('BUS', course.get_text())]
@@ -502,6 +518,8 @@ def parseChoice(choice, year):
     else:
         n, additional = 0, False
         logic = choice[0].get_text().lower()
+        if 'breadth and depth' in logic or '5.0 non-math units' in logic: 
+            raise Exception('breadth and depth required')
         options, res = [], []
         if 'additional' in logic: 
             additional = True
@@ -525,6 +543,30 @@ def parseChoice(choice, year):
                     if len(levels) == 0: options.append(subject + ' xxx')
                     for level in levels:
                         options.append(subject + ' ' + level[0] + 'xx')
+                n = stringToNum(choice[0].get_text().lower())
+                if not n: return [], set(), False
+                res.append((n, set(options)))
+            elif 'from' in logic:
+                if choice[0].find('a') is None:
+                    options = choice[0].get_text().split('from ')[1].split(', ')
+                    options = [option.strip().strip('.') for option in options]
+                    if 'with at least' in logic:
+                        print('----- with at least ----')
+                        logics = choice[0].get_text().split('with at least')
+                        total, atLeast = stringToNum(logics[0].lower()), stringToNum(logics[1].lower())
+                        atLeastOptions = [o.replace('.', '') for o in logics[1].split('from ')[1].split(', ')]
+                        atLeastOptions = list(filter(lambda o: o != '', atLeastOptions))
+                        restOptions = logics[0].split('from ')[1].split(', ')
+                        restOptions = list(filter(lambda o: o != '', restOptions))
+                        res.append((atLeast, atLeastOptions))
+                        res.append((total - atLeast, restOptions))
+                        options = set(atLeastOptions + restOptions)
+                        return res, options, additional
+                else:
+                    courses = [a.get_text() for a in choice[0].find_all('a')]
+                    for course in courses:
+                        if any(char.isdigit() for char in course): options.append(course)
+                        else: options.append(course + ' xxx')
                 n = stringToNum(choice[0].get_text().lower())
                 if not n: return [], set(), False
                 res.append((n, set(options)))
@@ -579,18 +621,37 @@ def parseChoice(choice, year):
                 cStr += '<\li>'
                 courses.append(BeautifulSoup(cStr, features='html.parser'))
             for course in courses:
-                if 'Note:' in course.contents[0].get_text(): continue
-                elif 'Note:' in course.get_text():
-                    contents = course.contents
-                    for content in contents:
-                        if 'Note:' in content.get_text(): break
-                        if content.name == 'a': options += [content.get_text()]
-                elif course.get_text().strip()[0] == '(': 
-                    continue
-                elif len(course.find_all('a')) == 3 and 'to' in course.get_text() and 'excluding' in course.get_text():
-                    options += [course.find_all('a')[0].get_text() + '-' + course.find_all('a')[1].get_text()]
-                else: 
-                    options += [a.get_text() for a in course.find_all('a')]
+                if 'level' in course.get_text():
+                    levels = findall(r'\b\d+\b', course.get_text().split('level')[0])
+                    subjects = [a.get_text() for a in course.find_all('a')]
+                    if 'Note:' in course.contents[0].get_text(): continue
+                    elif 'Note:' in course.get_text():
+                        start = search(r'\d+', course.get_text()).start()
+                        subjects = [course.get_text()[:start]]
+                    elif len(subjects) == 0:
+                        print(course.get_text())
+                        print(search(r'\d+', course.get_text()))
+                        start = search(r'\d+', course.get_text()).start()
+                        print(start)
+                        subjects = [course.get_text()[:start]]
+                    print('subjects:', subjects)
+                    for subject in subjects:
+                        if len(levels) == 0: options.append(subject + ' xxx')
+                        for level in levels:
+                            options.append(subject + ' ' + level[0] + 'xx')
+                else:
+                    if 'Note:' in course.contents[0].get_text(): continue
+                    elif 'Note:' in course.get_text():
+                        contents = course.contents
+                        for content in contents:
+                            if 'Note:' in content.get_text(): break
+                            if content.name == 'a': options += [content.get_text()]
+                    elif course.get_text().strip()[0] == '(': 
+                        continue
+                    elif len(course.find_all('a')) == 3 and 'to' in course.get_text() and 'excluding' in course.get_text():
+                        options += [course.find_all('a')[0].get_text() + '-' + course.find_all('a')[1].get_text()]
+                    else: 
+                        options += [a.get_text() for a in course.find_all('a')]
             if 'all' in logic:
                 for course in courses:
                     option = [a.get_text() for a in course.find_all('a')]
@@ -691,25 +752,26 @@ if __name__ == '__main__':
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
-    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2019)
-    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2020)
-    getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2021)
-    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2019)
-    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2020)
-    getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2021)
+    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2019)
+    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2020)
+    # getProgramRequirements('Applied Mathematics', '/group/MATH-Applied-Mathematics-1', 2021)
+    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2019)
+    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2020)
+    # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2021)
     # getProgramRequirements('Combinatorics and Optimization', '/group/MATH-Combinatorics-and-Optimization1', 2023)
-    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2019)
-    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2020)
-    getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2021)
-    # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2022)
+    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2019)
+    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2020)
+    # getProgramRequirements('Computational Mathematics', '/MATH-Computational-Mathematics-1', 2021)
+    # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2021)
     # getProgramRequirements('Computer Science', '/group/MATH-Computer-Science-1', 2023)
+    # getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2022)
     # getProgramRequirements('Computing and Financial Management', '/group/MATH-Computing-and-Financial-Management', 2023)
     # getProgramRequirements('Mathematics/Business', '/group/MATH-Mathematics-or-Business', 2023)
     # getProgramRequirements('Mathematical Optimization', '/group/MATH-Mathematical-Optimization1', 2023)
     # getProgramRequirements('Mathematics/Teaching', '/group/MATH-Mathematics-or-Teaching', 2023)
     # getProgramRequirements('Pure Mathematics', '/group/MATH-Pure-Mathematics-1', 2023)
     # getProgramRequirements('Statistics', '/group/MATH-Statistics-1', 2023)
-    # getAcademicPrograms(2021)
+    getAcademicPrograms(2022)
     # getTable2Courses(2019)
     # getTable2Courses(2020)
     # getTable2Courses(2021)
