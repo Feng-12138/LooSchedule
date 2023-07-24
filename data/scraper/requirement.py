@@ -159,7 +159,13 @@ def getRequirement(name, url, year, add=True):
     else:
         choices = []
         addReq, coopOnly, isDD = None, False, False
-        if 'Table 2' in [a.get_text() for a in list(contents)[0].find_all('a')]:
+        includeTable2 = False
+        aList = [a.get_text() for a in contents.find_all('a')]
+        for name in ['Table 2', 'Table II']:
+            if name in aList: 
+                includeTable2 = True
+                break
+        if includeTable2:
             res, courses = getTable2Courses(year)
             additionalCourses = courses
         contents = list(contents)[1:]
@@ -168,7 +174,7 @@ def getRequirement(name, url, year, add=True):
         # print(contents)
         while i < n:
             c = contents[i]
-            if c.name is not None and 'h' in c.name and 'Note' in c.get_text(): break
+            if c.name and 'h' in c.name and 'Note' in c.get_text(): break
             i += 1
             if c.name == 'p' or c.name is None:
                 choice = (c, [])
@@ -178,7 +184,6 @@ def getRequirement(name, url, year, add=True):
                 while i < n and contents[i].name == 'blockquote':
                     choice[1].append(contents[i])
                     i += 1
-                if c.name is None: print(choice)
                 choices.append(choice)
         for choice in choices:
             # print(choice)
@@ -508,6 +513,7 @@ def parseChoice(choice, year):
                         if 'other than' in choice[0].get_text():
                             exclude = set(choice.get_text().split('other than ')[1].split(', '))
                             subjects = list(set(subjects).difference(exclude))
+                    elif 'ACTSC' in choice[0].get_text(): subjects.append('ACTSC')
                 for subject in subjects:
                     if len(levels) == 0: options.append(subject + ' xxx')
                     for level in levels:
@@ -597,7 +603,7 @@ def addRequirement(planName, year, courses, addReq, link, coopOnly, isDD):
 if __name__ == '__main__':
     # getAcademicPrograms()
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2019)
-    # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
+    getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2020)
     getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2021)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2022)
     # getProgramRequirements('Actuarial Science', '/group/MATH-Actuarial-Science-1', 2023)
