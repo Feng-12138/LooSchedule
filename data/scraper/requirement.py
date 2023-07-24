@@ -158,21 +158,27 @@ def getRequirement(name, url, year, add=True):
         return res, courses
     else:
         choices = []
+        addReq, coopOnly, isDD = None, False, False
         if 'Table 2' in [a.get_text() for a in list(contents)[0].find_all('a')]:
             res, courses = getTable2Courses(year)
             additionalCourses = courses
         contents = list(contents)[1:]
         contents = list(filter(lambda c: c != '\n', contents))
         i, n = 0, len(contents)
+        # print(contents)
         while i < n:
             c = contents[i]
-            if c.name == compile('h') and 'Note' in c.get_text(): break
+            if c.name is not None and 'h' in c.name and 'Note' in c.get_text(): break
             i += 1
-            if c.name == 'p':
+            if c.name == 'p' or c.name is None:
                 choice = (c, [])
+                if c.name is None: 
+                    choice = (BeautifulSoup('<p>' + str(c) + '</p>', features='html.parser'), [])
+                while i < n and contents[i].name == 'br': i += 1
                 while i < n and contents[i].name == 'blockquote':
                     choice[1].append(contents[i])
                     i += 1
+                if c.name is None: print(choice)
                 choices.append(choice)
         for choice in choices:
             # print(choice)
@@ -182,12 +188,12 @@ def getRequirement(name, url, year, add=True):
             except Exception as msg:
                 if str(msg) in ADDITIONAL_REQS: addReq = str(msg)
                 else: raise msg
-        # if add:
-        #     requiredCourses = parseRequirement(res)
-        #     if 'co-op only' in name.lower(): coopOnly = True
-        #     if 'double degree' in name.lower(): isDD = True
-        #     addRequirement(name, year, requiredCourses, addReq, url, coopOnly, isDD)
-        print(res)
+        if add:
+            requiredCourses = parseRequirement(res)
+            if 'co-op only' in name.lower(): coopOnly = True
+            if 'double degree' in name.lower(): isDD = True
+            addRequirement(name, year, requiredCourses, addReq, url, coopOnly, isDD)
+        # print(res)
         return res, courses
     
 
@@ -294,7 +300,6 @@ def parseChoice(choice, year):
         if choice.find_all('li') == []:
             if 'concentration' in choice.get_text(): raise Exception('concentration required')
             if 'level' in logic:
-                levels = []
                 levels = findall(r'\b\d+\b', logic.split('level')[0])
                 subjects = [a.get_text() for a in choice.find_all('a')]
                 subjects = list(filter(lambda s: 'advisor' not in s, subjects))
@@ -308,7 +313,6 @@ def parseChoice(choice, year):
                     elif 'COMM' in choice.get_text(): subjects.append('COMM')
                     elif 'ENTR' in choice.get_text(): subjects.append('ENTR')
                     elif 'STAT' in choice.get_text(): subjects.append('STAT')
-                    
                 for subject in subjects:
                     if len(levels) == 0: options.append(subject + ' xxx')
                     for level in levels:
@@ -495,7 +499,21 @@ def parseChoice(choice, year):
         n, additional = 0, False
         options, res = [], []
         if len(choice[1]) == 0:
-            # print(choice[0])
+            if 'level' in choice[0].get_text():
+                levels = findall(r'\b\d+\b', choice[0].get_text().split('level')[0])
+                subjects = [a.get_text() for a in choice[0].find_all('a')]
+                if len(subjects) == 0:
+                    if 'math course' in choice[0].get_text(): 
+                        subjects = MATH_COURSE_CODES
+                        if 'other than' in choice[0].get_text():
+                            exclude = set(choice.get_text().split('other than ')[1].split(', '))
+                            subjects = list(set(subjects).difference(exclude))
+                for subject in subjects:
+                    if len(levels) == 0: options.append(subject + ' xxx')
+                    for level in levels:
+                        options.append(subject + ' ' + level[0] + 'xx')
+                n = stringToNum(choice[0].get_text().lower())
+                res.append((n, set(options)))
             return res, options, additional
         else:
             logic = choice[0].get_text().lower()
@@ -513,9 +531,9 @@ def parseChoice(choice, year):
                 if 'Note:' in course.contents[0].get_text(): continue
                 options += [a.get_text() for a in course.find_all('a')]
             if 'all' in logic:
-                for course in choice[1]:
+                for course in courses:
                     option = [a.get_text() for a in course.find_all('a')]
-                    res.append((1, set(option)))
+                    if len(option) > 0: res.append((1, set(option)))
                 return res, options, additional
             elif stringToNum(logic): n = stringToNum(logic)
             else:
