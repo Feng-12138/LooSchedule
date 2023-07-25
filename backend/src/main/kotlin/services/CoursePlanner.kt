@@ -170,6 +170,10 @@ class CoursePlanner {
         val chosenCourses = mutableListOf<Course>()
         for (course in selectedCourses) {
             val result = checkConstraint(course, parsedDataList, majors)
+            if (course.courseID == "MATH 237" || course.courseID == "MATH 247") {
+                println("here")
+                println(result)
+            }
             if (result) {
                 chosenCourses.add(course)
                 listofTakenCourses.add(course.courseID)
@@ -195,12 +199,14 @@ class CoursePlanner {
 
     private fun selectCommunication(startYear: Year, nonMathCourses: MutableSet<Course>) {
         val sortedList1Courses = communicationRepo.getListNByYear(startYear.toInt(), 1).toList().sortedWith(courseComparator).toMutableList()
+        sortedList1Courses[0].color = "green"
         computeAndUpdateTermCourses(sortedList1Courses[0])
         nonMathCourses.add(sortedList1Courses[0])
         countTakenNonMathCourse++
         sortedList1Courses.removeAt(0)
         val sortedComCourses: List<Course> = (sortedList1Courses + communicationRepo.getListNByYear(startYear.toInt(), 2).toList()).sortedWith(courseComparator)
         computeAndUpdateTermCourses(sortedComCourses[0])
+        sortedComCourses[0].color = "green"
         nonMathCourses.add(sortedComCourses[0])
         countTakenNonMathCourse++
     }
@@ -271,6 +277,7 @@ class CoursePlanner {
             idx++
             val result = checkConstraint(course, parsedDataMap = parsedDataMap, majors = majors)
             if (result) {
+                course.color = "blue"
                 computeAndUpdateTermCourses(course)
                 returnedCourseList.add(course)
                 countMathCourse++
@@ -372,6 +379,7 @@ class CoursePlanner {
 
         var mandatoryCourseNonMath = mutableListOf<Course>()
         for (mandatoryCourse in mandatoryCourses) {
+            mandatoryCourse.color = "red"
             if (mathSubjects.contains(mandatoryCourse.subject)) {
                 mathCourses.add(mandatoryCourse)
                 computeAndUpdateTermCourses(mandatoryCourse)
@@ -399,10 +407,10 @@ class CoursePlanner {
         }
 
         for (course in mandatoryCourseNonMath) {
+            course.color = "red"
             computeAndUpdateTermCourses(course)
         }
         selectCommunication(startYear, nonMathCourses)
-        println(listofTakenCourses)
         // non math courses are more flexible
 
         val courses = getCompleteOptionCourse(modifiedMajors.toList(), parsedDataList)

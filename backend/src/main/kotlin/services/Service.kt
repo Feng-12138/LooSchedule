@@ -120,12 +120,9 @@ class Service: IService {
             .split(",")
             .map {
                 val parts = it.trim().split(" ")
-                println(parts)
                 Course(parts[0], parts[1])
             }
             .toList()
-
-        println(courses)
 
         return courses
     }
@@ -153,10 +150,6 @@ class Service: IService {
             }
         }
 
-//        println("------------------")
-//        println(requirements)
-//        println("------------------")
-
         val sequenceMap = sequenceGenerator.generateSequence(plan.sequence)
         val selectedCourses = coursePlanner.getCoursesPlanToTake(
             plan.startYear,
@@ -165,13 +158,9 @@ class Service: IService {
             sequenceMap = sequenceMap
         )
 
-//        println("????????????")
-//        println(selectedCourses.map{it.value})
-//        println("?????????????/")
-//        println(selectedCourses["F"]!!.map { it.courseID })
-//        println(selectedCourses["W"]!!.map { it.courseID })
-//        println(selectedCourses["S"]!!.map { it.courseID })
-
+        println(selectedCourses["F"]!!.map { it.courseID })
+        println(selectedCourses["W"]!!.map { it.courseID })
+        println(selectedCourses["S"]!!.map { it.courseID })
 
         return termMapperService.mapCoursesToSequence(
             courseData = CourseDataClass(fallCourses = selectedCourses["F"]!!, springCourses = selectedCourses["S"]!!, winterCourses = selectedCourses["W"]!!,
