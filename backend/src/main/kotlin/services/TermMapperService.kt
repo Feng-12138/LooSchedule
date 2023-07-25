@@ -93,6 +93,7 @@ class TermMapperService {
         return finalSchedule
     }
 
+    // 这玩意现在没用了 请移步checkConstraint
     private fun checkMathCourseConstraint(course: Course, termName : String, season: String,
                                           prereqMap: MutableMap<String, ParsedPrereqData>): Boolean {
         val parsedPrereqData = prereqMap[course.courseID] ?: return false
@@ -120,6 +121,7 @@ class TermMapperService {
         }
     }
 
+    // 有用的
     private fun checkConstraint(course: Course, parsedDataMap:MutableMap<String, ParsedPrereqData>, retvalList: List<String>) : Boolean {
         val selectedCourseData = parsedDataMap[course.courseID]
 
@@ -262,136 +264,137 @@ class TermMapperService {
         return retvalList
     }
 
-    private fun generateCourseForTerm(
-        termName : String,
-        season: String,
-        numCourse: Int,
-        mathCourse: MutableSet<Course>,
-        nonMathCourse: MutableSet<Course>,
-        prereqMap: MutableMap<String, ParsedPrereqData>
-    ) : MutableList<Course> {
-        // non math courses have not taken
-        val notTakenNonMathCourse = mutableListOf<Course>()
-        val notTakenMathCourse = mutableListOf<Course>()
-        val satisfyConstraintMathCourse = mutableListOf<Course>()
-        // non math courses could be taken this term
-        val satisfyConstraintNonMathCourse = mutableListOf<Course>()
-        // non math courses could be taken this term online, DOES NOT DUPLICATE WITH satisfyConstraintNonMathCourse
-        val satisfyConstraintOnlineNonMathCourse = mutableListOf<Course>()
-        val retvalList = mutableListOf<Course>()
-        for (course in mathCourse) {
-            if (course.courseID !in takenCourses) {
-                notTakenMathCourse.add(course)
-            }
-        }
-        for (course in nonMathCourse) {
-            if (course.courseID !in takenCourses) {
-                notTakenNonMathCourse.add(course)
-            }
-        }
-
-        for (course in notTakenMathCourse) {
-            if (checkMathCourseConstraint(course, termName, season, prereqMap)) {
-                satisfyConstraintMathCourse.add(course)
-            }
-        }
-
-        for (course in notTakenNonMathCourse) {
-            val addStatus: NonMathAddStatus = checkNonMathCourseConstraint(course, termName, season, prereqMap)
-            if (addStatus == NonMathAddStatus.AddToOnline) {
-                satisfyConstraintOnlineNonMathCourse.add(course)
-            } else if (addStatus == NonMathAddStatus.AddToInPerson) {
-                satisfyConstraintNonMathCourse.add(course)
-            }
-        }
-        var newSatisfyConstraintMathCourse = satisfyConstraintMathCourse.sortedBy { it.courseID }
-        var newSatisfyConstraintNonMathCourse = satisfyConstraintNonMathCourse.sortedBy { it.courseID }
-        var newSatisfyConstraintOnlineNonMathCourse = satisfyConstraintOnlineNonMathCourse.sortedBy { it.courseID }
-
-        var numCourseCounter = numCourse
-        for (i in 0 until numCourse - 1) {
-            if (i >= newSatisfyConstraintMathCourse.size) {
-                break
-            } else {
-                retvalList.add(newSatisfyConstraintMathCourse[i])
-            }
-            numCourseCounter--
-        }
-        var i = 0
-
-        while (i < numCourseCounter) {
-            var counter = i
-            if (termName.contains("WT")) {
-                for (item in newSatisfyConstraintOnlineNonMathCourse) {
-                    retvalList.add(item)
-                    counter++
-                    if (counter >= numCourseCounter) {
-                        break
-                    }
-                }
-                if (counter >= numCourseCounter) {
-                    break
-                }
-
-                for (item in newSatisfyConstraintNonMathCourse) {
-                    retvalList.add(item)
-                    counter++
-                    if (counter >= numCourseCounter) {
-                        break
-                    }
-                }
-                i = counter
-            } else {
-                // Add communication course for the first term
-                if (termName == "1A") {
-                    var communicationCourseAdded = false
-                    for (item in newSatisfyConstraintNonMathCourse) {
-                        val courseID = item.courseID
-                        if (courseID in ListOneCourses) {
-                            retvalList.add(item)
-                            counter++
-                            communicationCourseAdded = true
-                            break
-                        }
-                    }
-                    if (!communicationCourseAdded) {
-                        for (item in newSatisfyConstraintOnlineNonMathCourse) {
-                            val courseID = item.courseID
-                            if (courseID in ListOneCourses) {
-                                retvalList.add(item)
-                                counter++
-                                break
-                            }
-                        }
-                    }
-                }
-                for (item in newSatisfyConstraintNonMathCourse) {
-                    retvalList.add(item)
-                    counter++
-                    if (counter >= numCourseCounter) {
-                        break
-                    }
-                }
-                if (counter >= numCourseCounter) {
-                    break
-                }
-                for (item in newSatisfyConstraintOnlineNonMathCourse) {
-                    retvalList.add(item)
-                    counter++
-                    if (counter >= numCourseCounter) {
-                        break
-                    }
-                }
-                // 没变
-                if (counter < numCourseCounter) {
-                    break
-                }
-                i = counter
-            }
-        }
-        takenCourses.clear()
-        return retvalList
-    }
+    // 这个也可以删了 看Michael 现在用的是generate season 那个
+//    private fun generateCourseForTerm(
+//        termName : String,
+//        season: String,
+//        numCourse: Int,
+//        mathCourse: MutableSet<Course>,
+//        nonMathCourse: MutableSet<Course>,
+//        prereqMap: MutableMap<String, ParsedPrereqData>
+//    ) : MutableList<Course> {
+//        // non math courses have not taken
+//        val notTakenNonMathCourse = mutableListOf<Course>()
+//        val notTakenMathCourse = mutableListOf<Course>()
+//        val satisfyConstraintMathCourse = mutableListOf<Course>()
+//        // non math courses could be taken this term
+//        val satisfyConstraintNonMathCourse = mutableListOf<Course>()
+//        // non math courses could be taken this term online, DOES NOT DUPLICATE WITH satisfyConstraintNonMathCourse
+//        val satisfyConstraintOnlineNonMathCourse = mutableListOf<Course>()
+//        val retvalList = mutableListOf<Course>()
+//        for (course in mathCourse) {
+//            if (course.courseID !in takenCourses) {
+//                notTakenMathCourse.add(course)
+//            }
+//        }
+//        for (course in nonMathCourse) {
+//            if (course.courseID !in takenCourses) {
+//                notTakenNonMathCourse.add(course)
+//            }
+//        }
+//
+//        for (course in notTakenMathCourse) {
+//            if (checkMathCourseConstraint(course, termName, season, prereqMap)) {
+//                satisfyConstraintMathCourse.add(course)
+//            }
+//        }
+//
+//        for (course in notTakenNonMathCourse) {
+//            val addStatus: NonMathAddStatus = checkNonMathCourseConstraint(course, termName, season, prereqMap)
+//            if (addStatus == NonMathAddStatus.AddToOnline) {
+//                satisfyConstraintOnlineNonMathCourse.add(course)
+//            } else if (addStatus == NonMathAddStatus.AddToInPerson) {
+//                satisfyConstraintNonMathCourse.add(course)
+//            }
+//        }
+//        var newSatisfyConstraintMathCourse = satisfyConstraintMathCourse.sortedBy { it.courseID }
+//        var newSatisfyConstraintNonMathCourse = satisfyConstraintNonMathCourse.sortedBy { it.courseID }
+//        var newSatisfyConstraintOnlineNonMathCourse = satisfyConstraintOnlineNonMathCourse.sortedBy { it.courseID }
+//
+//        var numCourseCounter = numCourse
+//        for (i in 0 until numCourse - 1) {
+//            if (i >= newSatisfyConstraintMathCourse.size) {
+//                break
+//            } else {
+//                retvalList.add(newSatisfyConstraintMathCourse[i])
+//            }
+//            numCourseCounter--
+//        }
+//        var i = 0
+//
+//        while (i < numCourseCounter) {
+//            var counter = i
+//            if (termName.contains("WT")) {
+//                for (item in newSatisfyConstraintOnlineNonMathCourse) {
+//                    retvalList.add(item)
+//                    counter++
+//                    if (counter >= numCourseCounter) {
+//                        break
+//                    }
+//                }
+//                if (counter >= numCourseCounter) {
+//                    break
+//                }
+//
+//                for (item in newSatisfyConstraintNonMathCourse) {
+//                    retvalList.add(item)
+//                    counter++
+//                    if (counter >= numCourseCounter) {
+//                        break
+//                    }
+//                }
+//                i = counter
+//            } else {
+//                // Add communication course for the first term
+//                if (termName == "1A") {
+//                    var communicationCourseAdded = false
+//                    for (item in newSatisfyConstraintNonMathCourse) {
+//                        val courseID = item.courseID
+//                        if (courseID in ListOneCourses) {
+//                            retvalList.add(item)
+//                            counter++
+//                            communicationCourseAdded = true
+//                            break
+//                        }
+//                    }
+//                    if (!communicationCourseAdded) {
+//                        for (item in newSatisfyConstraintOnlineNonMathCourse) {
+//                            val courseID = item.courseID
+//                            if (courseID in ListOneCourses) {
+//                                retvalList.add(item)
+//                                counter++
+//                                break
+//                            }
+//                        }
+//                    }
+//                }
+//                for (item in newSatisfyConstraintNonMathCourse) {
+//                    retvalList.add(item)
+//                    counter++
+//                    if (counter >= numCourseCounter) {
+//                        break
+//                    }
+//                }
+//                if (counter >= numCourseCounter) {
+//                    break
+//                }
+//                for (item in newSatisfyConstraintOnlineNonMathCourse) {
+//                    retvalList.add(item)
+//                    counter++
+//                    if (counter >= numCourseCounter) {
+//                        break
+//                    }
+//                }
+//                // 没变
+//                if (counter < numCourseCounter) {
+//                    break
+//                }
+//                i = counter
+//            }
+//        }
+//        takenCourses.clear()
+//        return retvalList
+//    }
 
     private fun finalizeSchedule(scheduleSoFar: MutableMap<String, MutableList<Course>>,
                                  countCourseTerm: MutableMap<String, Int>, sequenceMap: Map<String, String>,
