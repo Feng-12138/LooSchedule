@@ -340,9 +340,6 @@ class CoursePlanner {
         val mathCourses: MutableSet<Course> = mutableSetOf()
         val nonMathCourses: MutableSet<Course> = mutableSetOf()
         val mandatoryCourses: MutableSet<Course> = courseRepo.getBySubjectCode(requirements.mandatoryCourses)
-
-        println(mandatoryCourses.map{it.courseID})
-        println(requirements.mandatoryCourses.map { it.subject })
         val optionalCourses: MutableSet<OptionalCourses> = requirements.optionalCourses.map {
             OptionalCourses(it.nOf, courseRepo.getBySubjectCode(it.courses))
         }.toMutableSet()
@@ -405,6 +402,7 @@ class CoursePlanner {
             computeAndUpdateTermCourses(course)
         }
         selectCommunication(startYear, nonMathCourses)
+        println(listofTakenCourses)
         // non math courses are more flexible
 
         val courses = getCompleteOptionCourse(modifiedMajors.toList(), parsedDataList)
