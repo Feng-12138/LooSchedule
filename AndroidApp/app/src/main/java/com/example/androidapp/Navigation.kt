@@ -4,8 +4,6 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,7 +34,18 @@ fun Navigation(){
 
     NavHost(navController = navController, startDestination = Screen.MainScreen.route){
         composable(route = Screen.SearchCourse.route){
-            MainScreen (navController = navController, name = "SearchCourse") { SearchCourseScreen(navController = navController) }
+            MainScreen (navController = navController, name = "SearchCourse") {
+                val schedule = navController.previousBackStackEntry?.arguments?.getParcelable("schedule", Schedule::class.java)
+                val term = navController.previousBackStackEntry?.arguments?.getString("term")
+                val position = navController.previousBackStackEntry?.arguments?.getInt("position")
+                if (term != null && schedule != null && position != null) {
+                    SearchCourseScreen(
+                        navController = navController,
+                        term = term,
+                        schedule = schedule,
+                        position = position)
+                }
+            }
         }
         composable(route = Screen.About.route){
             MainScreen (navController = navController, name = "About") { AboutScreen() }

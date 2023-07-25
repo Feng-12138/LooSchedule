@@ -1,6 +1,5 @@
 package com.example.androidapp.screens
 
-import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,17 +30,16 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -49,7 +47,6 @@ import androidx.navigation.NavController
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.viewModels.ScheduleViewModel
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.lang.Integer.min
 
@@ -163,7 +160,7 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                     ?: scheduleViewModel.schedule.termSchedule[termList[page]].also {
                         it?.let { pagerCourses[page] = it }
                     } ?: emptyList()
-                CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position)
+                CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position, isValidated = isValidated)
             }
         }
     }
@@ -171,13 +168,12 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
 
 
 @Composable
-private fun CourseSchedulePage(courses: List<Course>, navController: NavController, schedule: Schedule, term: String, position: Int) {
+private fun CourseSchedulePage(courses: List<Course>, navController: NavController, schedule: Schedule, term: String, position: Int, isValidated: MutableState<Boolean>) {
     if (courses.isEmpty()) {
         Box(
             contentAlignment = Alignment.TopCenter,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 56.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
@@ -194,6 +190,46 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                     style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)),
                     textAlign = TextAlign.Center
                 )
+            }
+            Box(
+                contentAlignment = Alignment.BottomEnd,
+                modifier = Modifier
+                    .padding(vertical = 24.dp)
+                    .fillMaxSize(),
+            ) {
+                Column() {
+                    FloatingActionButton(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = Color.White,
+                        shape = CircleShape,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        onClick = {
+                            navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
+                            navController.currentBackStackEntry?.arguments?.putString("term", term)
+                            navController.currentBackStackEntry?.arguments?.putInt("position", position)
+                            navController.navigate(Screen.SearchCourse.route)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add"
+                        )
+                    }
+
+                    FloatingActionButton(
+                        containerColor = if (isValidated.value) MaterialTheme.colorScheme.secondary else Color.Red,
+                        contentColor = Color.White,
+                        shape = CircleShape,
+                        onClick = {
+
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Done,
+                            contentDescription = "Validate"
+                        )
+                    }
+                }
             }
         }
         return
@@ -225,7 +261,10 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                     shape = CircleShape,
                     modifier = Modifier.padding(bottom = 12.dp),
                     onClick = {
-
+                        navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
+                        navController.currentBackStackEntry?.arguments?.putString("term", term)
+                        navController.currentBackStackEntry?.arguments?.putInt("position", position)
+                        navController.navigate(Screen.SearchCourse.route)
                     }
                 ) {
                     Icon(
@@ -235,7 +274,7 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                 }
 
                 FloatingActionButton(
-//                    containerColor = if (isValidated.value) MaterialTheme.colorScheme.secondary else Color.Red,
+                    containerColor = if (isValidated.value) MaterialTheme.colorScheme.secondary else Color.Red,
                     contentColor = Color.White,
                     shape = CircleShape,
                     onClick = {
