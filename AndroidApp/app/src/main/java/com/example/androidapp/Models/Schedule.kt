@@ -23,8 +23,11 @@ class Schedule(var terms: MutableMap<String, MutableList<Course>>,
     @SerializedName("Validated")
     var validated: Boolean = true
 
-    @SerializedName("ValidatedCourse")
-    lateinit var validatedCourse: MutableMap<String, List<List<ValidateResults>>>
+    @SerializedName("CourseValidation")
+    var courseValidation: Map<String, MutableList<List<ValidateResults>>> = mutableMapOf()
+
+    @SerializedName("DegreeValidation")
+    var degreeValidation: List<OverallValidationResult> = listOf()
 
     @SerializedName("Degree")
     var degree: List<String> = myDegree
