@@ -678,6 +678,10 @@ def parsePrereqs(programList: list):
                                 if onlyOpenToStr.find(program) != -1:
                                     continue
                                 program = "Faculty of Mathematics"
+                            if program == "Honours Math":
+                                if onlyOpenToStr.find(program) != -1:
+                                    continue
+                                program = "Faculty of Mathematics"
                             onlyOpenToStr += f"{program},"
                 onlyOpenToStr = onlyOpenToStr[:-1]
             elif (notOpenPattern != ""):
@@ -710,6 +714,10 @@ def parsePrereqs(programList: list):
                                 if notOpenToStr.find(program) != -1:
                                     continue
                                 program = "Faculty of Mathematics"
+                            if program == "Honours Math":
+                                if notOpenToStr.find(program) != -1:
+                                    continue
+                            program = "Faculty of Mathematics"
                             notOpenToStr += f"{program},"
             else:
                 for program in programList:
@@ -736,6 +744,10 @@ def parsePrereqs(programList: list):
                                 continue
                             program = "Faculty of Health"
                         if program == "Mathematics students":
+                            if onlyOpenToStr.find(program) != -1:
+                                continue
+                            program = "Faculty of Mathematics"
+                        if program == "Honours Math":
                             if onlyOpenToStr.find(program) != -1:
                                 continue
                             program = "Faculty of Mathematics"
@@ -778,6 +790,7 @@ def parsePrograms():
     retvalList.append("Engineering students ")
     retvalList.append("Environment students")
     retvalList.append("Science students")
+    retvalList.append("Honours Math")
     return retvalList
     
     
