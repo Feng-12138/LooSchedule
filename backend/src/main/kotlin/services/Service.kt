@@ -175,9 +175,21 @@ class Service: IService {
 
     @Override
     override fun validateSchedule(input: ScheduleValidator.ScheduleValidationInput): ScheduleValidator.ScheduleValidationOutput {
+        val requirementsId = mutableSetOf<Long>()
+        for (major in input.academicPlan.majors) {
+            requirementsId.add(majorRepo.getRequirementIdByName(major))
+        }
+        for (minor in input.academicPlan.minors) {
+            requirementsId.add(minorRepo.getRequirementIdByName(minor))
+        }
+        for (specialization in input.academicPlan.specializations) {
+            requirementsId.add(specializationRepo.getRequirementIdByName(specialization))
+        }
+        val requirementsData = requirementRepo.getRequirementCoursesByIds(requirementsId)
         return scheduleValidator.validateSchedule(input.schedule,
                                                   input.academicPlan.majors,
-                                                  sequenceGenerator.generateSequence(input.academicPlan.sequence))
+                                                  sequenceGenerator.generateSequence(input.academicPlan.sequence),
+                                                  requirementsParser.initialReqParse(requirementsData))
     }
 
     private fun getRequirements(plan: AcademicPlan): Requirements {

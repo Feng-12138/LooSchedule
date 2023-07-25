@@ -82,7 +82,7 @@ class RequirementsParser {
     }
 
     // Extract all courses needed based on requirement.
-    private fun initialReqParse(requirementsData: List<String>): Requirements {
+    fun initialReqParse(requirementsData: List<String>): Requirements {
         val optionalCourses = mutableSetOf<OptionalCourses>()
         val mandatoryCourses = mutableSetOf<Course>()
         for (requirements in requirementsData) {
