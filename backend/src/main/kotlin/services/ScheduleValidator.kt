@@ -1,6 +1,7 @@
 package services
 
 import entities.Course
+import entities.Major
 import jakarta.inject.Inject
 import repositories.MajorRepo
 import repositories.ParsedPrereqData
@@ -19,8 +20,7 @@ class ScheduleValidator {
 
     data class ScheduleValidationInput (
         val schedule: Schedule = mutableMapOf(),
-        val degree: String = "",
-        val sequence: String = "Regular",
+        val academicPlan: AcademicPlan = AcademicPlan()
     )
 
     data class ScheduleValidationOutput (
@@ -41,7 +41,7 @@ class ScheduleValidator {
 
     enum class OverallValidationResult {
         Success,
-        NoSuchMajor,
+        InvalidMajor,
         CommunicationCourseTooLate,
         NotEnoughCourse,
         NotMeetDegreeRequirement,
@@ -103,10 +103,12 @@ class ScheduleValidator {
         return ValidationResult.Success
     }
 
-    private fun checkList1CommunicationCourse(schedule: Schedule, degree: String): OverallValidationResult {
-        val major: entities.Major = majorRepo.getMajorByName(degree) ?: return OverallValidationResult.NoSuchMajor
+    private fun checkList1CommunicationCourse(schedule: Schedule, majorNames: List<String>): OverallValidationResult {
+        val majors: List<Major> = majorRepo.getMajorsByNames(majorNames)
+        if (majors.size != majorNames.size) return OverallValidationResult.InvalidMajor
+
         // Double degree programs need to take list 1 communication course in 1A
-        if (major.isDoubleDegree) {
+        if (majors.any { it.isDoubleDegree }) {
             for (course in schedule["1A"]!!) {
                 if (course.courseID in listOneCommunicationCourses) return OverallValidationResult.Success
             }
@@ -122,12 +124,18 @@ class ScheduleValidator {
         return OverallValidationResult.CommunicationCourseTooLate
     }
     
-    private fun checkOpenTo(course: Course, degree: String): ValidationResult {
+    private fun checkOpenTo(course: Course, majors: List<String>): ValidationResult {
         // Check if course satisfies not open to and only open to
         return ValidationResult.Success
     }
+
+    private fun checkDegreeCourseRequirements(schedule: Schedule,
+                                              requirements: Requirements): OverallValidationResult {
+        TODO()
+    }
     
-    fun validateSchedule(schedule: Schedule, degree: String, sequenceMap: Map<String, String>): ScheduleValidationOutput {
+    fun validateSchedule(schedule: Schedule, majors: List<String>, sequenceMap: Map<String, String>,
+                         requirements: Requirements): ScheduleValidationOutput {
         val courseValidity = mutableMapOf<String, MutableList<List<ValidationResult>>>()
         val degreeValidity = mutableListOf<OverallValidationResult>()
         var overallResult = true
@@ -137,7 +145,7 @@ class ScheduleValidator {
         val courseConstraints = prerequisiteRepo.getParsedPrereqData(courseList)
 
         // First check communication courses
-         val commRes: OverallValidationResult = checkList1CommunicationCourse(schedule, degree)
+         val commRes: OverallValidationResult = checkList1CommunicationCourse(schedule, majors)
          if (commRes != OverallValidationResult.Success) {
              degreeValidity.add(commRes)
              // Currently, not satisfying communication timeline is only a warning.
@@ -160,7 +168,7 @@ class ScheduleValidator {
                     checkCoursePreReq(course, takenSoFar, courseConstraints),
                     checkCourseCoReq(course, takenAndTakingSoFar, courseConstraints),
                     checkCourseAntiReq(course, takenAndTakingSoFar, courseConstraints),
-                    checkOpenTo(course, degree)
+                    checkOpenTo(course, majors)
                 )
                 // Only keep the invalid reasons for that course
                 courseResult.removeIf { it == ValidationResult.Success }
@@ -171,7 +179,13 @@ class ScheduleValidator {
             courseValidity[term] = termResult
         }
 
-        // Check if degree requirements are satisfied
+        // Check if degree course requirements are satisfied
+        val degreeRes: OverallValidationResult = checkDegreeCourseRequirements(schedule, requirements)
+        if (degreeRes != OverallValidationResult.Success) {
+            degreeValidity.add(degreeRes)
+            // If not enough course selected in the schedule, then don't consider it as being invalid
+            if (degreeRes == OverallValidationResult.NotMeetDegreeRequirement) overallResult = false
+        }
 
         return ScheduleValidationOutput(courseValidity, degreeValidity, overallResult)
     }
