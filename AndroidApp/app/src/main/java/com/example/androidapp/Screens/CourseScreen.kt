@@ -191,7 +191,7 @@ fun SwapAndDelete(modifier: Modifier = Modifier, onSwap: () -> Unit, onDelete: (
 
             Button(
                 modifier = Modifier.height(56.dp),
-                onClick = { /* Handle button 1 click */ }
+                onClick = { onSwap() }
             ) {
                 Icon(
                     imageVector = Icons.Default.ShoppingCart,
