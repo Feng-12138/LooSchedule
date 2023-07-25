@@ -76,6 +76,8 @@ class Course {
     @OneToOne(cascade = [CascadeType.ALL])
     @PrimaryKeyJoinColumn
     lateinit var prereqs: Prerequisite
+
+    var color: String = "blue"
 }
 
 
