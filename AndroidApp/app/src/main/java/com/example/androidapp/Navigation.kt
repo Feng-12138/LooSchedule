@@ -38,12 +38,17 @@ fun Navigation(){
                 val schedule = navController.previousBackStackEntry?.arguments?.getParcelable("schedule", Schedule::class.java)
                 val term = navController.previousBackStackEntry?.arguments?.getString("term")
                 val position = navController.previousBackStackEntry?.arguments?.getInt("position")
-                if (term != null && schedule != null && position != null) {
+                val swap = navController.previousBackStackEntry?.arguments?.getBoolean("swap")
+                val courseIndex = navController.previousBackStackEntry?.arguments?.getInt("index")
+                if (term != null && schedule != null && position != null && swap != null && courseIndex != null) {
                     SearchCourseScreen(
                         navController = navController,
                         term = term,
                         schedule = schedule,
-                        position = position)
+                        position = position,
+                        swap = swap,
+                        courseIndex = courseIndex
+                    )
                 }
             }
         }
