@@ -131,7 +131,12 @@ fun CourseList(navController: NavController, courseList: List<Course>, searchQue
                 Text(text = "Warning")
             },
             text = {
-                Text("Are you sure you want to add this course?")
+                if(swap && selectedCourse.isNotEmpty()){
+                    Text("Are you sure you want to swap with this course?")
+                }
+                else{
+                    Text("Are you sure you want to add this course?")
+                }
             },
             confirmButton = {
                 Button(
