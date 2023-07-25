@@ -131,31 +131,38 @@ class Service: IService {
     override fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>> {
         val requirements = getRequirements(plan)
         val takenCourses = plan.coursesTaken
-        val currentTerm = plan.currentTerm
 
         if (takenCourses.isNotEmpty()) {
+            // remove 136L if 136 is taken means it's not coreq
+            if (takenCourses.contains("CS 136")) {
+                requirements.mandatoryCourses.remove(Course("CS", "136L"))
+            }
             requirements.mandatoryCourses.removeIf { mandatoryCourse ->
                 val course = mandatoryCourse.subject + " " + mandatoryCourse.code
                 takenCourses.contains(course)
             }
 
-            for (optionalReq in requirements.optionalCourses) {
-                val commonCourses = optionalReq.courses.filter { it.subject + " " + it.code in takenCourses }
-                optionalReq.courses.removeAll(commonCourses.toSet())
-                optionalReq.nOf -= commonCourses.size
-                if (optionalReq.nOf <= 1) {
-                    requirements.mandatoryCourses.addAll(optionalReq.courses)
-                    requirements.optionalCourses.remove(optionalReq)
+            val iterator = requirements.optionalCourses.iterator()
+
+            while (iterator.hasNext()) {
+                val optionalReq = iterator.next()
+                val commonCourses = optionalReq.courses.filter { "${it.subject} ${it.code}" in takenCourses }
+                if (commonCourses.size >= optionalReq.nOf) {
+                    iterator.remove()
+                } else {
+                    optionalReq.nOf -= commonCourses.size
+                    optionalReq.courses.removeAll(commonCourses.toSet())
                 }
             }
         }
 
-        val sequenceMap = sequenceGenerator.generateSequence(plan.sequence)
+        val sequenceMap = sequenceGenerator.generateSequence(plan.sequence, plan.currentTerm)
         val selectedCourses = coursePlanner.getCoursesPlanToTake(
             plan.startYear,
             requirements,
             plan.majors,
-            sequenceMap = sequenceMap
+            sequenceMap = sequenceMap,
+            takenCourses,
         )
 
         println(selectedCourses["F"]!!.map { it.courseID })
@@ -166,7 +173,7 @@ class Service: IService {
             courseData = CourseDataClass(fallCourses = selectedCourses["F"]!!, springCourses = selectedCourses["S"]!!, winterCourses = selectedCourses["W"]!!,
                 prereqMap = coursePlanner.getPrereqMap()),
             sequenceMap = sequenceMap,
-            currentTerm = currentTerm,
+            previousTakenCourses = takenCourses,
         )
     }
 
@@ -222,10 +229,10 @@ data class AcademicPlan(
     var minors: List<String> = listOf(),
     var specializations: List<String> = listOf(),
     var coursesTaken: List<String> = listOf(),
-    var currentTerm: String = "1A",
+    var currentTerm: String? = null,
 ) {
     // Default constructor
-    constructor() : this(listOf(), "2023", "Regular", listOf(), listOf(), listOf())
+    constructor() : this(listOf(), "2023", "Regular", listOf(), listOf(), listOf(), null)
 }
 
 data class Message(
