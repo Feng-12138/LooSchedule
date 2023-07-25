@@ -1,8 +1,4 @@
 package com.example.androidapp.screens
-
-import android.content.Context
-import android.graphics.ColorSpace.Rgb
-import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -180,11 +176,7 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                     ?: scheduleViewModel.schedule.termSchedule[termList[page]].also {
                         it?.let { pagerCourses[page] = it }
                     } ?: emptyList()
-<<<<<<< HEAD
-                CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position, isValidated = isValidated)
-=======
                 CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position, scheduleViewModel = scheduleViewModel)
->>>>>>> 7584a9d (validate api works)
             }
         }
     }
@@ -192,13 +184,9 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
 
 
 @Composable
-<<<<<<< HEAD
-private fun CourseSchedulePage(courses: List<Course>, navController: NavController, schedule: Schedule, term: String, position: Int, isValidated: MutableState<Boolean>) {
-=======
 private fun CourseSchedulePage(courses: List<Course>, navController: NavController, schedule: Schedule, term: String, position: Int, scheduleViewModel: ScheduleViewModel) {
     val context = LocalContext.current
     var isValidated = remember { mutableStateOf(scheduleViewModel.schedule.validated) }
->>>>>>> 7584a9d (validate api works)
     if (courses.isEmpty()) {
         Box(
             contentAlignment = Alignment.TopCenter,
