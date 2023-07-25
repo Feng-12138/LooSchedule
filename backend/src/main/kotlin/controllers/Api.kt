@@ -1,14 +1,12 @@
 package controllers
 
-import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import jakarta.inject.Inject
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import services.AcademicPlan
-import services.IService
+import kotlinx.coroutines.runBlocking
+import okhttp3.*
+import services.*
 
 @Path("/")
 class Api {
@@ -29,28 +27,13 @@ class Api {
     }
 
     @GET
-    @Path("api/Courses")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun getCourses(): Response {
-        try{
-            val message = service.allCourses()
-            return Response.ok(message).build()
-        }
-        catch (e: Exception){
-            println(e.message)
-        }
-        return Response.serverError().build()
-    }
-
-    @GET
     @Path("api/Communications")
     @Produces(MediaType.APPLICATION_JSON)
     fun getCommunications(): Response {
         try {
             val message = service.allCommunications()
             return Response.ok(message).build()
-        }
-        catch (e: Exception){
+        } catch (e: Exception) {
             println(e.message)
         }
         return Response.serverError().build()
@@ -64,8 +47,50 @@ class Api {
         try {
             val message = service.generateSchedule(academicPlan)
             return Response.ok(message).build()
+        } catch (e: Exception) {
+            println(e.message)
         }
-        catch (e: Exception){
+        return Response.serverError().build()
+    }
+
+    @GET
+    @Path("api/everything")
+    @Produces(MediaType.APPLICATION_JSON)
+    fun getAllPlans(): Response {
+        try {
+            val message = service.allPlanNames()
+            print(message)
+            return Response.ok(message).build()
+        } catch (e: Exception) {
+            println(e.message)
+        }
+        return Response.serverError().build()
+    }
+
+    @POST
+    @Path("gpt")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    fun tryGpt(request: Message): Response = runBlocking {
+        try {
+            println(request.position)
+            val message = service.recommendCourses(request.position)
+            return@runBlocking Response.ok(message).build()
+        } catch (e: Exception) {
+            println(e.message)
+        }
+        return@runBlocking Response.serverError().build()
+    }
+
+    @POST
+    @Path("api/validate")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    fun validateSchedule(scheduleToVerify: ScheduleValidator.ScheduleValidationInput): Response {
+        try {
+            val message = service.validateSchedule(scheduleToVerify)
+            return Response.ok(message).build()
+        } catch (e: Exception) {
             println(e.message)
         }
         return Response.serverError().build()

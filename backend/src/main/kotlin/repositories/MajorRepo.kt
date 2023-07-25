@@ -20,4 +20,29 @@ class MajorRepo {
             0
         }
     }
+
+    fun getAllMajorNames(): List<String> {
+        return try {
+            val session = sessionFactory.openSession()
+            val hql = "FROM Major"
+            val majors = session.createQuery(hql, Major::class.java)
+            majors.list().map { it.majorName }
+        } catch (e: Exception) {
+            println(e.message)
+            listOf()
+        }
+    }
+
+    fun getMajorByName(majorName: String): Major? {
+        return try {
+            val session = sessionFactory.openSession()
+            val hql = "FROM Major M WHERE M.majorName = :majorName"
+            val query = session.createQuery(hql, Major::class.java)
+            query.setParameter("majorName", majorName)
+            query.uniqueResult()
+        } catch (e: Exception) {
+            println(e.message)
+            null
+        }
+    }
 }

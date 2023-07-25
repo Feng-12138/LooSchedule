@@ -1,13 +1,11 @@
 import requests
 import re
-from dotenv import dotenv_values, load_dotenv
 from sqlite3 import OperationalError
 from multiprocessing.dummy import Pool
 from __init__ import Session
 from schemas import Course, Prerequisite
 import os
 
-load_dotenv()
 
 yearList = []
 courseDict = {}
@@ -15,7 +13,6 @@ levels = ['1A', '1B', '2A', '2B', '3A', "3B", "4A", "4B"]
 
 coursePrereqDict = {}
 
-config = dotenv_values(".env")
 
 def getUrl(url: str, query = ""):
     data = ""
@@ -38,7 +35,7 @@ def parseCourseUrl(data: str, yearList: list):
         for item in lst:
             url = item.split('<a href="/courses/')[-1].split('">')[0]
             courseStr = f"course-{url}.html"
-            url = os.environ["CourseCalendarBaseUrl"] + year + "/COURSE/" + courseStr
+            url = "https://ucalendar.uwaterloo.ca/" + year + "/COURSE/" + courseStr
             urlList.append(url)
     return urlList
 
@@ -62,7 +59,7 @@ def wrapperCourseDataFunc(curYear: int):
         startYear = str(year)[-2:]
         endYear = str(year + 1)[-2:]
         yearList.append(startYear + endYear)
-    data = getUrl(os.environ["CourseIndexUrl"])
+    data = getUrl("https://ugradcalendar.uwaterloo.ca/page/Course-Descriptions-Index")
     urlList = parseCourseUrl(data, yearList)
     coursePages = getAllCoursePage(urlList)
     # get all the courses first
@@ -109,7 +106,7 @@ def wrapperCourseDataFunc(curYear: int):
                 courseDict[courseNum].usefulRating = ""
                 courseDict[courseNum].coreqs = ""
                 courseDict[courseNum].antireqs = ""
-    uwFlowCourseList = getUrl(os.environ['uwflowUrl'], query="""query Course {
+    uwFlowCourseList = getUrl("https://uwflow.com/graphql", query="""query Course {
     course {
         antireqs
         code
@@ -759,7 +756,7 @@ def parsePrereqs(programList: list):
             
 def parsePrograms():
     retvalList = []
-    htmlStr = getUrl(os.environ["programListUrl"])
+    htmlStr = getUrl("https://uwaterloo.ca/future-students/programs/alpha-list")
     contentStr = htmlStr.split('<div> class="content">')[-1]
     contentStr = contentStr.split('<table class="tablesaw tablesaw-stack"')[0]
     contentStrList = contentStr.split("<li><a")

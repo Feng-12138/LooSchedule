@@ -2,19 +2,16 @@ package com.example.androidapp.viewModels
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.androidapp.dataClass.MyDegree
-import com.example.androidapp.enum.CoopSequence
-import com.example.androidapp.enum.MyMajor
-import com.example.androidapp.enum.MyMinor
-import com.example.androidapp.enum.MySpecialization
-import com.example.androidapp.enum.MyYear
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.screens.Screen
 import com.example.androidapp.services.RetrofitClient
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,7 +31,15 @@ data class RequestData(
 )
 
 class SelectDegreeVM(context: Context, navController: NavController) : ViewModel() {
-    private val _uiState = MutableStateFlow(MyDegree())
+    private val _uiState = MutableStateFlow(
+        MyDegree(
+            major = "Select your degree",
+            minor = "Select your minor",
+            specialization = "Select your specialization",
+            year = "Select your academic year",
+            sequence = "Select your Coop sequence"
+        )
+    )
     val uiState: StateFlow<MyDegree> = _uiState.asStateFlow()
 
     private val _showDialog = MutableStateFlow(false)
@@ -49,15 +54,13 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
         minor: String,
         specialization: String
     ) {
-        var inputMajor = listOf(major)
-        var inputYear = year
-        var inputSequence = sequence
-        var inputMinor = if (minor != "Select your minor"){
+        val inputMajor = listOf(major)
+        val inputMinor = if (minor != "Select your minor"){
             listOf(minor)
         } else{
             emptyList()
         }
-        var inputSpecialization = if (specialization != "Select your specialization"){
+        val inputSpecialization = if (specialization != "Select your specialization"){
             listOf(minor)
         } else{
             emptyList()
@@ -65,8 +68,8 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
 
         val requestData = RequestData(
             majors = inputMajor,
-            startYear = inputYear,
-            sequence = inputSequence,
+            startYear = year,
+            sequence = sequence,
             minors = inputMinor,
             specializations = inputSpecialization
         )
@@ -78,31 +81,27 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
         val api = RetrofitClient.create()
         val requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody)
 
-
         val call = api.getCourseSchedule(requestBody)
-        call?.enqueue(object : Callback<Map<String, List<Course>>> {
+        call.enqueue(object : Callback<Map<String, List<Course>>> {
             override fun onResponse(
                 call: Call<Map<String, List<Course>>>,
                 response: Response<Map<String, List<Course>>>
             ) {
                 if (response.isSuccessful) {
                     val output = response.body()
-                    val schedule = output?.let { Schedule(it) }
-
                     val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-                    val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
-                    val scheduleList =
-                        (existingList?.map { Gson().fromJson(it, Schedule::class.java) } ?: emptyList()).toMutableList()
+                    val existingList = sharedPreferences.getString("scheduleList", "[]")
+                    val type = object : TypeToken<MutableList<Schedule>>() {}.type
+                    val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
                     var position = 0
-                    if(scheduleList.size > 0){
-                        position = scheduleList.size
+                    val schedule = output?.let { Schedule(it as MutableMap<String, MutableList<Course>>, myDegree = inputMajor, mySequence = sequence) }
+                    if (schedule != null) {
+                        scheduleList.add(position , schedule)
                     }
-                    scheduleList.add(position , schedule)
                     val editor = sharedPreferences.edit()
-                    val jsonList = scheduleList.map { Gson().toJson(it) }.toSet()
-                    editor.putStringSet("scheduleList", jsonList)
+                    val jsonList = Gson().toJson(scheduleList)
+                    editor.putString("scheduleList", jsonList)
                     editor.apply()
-
                     navController.navigate(Screen.ViewSchedule.route)
                 } else {
                     println(response.message())
@@ -123,21 +122,21 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
     }
 
     fun generateSchedule(
-        major: MyMajor,
-        year: MyYear,
-        sequence: CoopSequence,
-        minor: MyMinor,
-        specialization: MySpecialization,
+        major: String,
+        year: String,
+        sequence: String,
+        minor: String,
+        specialization: String,
         context: Context,
         navController: NavController
     ) {
-        if (major.major == "Select your degree" ||
-            year.year == "Select your academic year" ||
-            sequence.sequence == "Select your Coop sequence") {
+        if (major == "Select your degree" ||
+            year == "Select your academic year" ||
+            sequence == "Select your Coop sequence") {
             toggleDialog()
             return
         }
 
-        getCourseSchedule(context, navController, major.major, year.year, sequence.sequence, minor.minor, specialization.specialization)
+        getCourseSchedule(context, navController, major, year, sequence, minor, specialization)
     }
 }

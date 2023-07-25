@@ -4,7 +4,6 @@ import repositories.ParsedPrereqData
 import repositories.PrerequisiteRepo
 import jakarta.inject.Inject
 import repositories.CourseRepo
-import java.util.TooManyListenersException
 
 class TermMapperService {
     @Inject
@@ -21,7 +20,7 @@ class TermMapperService {
 
     val ListOneCourses = listOf("COMMST 100", "COMMST 223", "EMLS 101R", "EMLS 102R", "EMLS 129R", "ENGL 129R", "ENGL 109")
 
-    fun mapCoursesToSequence(courseData: CourseDataClass, sequenceMap: Map<String, String>): MutableMap<String, MutableList<Course>> {
+    fun mapCoursesToSequence(courseData: CourseDataClass, sequenceMap: Map<String, String>, currentTerm: String): MutableMap<String, MutableList<Course>> {
         val list = courseData.fallCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.winterCourses.map { it.courseID })
         list.addAll(courseData.springCourses.map{it.courseID})
@@ -68,25 +67,41 @@ class TermMapperService {
             val coursesTakeThisTerm = courseList.map{it.courseID}
             takenCourses.addAll(coursesTakeThisTerm)
             generatedSchedule[key] = courseList
-            println(coursesTakeThisTerm)
         }
         takenCourses.clear()
         courseData.fallCourses.clear()
         courseData.springCourses.clear()
         courseData.winterCourses.clear()
-        return generatedSchedule
+        for ((key, value) in generatedSchedule) {
+            println("$key: ")
+            print("\t")
+            for (course in value) {
+                print("${course.courseID}, ")
+            }
+            println("")
+        }
+//        val finalSchedule: MutableMap<String, MutableList<Course>> = finalizeSchedule(generatedSchedule, countCourseTerm, sequenceMap, prereqsData.toMutableMap())
+        val finalSchedule = generatedSchedule
+        for ((key, value) in finalSchedule) {
+            println("$key: ")
+            print("\t")
+            for (course in value) {
+                print("${course.courseID}, ")
+            }
+            println("")
+        }
+        return finalSchedule
     }
 
     private fun checkMathCourseConstraint(course: Course, termName : String, season: String,
                                           prereqMap: MutableMap<String, ParsedPrereqData>): Boolean {
-        val parsedPrereqData = prereqMap[course.courseID]
-        assert(parsedPrereqData != null)
+        val parsedPrereqData = prereqMap[course.courseID] ?: return false
         var satisfyTerm = false
-        if (course.availability!!.contains(season) && parsedPrereqData!!.minimumLevel <= termName) {
+        if (course.availability!!.contains(season) && parsedPrereqData.minimumLevel <= termName) {
             satisfyTerm = true
         }
 
-        if (parsedPrereqData!!.courses.isEmpty() || parsedPrereqData.courses.all {it.isEmpty()}) {
+        if (parsedPrereqData.courses.isEmpty() || parsedPrereqData.courses.all {it.isEmpty()}) {
             return true
         } else {
             for (requirement in parsedPrereqData.courses) {
@@ -157,13 +172,12 @@ class TermMapperService {
     }
     private fun checkNonMathCourseConstraint(course: Course, termName : String, season: String,
                                              prereqMap: MutableMap<String, ParsedPrereqData>): NonMathAddStatus {
-        val parsedPrereqData = prereqMap[course.courseID]
-        assert(parsedPrereqData != null)
+        val parsedPrereqData = prereqMap[course.courseID] ?: return NonMathAddStatus.DontAdd
         var satisfyTerm = false
-        if (course.availability!!.contains(season) && parsedPrereqData!!.minimumLevel <= termName) {
+        if (course.availability!!.contains(season) && parsedPrereqData.minimumLevel <= termName) {
             satisfyTerm = true
         }
-        if (parsedPrereqData!!.courses.isEmpty() || parsedPrereqData.courses.all {it.isEmpty()}) {
+        if (parsedPrereqData.courses.isEmpty() || parsedPrereqData.courses.all {it.isEmpty()}) {
             return NonMathAddStatus.AddToOnline
         } else {
             for (requirement in parsedPrereqData.courses) {
@@ -259,11 +273,11 @@ class TermMapperService {
         // non math courses have not taken
         val notTakenNonMathCourse = mutableListOf<Course>()
         val notTakenMathCourse = mutableListOf<Course>()
-        var satisfyConstraintMathCourse = mutableListOf<Course>()
+        val satisfyConstraintMathCourse = mutableListOf<Course>()
         // non math courses could be taken this term
-        var satisfyConstraintNonMathCourse = mutableListOf<Course>()
+        val satisfyConstraintNonMathCourse = mutableListOf<Course>()
         // non math courses could be taken this term online, DOES NOT DUPLICATE WITH satisfyConstraintNonMathCourse
-        var satisfyConstraintOnlineNonMathCourse = mutableListOf<Course>()
+        val satisfyConstraintOnlineNonMathCourse = mutableListOf<Course>()
         val retvalList = mutableListOf<Course>()
         for (course in mathCourse) {
             if (course.courseID !in takenCourses) {
@@ -290,10 +304,10 @@ class TermMapperService {
                 satisfyConstraintNonMathCourse.add(course)
             }
         }
-
         var newSatisfyConstraintMathCourse = satisfyConstraintMathCourse.sortedBy { it.courseID }
         var newSatisfyConstraintNonMathCourse = satisfyConstraintNonMathCourse.sortedBy { it.courseID }
         var newSatisfyConstraintOnlineNonMathCourse = satisfyConstraintOnlineNonMathCourse.sortedBy { it.courseID }
+
         var numCourseCounter = numCourse
         for (i in 0 until numCourse - 1) {
             if (i >= newSatisfyConstraintMathCourse.size) {
@@ -382,34 +396,32 @@ class TermMapperService {
     private fun finalizeSchedule(scheduleSoFar: MutableMap<String, MutableList<Course>>,
                                  countCourseTerm: MutableMap<String, Int>, sequenceMap: Map<String, String>,
                                  prereqMap: MutableMap<String, ParsedPrereqData>): MutableMap<String, MutableList<Course>> {
-        var availableCourses: MutableList<Course> = courseRepo.getAll().sortedWith(coursePlanner.courseComparator).toMutableList()
+        val availableCourses: MutableList<Course> = courseRepo.getAll().sortedWith(coursePlanner.courseComparator).toMutableList()
         for ((term, schedule) in scheduleSoFar) {
             // Remove taken courses so that no retake
-            availableCourses.removeAll(schedule)
+            availableCourses.removeIf { course ->
+                schedule.any { it.courseID == course.courseID }
+            }
             var unfillCourseCount = countCourseTerm[term]!! - schedule.size
-            println("Need to have: " + countCourseTerm[term].toString())
-            println("have: " + schedule.size.toString())
-            println("Need to add: $unfillCourseCount")
 
+            if (unfillCourseCount <= 0) continue
+
+            val addedCourses = mutableListOf<Course>()
             for (availableCourse in availableCourses) {
-                var canAddCourse: Boolean
-                println("Considering: ${availableCourse.courseID}")
-                if (coursePlanner.mathSubjects.contains(availableCourse.subject)) {
-                    canAddCourse = checkMathCourseConstraint(availableCourse, term, sequenceMap[term]!!, prereqMap)
-                    println("math")
+                val canAddCourse: Boolean = if (coursePlanner.mathSubjects.contains(availableCourse.subject)) {
+                    checkMathCourseConstraint(availableCourse, term, sequenceMap[term]!!, prereqMap)
                 } else {
-                    canAddCourse = checkNonMathCourseConstraint(availableCourse, term, sequenceMap[term]!!, prereqMap) != NonMathAddStatus.DontAdd
-                    println("Nonmath")
+                    checkNonMathCourseConstraint(availableCourse, term, sequenceMap[term]!!, prereqMap) != NonMathAddStatus.DontAdd
                 }
                 if (canAddCourse) {
                     scheduleSoFar[term]!!.add(availableCourse)
                     takenCourses.add(availableCourse.courseID)
-                    println("Added: " + availableCourse.courseID)
                     unfillCourseCount--
+                    addedCourses.add(availableCourse)
                     if (unfillCourseCount <= 0) break
                 }
-                println("Did we add? $canAddCourse")
             }
+            availableCourses.removeAll(addedCourses)
         }
         return scheduleSoFar
     }

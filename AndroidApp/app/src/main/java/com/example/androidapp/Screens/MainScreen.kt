@@ -76,6 +76,12 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                             shape = RoundedCornerShape(0.dp),
                             onClick = { navController.navigate(Screen.About.route) }
                         )
+                        NavigationDrawerItem(
+                            label = { Text(text = "Search(Temp)") },
+                            selected = false,
+                            shape = RoundedCornerShape(0.dp),
+                            onClick = { navController.navigate(Screen.SearchCourse.route) }
+                        )
                         // For testing purpose
 //                        NavigationDrawerItem(
 //                            label = { Text(text = "PlayGround") },

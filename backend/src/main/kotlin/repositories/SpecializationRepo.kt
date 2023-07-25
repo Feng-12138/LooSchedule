@@ -1,5 +1,6 @@
 package repositories
 
+import entities.Major
 import entities.Minor
 import entities.Specialization
 import jakarta.inject.Inject
@@ -19,6 +20,18 @@ class SpecializationRepo {
         } catch (e: Exception) {
             println(e.message)
             0
+        }
+    }
+
+    fun getAllSpecializationsNames(): List<String> {
+        return try {
+            val session = sessionFactory.openSession()
+            val hql = "FROM Specialization"
+            val majors = session.createQuery(hql, Specialization::class.java)
+            majors.list().map { it.specializationName }
+        } catch (e: Exception) {
+            println(e.message)
+            listOf()
         }
     }
 }
