@@ -55,7 +55,7 @@ import java.lang.Integer.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CourseDescription(course: Course, navController: NavController, schedule: Schedule, term: String, index: Int) {
+private fun CourseDescription(course: Course, navController: NavController, schedule: Schedule, term: String, index: Int, position: Int) {
     Card(
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier.padding(10.dp,5.dp,10.dp,10.dp),
@@ -70,6 +70,7 @@ private fun CourseDescription(course: Course, navController: NavController, sche
             navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
             navController.currentBackStackEntry?.arguments?.putInt("index", index)
             navController.currentBackStackEntry?.arguments?.putString("term", term)
+            navController.currentBackStackEntry?.arguments?.putInt("position", position)
             navController.navigate(Screen.CourseDetail.route)
         },
     ) {
@@ -121,26 +122,6 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
         scheduleViewModel.onTermSelected(currentTerm)
     }
 
-//    val sharedPreferences = LocalContext.current.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-//    val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
-//    val scheduleList = existingList?.map { Gson().fromJson(it, Schedule::class.java) } ?: emptyList()
-//    val scheduleViewModel = ScheduleViewModel(scheduleList[0])
-//
-//    LaunchedEffect(scheduleViewModel) {
-//        snapshotFlow { scheduleViewModel.schedule }
-//            .collect { updatedSchedule ->
-//                val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-//                val jsonUpdatedSchedule = Gson().toJson(updatedSchedule)
-//                val existingSchedules = sharedPreferences.getStringSet("scheduleList", emptySet())?.toMutableList() ?: mutableListOf()
-//                existingSchedules.remove(Gson().toJson(scheduleList[updatedSchedule.position]))
-//                existingSchedules.add(updatedSchedule.position, jsonUpdatedSchedule)
-//                val jsonList = existingSchedules.map { Gson().toJson(it) }.toSet()
-//                val editor = sharedPreferences.edit()
-//                editor.putStringSet("scheduleList", jsonList)
-//                editor.apply()
-//            }
-//    }
-
     Surface(
         modifier = Modifier
             .padding(horizontal = 8.dp)
@@ -185,41 +166,6 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                 CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position)
             }
         }
-
-        Box(
-            contentAlignment = Alignment.BottomEnd,
-            modifier = Modifier
-                .padding(vertical = 24.dp, horizontal = 12.dp)
-        ) {
-            Column() {
-                FloatingActionButton(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = Color.White,
-                    shape = CircleShape,
-                    modifier = Modifier.padding(bottom = 12.dp),
-                    onClick = { /* Handle button click here */ }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add"
-                    )
-                }
-
-                FloatingActionButton(
-                    containerColor = if (isValidated.value) MaterialTheme.colorScheme.secondary else Color.Red,
-                    contentColor = Color.White,
-                    shape = CircleShape,
-                    onClick = {
-
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Done,
-                        contentDescription = "Validate"
-                    )
-                }
-            }
-        }
     }
 }
 
@@ -257,11 +203,50 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
        modifier = Modifier.fillMaxSize()
     ) {
         LazyColumn(
-            state = rememberLazyListState()
+            state = rememberLazyListState(),
+            modifier = Modifier.fillMaxSize()
         ) {
             items(courses) { course, ->
                 val index = courses.indexOf(course)
-                CourseDescription(course = course, navController = navController, schedule = schedule, term = term, index = index)
+                CourseDescription(course = course, navController = navController, schedule = schedule, term = term, index = index, position = position)
+            }
+        }
+
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = Modifier
+                .padding(vertical = 24.dp)
+                .fillMaxSize(),
+        ) {
+            Column() {
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    modifier = Modifier.padding(bottom = 12.dp),
+                    onClick = {
+
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add"
+                    )
+                }
+
+                FloatingActionButton(
+//                    containerColor = if (isValidated.value) MaterialTheme.colorScheme.secondary else Color.Red,
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    onClick = {
+
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Done,
+                        contentDescription = "Validate"
+                    )
+                }
             }
         }
     }

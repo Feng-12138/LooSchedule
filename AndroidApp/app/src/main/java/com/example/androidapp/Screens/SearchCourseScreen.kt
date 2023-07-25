@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.androidapp.EverythingManager
+import com.example.androidapp.models.Course
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +37,7 @@ import com.example.androidapp.EverythingManager
 fun SearchCourseScreen(navController: NavController){
     var text by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
-    val courses: List<String>? = EverythingManager.getInstance().getCourses()
+    val courses: List<Course>? = EverythingManager.getInstance().getCourses()
     Column() {
         SearchBar(
             modifier = Modifier.fillMaxWidth(),
@@ -79,13 +80,13 @@ fun SearchCourseScreen(navController: NavController){
 
 
 @Composable
-fun CourseList(courseList: List<String>, searchQuery: String) {
-    var filteredCourses = remember { mutableStateListOf<String>() }
+fun CourseList(courseList: List<Course>, searchQuery: String) {
+    var filteredCourses = remember { mutableStateListOf<Course>() }
     LaunchedEffect(searchQuery) {
         filteredCourses.clear()
         if (searchQuery.isNotEmpty()) {
             filteredCourses.addAll(courseList.filter { course ->
-                containsWithOrder(course.lowercase(), searchQuery.lowercase())
+                containsWithOrder(course.courseID.lowercase() + course.courseName.lowercase(), searchQuery.lowercase())
             })
         } else {
             filteredCourses.addAll(courseList)
@@ -103,7 +104,7 @@ fun CourseList(courseList: List<String>, searchQuery: String) {
                     .padding(8.dp)
             ) {
                 Text(
-                    text = course,
+                    text = course.courseID + "  " + course.courseName,
                     modifier = Modifier.padding(16.dp)
                 )
             }

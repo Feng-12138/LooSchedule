@@ -26,6 +26,7 @@ import com.example.androidapp.screens.ViewSchedule
 import com.example.androidapp.viewModels.ScheduleViewModel
 import com.example.androidapp.viewModels.SelectDegreeVM
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -50,8 +51,9 @@ fun Navigation(){
 
         composable(route = Screen.ViewSchedule.route){
             val sharedPreferences = LocalContext.current.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-            val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
-            val scheduleList = existingList?.map { Gson().fromJson(it, Schedule::class.java) } ?: emptyList()
+            val existingList = sharedPreferences.getString("scheduleList", "[]")
+            val type = object : TypeToken<MutableList<Schedule>>() {}.type
+            val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
             if(scheduleList.isEmpty()){
                 MainScreen(navController = navController, name = "Current Schedule") {
                     ErrorScreen(navController = navController)
@@ -59,7 +61,7 @@ fun Navigation(){
             }
             else{
                 MainScreen (navController = navController, name = "Current Schedule") { ViewSchedule(navController = navController,
-                    scheduleViewModel = ScheduleViewModel(scheduleList[0]), 0) }
+                    scheduleViewModel = ScheduleViewModel(scheduleList[0]), position = 0) }
             }
         }
 
@@ -89,8 +91,9 @@ fun Navigation(){
 
         composable(route = Screen.ScheduleHistory.route){
             val sharedPreferences = LocalContext.current.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-            val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
-            val scheduleList = existingList?.map { Gson().fromJson(it, Schedule::class.java) } ?: emptyList()
+            val existingList = sharedPreferences.getString("scheduleList", "[]")
+            val type = object : TypeToken<MutableList<Schedule>>() {}.type
+            val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
             MainScreen (navController = navController, name = "History") { HistoryScreen(scheduleList, navController = navController) }
         }
 
