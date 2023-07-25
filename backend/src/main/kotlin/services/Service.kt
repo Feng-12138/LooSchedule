@@ -153,13 +153,22 @@ class Service: IService {
             }
         }
 
-        val selectedCourses = coursePlanner.getCoursesPlanToTake(plan.startYear, requirements)
-        println(selectedCourses.first.map { it.courseID })
-        println(selectedCourses.second.map { it.courseID })
+        val sequenceMap = sequenceGenerator.generateSequence(plan.sequence)
+        val selectedCourses = coursePlanner.getCoursesPlanToTake(
+            plan.startYear,
+            requirements,
+            plan.majors,
+            sequenceMap = sequenceMap
+        )
+        println(selectedCourses["F"]!!.map { it.courseID })
+        println(selectedCourses["W"]!!.map { it.courseID })
+        println(selectedCourses["S"]!!.map { it.courseID })
+
 
         return termMapperService.mapCoursesToSequence(
-            courseData = CourseDataClass(mathCourses = selectedCourses.first, nonMathCourses = selectedCourses.second),
-            sequenceMap = sequenceGenerator.generateSequence(plan.sequence),
+            courseData = CourseDataClass(fallCourses = selectedCourses["F"]!!, springCourses = selectedCourses["S"]!!, winterCourses = selectedCourses["W"]!!,
+                prereqMap = coursePlanner.getPrereqMap()),
+            sequenceMap = sequenceMap,
             currentTerm = currentTerm,
         )
     }
