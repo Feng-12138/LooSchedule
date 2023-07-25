@@ -82,7 +82,7 @@ class CoursePlanner {
             return false
         }
         val availableSeasonList = seasonCourseCounter.keys.mapNotNull {key ->
-            if (seasonCourseCounter[key] !!> 0) key else null
+            if (seasonCourseCounter[key]!! > 0) key else null
         }
         var satisfyTermConstraint = false
         for (season in course.availability!!) {
@@ -95,7 +95,7 @@ class CoursePlanner {
         }
 
         var satisfyOnlyOpenTo = false
-        for (major in selectedCourseData!!.onlyOpenTo) {
+        for (major in selectedCourseData.onlyOpenTo) {
             if (major in majors) {
                 satisfyOnlyOpenTo = true
             }
@@ -106,7 +106,7 @@ class CoursePlanner {
         if (!satisfyOnlyOpenTo) {
             return false
         }
-        for (antireqCourse in selectedCourseData!!.antireqCourses) {
+        for (antireqCourse in selectedCourseData.antireqCourses) {
             if (antireqCourse == "") {
                 continue
             }
@@ -135,7 +135,7 @@ class CoursePlanner {
             satisfyPrereq = true
         }
 
-        for (coreqCourseOption in selectedCourseData!!.coreqCourses) {
+        for (coreqCourseOption in selectedCourseData.coreqCourses) {
             var satisfy = true
             if (coreqCourseOption.size == 0) {
                 continue
@@ -150,7 +150,7 @@ class CoursePlanner {
                 satisfyCoreq = satisfy
             }
         }
-        if (selectedCourseData!!.coreqCourses.size == 0 || course.courseID == "CS 136" || course.courseID == "CS 146" || course.courseID == "CS 136L") {
+        if (selectedCourseData.coreqCourses.size == 0 || course.courseID == "CS 136" || course.courseID == "CS 146" || course.courseID == "CS 136L") {
             satisfyCoreq = true
         }
         return !(!satisfyPrereq || !satisfyCoreq)
@@ -194,18 +194,27 @@ class CoursePlanner {
         return count - curCount
     }
 
-    private fun selectCommunication(startYear: Year, nonMathCourses: MutableSet<Course>) {
+    private fun selectCommunication(
+        startYear: Year,
+        nonMathCourses: MutableSet<Course>,
+        takenCourses: List<String>,
+    ) {
         val sortedList1Courses = communicationRepo.getListNByYear(startYear.toInt(), 1).toList().sortedWith(courseComparator).toMutableList()
         sortedList1Courses[0].color = "green"
-        computeAndUpdateTermCourses(sortedList1Courses[0])
+        if (!sortedList1Courses.any { it.subject + " " + it.courseID in takenCourses }) {
+            computeAndUpdateTermCourses(sortedList1Courses[0])
+            countTakenNonMathCourse++
+        }
         nonMathCourses.add(sortedList1Courses[0])
-        countTakenNonMathCourse++
         sortedList1Courses.removeAt(0)
         val sortedComCourses: List<Course> = (sortedList1Courses + communicationRepo.getListNByYear(startYear.toInt(), 2).toList()).sortedWith(courseComparator)
         sortedComCourses[0].color = "green"
-        computeAndUpdateTermCourses(sortedComCourses[0])
-        nonMathCourses.add(sortedComCourses[0])
         countTakenNonMathCourse++
+        if (!sortedComCourses.any { it.subject + " " + it.courseID in takenCourses }) {
+            computeAndUpdateTermCourses(sortedComCourses[0])
+            countTakenNonMathCourse++
+        }
+        nonMathCourses.add(sortedComCourses[0])
     }
 
     private fun computeAndUpdateTermCourses(course: Course) {
@@ -249,7 +258,6 @@ class CoursePlanner {
         if (course.availability!!.contains("S")) {
             val count = seasonCourseCounter["S"] ?: 0
             if (count > maxAvailability) {
-                maxAvailability = count
                 bestTerm = "S"
             }
         }
@@ -282,7 +290,7 @@ class CoursePlanner {
         }
     }
 
-    private fun getCompleteOptionCourse(majors: List<String>, parsedDataMap: MutableMap<String, ParsedPrereqData>) : List<Course> {
+    private fun getCompleteOptionCourse(majors: List<String>) : List<Course> {
         var numNonMathNeeded = TOTAL_NON_MATH - countTakenNonMathCourse
         var numMathNeeded = TOTAL_MATH - countTakenMathCourse
         var returnedCourseList = mutableListOf<Course>()
@@ -339,10 +347,12 @@ class CoursePlanner {
         startYear: Year,
         requirements: Requirements,
         majors: List<String>,
-        sequenceMap: MutableMap<String, String>
+        sequenceMap: MutableMap<String, String>,
+        takenCourses: List<String>
     ): Map<String, MutableSet<Course>> {
         val mathCourses: MutableSet<Course> = mutableSetOf()
         val nonMathCourses: MutableSet<Course> = mutableSetOf()
+        listofTakenCourses.addAll(takenCourses)
         val mandatoryCourses: MutableSet<Course> = courseRepo.getBySubjectCode(requirements.mandatoryCourses)
         val optionalCourses: MutableSet<OptionalCourses> = requirements.optionalCourses.map {
             OptionalCourses(it.nOf, courseRepo.getBySubjectCode(it.courses))
@@ -392,6 +402,20 @@ class CoursePlanner {
             listofTakenCourses.add(mandatoryCourse.courseID)
         }
 
+        takenCourses.forEach {
+            val temp = it.split(" ")
+            val subject = temp[0]
+            val code = temp[1]
+            val course = courseRepo.getBySubjectCode(setOf(Course(subject, code))).single()
+            if (mathSubjects.contains(it.split(" ")[0])) {
+                mathCourses.add(course)
+                countTakenMathCourse++
+            } else {
+                mathCourses.add(course)
+                countTakenNonMathCourse++
+            }
+        }
+
         var incompleteOptionalList = mutableSetOf<OptionalCourses>()
         for (optionalCourseList in optionalCourses) {
             val result = selectCoursesFromOptional(optionalCourseList, parsedDataList, modifiedMajors.toList(), mathCourses, nonMathCourses)
@@ -407,10 +431,10 @@ class CoursePlanner {
             course.color = "red"
             computeAndUpdateTermCourses(course)
         }
-        selectCommunication(startYear, nonMathCourses)
-        // non math courses are more flexible
+        selectCommunication(startYear, nonMathCourses, takenCourses)
 
-        val courses = getCompleteOptionCourse(modifiedMajors.toList(), parsedDataList)
+        // non math courses are more flexible
+        val courses = getCompleteOptionCourse(modifiedMajors.toList())
         for (course in courses) {
             if (course.subject in mathSubjects) {
                 mathCourses.add(course)

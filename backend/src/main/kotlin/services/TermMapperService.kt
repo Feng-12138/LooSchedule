@@ -15,8 +15,9 @@ class TermMapperService {
     fun mapCoursesToSequence(
         courseData: CourseDataClass,
         sequenceMap: Map<String, String>,
-        currentTerm: String
+        previousTakenCourses: List<String>,
     ): MutableMap<String, MutableList<Course>> {
+        takenCourses.addAll(previousTakenCourses)
         val list = courseData.fallCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.winterCourses.map { it.courseID })
         list.addAll(courseData.springCourses.map { it.courseID })
