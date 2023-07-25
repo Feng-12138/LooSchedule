@@ -21,7 +21,7 @@ data class Plans (
     val majors: List<String>,
     val minors: List<String>,
     val specializations: List<String>,
-    val courses: List<String>,
+    val courses: List<Course>,
 )
 
 

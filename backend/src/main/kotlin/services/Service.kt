@@ -68,7 +68,7 @@ class Service: IService {
         val majors = majorRepo.getAllMajorNames()
         val minors = minorRepo.getAllMinorNames()
         val specializations = specializationRepo.getAllSpecializationsNames()
-        val courses = courseRepo.getAllIdAndNames()
+        val courses = courseRepo.getAll()
         return Plans(
             majors = majors,
             minors = minors,
