@@ -2,13 +2,15 @@ package com.example.androidapp.viewModels
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
-import com.example.androidapp.enum.ValidationResults
+import com.example.androidapp.dataClass.ValidationResults
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.services.RetrofitClient
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
 import okhttp3.MediaType
 import okhttp3.RequestBody
@@ -18,13 +20,20 @@ import retrofit2.Response
 
 data class ValidateData(
     val schedule: MutableMap<String, MutableList<Course>>,
-    val degree: String,
-    val sequence: String
+    val academicPlan: AcademicPlan
+)
+
+data class AcademicPlan(
+    val majors: List<String>,
+    val startYear: String,
+    val sequence: String,
+    val minors: List<String>,
+    val specializations: List<String>,
 )
 
 class ScheduleViewModel(input: Schedule) : ViewModel() {
 
-    private val _schedule = MutableStateFlow(input)
+    private var _schedule = MutableStateFlow(input)
     val schedule: Schedule get() = _schedule.value
 
     private val _termList = schedule.termSchedule.keys.toList()
@@ -49,27 +58,22 @@ class ScheduleViewModel(input: Schedule) : ViewModel() {
         _courseList.value = schedule.termSchedule[term]!!
     }
 
-    var onCourseDeleted: ((String, Course) -> Unit)? = null
 
-    fun deleteCourse(term: String, course: Course) {
-        val updatedCourseList = schedule.termSchedule[term]?.filterNot { it == course } ?: emptyList()
-        schedule.termSchedule[term] = updatedCourseList as MutableList<Course>
-        updateCourseList()
-
-        // Notify external listeners about the course deletion
-        onCourseDeleted?.invoke(term, course)
-    }
-
-    private fun validateCourseSchedule(
-        context: Context,
-        navController: NavController,
-        schedule: Schedule
+    fun validateCourseSchedule(
+        schedule: Schedule,
+        context: Context
     ){
         val validateData = ValidateData(
             schedule = schedule.termSchedule,
-            degree = schedule.degree[0],
-            sequence = schedule.sequence
+            academicPlan = AcademicPlan(
+                majors = schedule.degree,
+                sequence = schedule.mySequence,
+                minors = schedule.minor,
+                specializations = schedule.specialization,
+                startYear = schedule.year
+            )
         )
+        println(validateData.toString())
 
         val gson = Gson()
         val jsonBody = gson.toJson(validateData)
@@ -79,24 +83,35 @@ class ScheduleViewModel(input: Schedule) : ViewModel() {
         val requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody)
         val call = api.validateSchedule(requestBody)
 
-        call.enqueue(object: Callback<Map<String, MutableSet<ValidationResults>>>{
+        call.enqueue(object: Callback<ValidationResults>{
             override fun onResponse(
-                call: Call<Map<String, MutableSet<ValidationResults>>>,
-                response: Response<Map<String, MutableSet<ValidationResults>>>
+                call: Call<ValidationResults>,
+                response: Response<ValidationResults>
             ) {
                 if (response.isSuccessful) {
                     val output = response.body()
+                    var newSchedule = schedule
+                    if (output != null) {
+                        newSchedule.validated = output.validated
+                        newSchedule.courseValidation = output.validatedCourses
+                        newSchedule.degreeValidation = output.validatedDegree
+
+                        _schedule.value.validated = output.validated
+                        _schedule.value.courseValidation = output.validatedCourses
+                        _schedule.value.degreeValidation = output.validatedDegree
+//                        val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
+//                        val existingList = sharedPreferences.getString("scheduleList", "[]")
+//                        val type = object : TypeToken<MutableList<Schedule>>() {}.type
+//                        val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
+                    }
 
                 } else {
                     println(response.message())
-                    Toast.makeText(context, response.message(), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, response.code().toString(), Toast.LENGTH_SHORT).show()
                 }
             }
 
-            override fun onFailure(
-                call: Call<Map<String, MutableSet<ValidationResults>>>,
-                t: Throwable
-            ) {
+            override fun onFailure(call: Call<ValidationResults>, t: Throwable) {
                 Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
                 println(t.message)
                 call.cancel()

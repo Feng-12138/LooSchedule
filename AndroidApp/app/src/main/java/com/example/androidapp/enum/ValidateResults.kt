@@ -1,6 +1,6 @@
 package com.example.androidapp.enum
 
-enum class ValidationResults {
+enum class ValidateResults {
     Success,
     TermUnavailable,
     NotMeetMinLvl,

@@ -1,5 +1,6 @@
 package com.example.androidapp.screens
 
+import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -160,7 +162,7 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                     ?: scheduleViewModel.schedule.termSchedule[termList[page]].also {
                         it?.let { pagerCourses[page] = it }
                     } ?: emptyList()
-                CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position, isValidated = isValidated)
+                CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position, isValidated = isValidated, scheduleViewModel = scheduleViewModel)
             }
         }
     }
@@ -168,7 +170,8 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
 
 
 @Composable
-private fun CourseSchedulePage(courses: List<Course>, navController: NavController, schedule: Schedule, term: String, position: Int, isValidated: MutableState<Boolean>) {
+private fun CourseSchedulePage(courses: List<Course>, navController: NavController, schedule: Schedule, term: String, position: Int, isValidated: MutableState<Boolean>, scheduleViewModel: ScheduleViewModel) {
+    val context = LocalContext.current
     if (courses.isEmpty()) {
         Box(
             contentAlignment = Alignment.TopCenter,
@@ -282,7 +285,7 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                     contentColor = Color.White,
                     shape = CircleShape,
                     onClick = {
-
+                        scheduleViewModel.validateCourseSchedule(schedule = schedule, context = context)
                     }
                 ) {
                     Icon(
