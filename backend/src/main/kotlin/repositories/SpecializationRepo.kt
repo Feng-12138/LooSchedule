@@ -23,15 +23,15 @@ class SpecializationRepo {
         }
     }
 
-    fun getAllSpecializationsNames(): List<String> {
+    fun getAllSpecializationsNames(): Set<String> {
         return try {
             val session = sessionFactory.openSession()
             val hql = "FROM Specialization"
             val majors = session.createQuery(hql, Specialization::class.java)
-            majors.list().map { it.specializationName }
+            majors.list().map { it.specializationName }.toSet()
         } catch (e: Exception) {
             println(e.message)
-            listOf()
+            setOf()
         }
     }
 }

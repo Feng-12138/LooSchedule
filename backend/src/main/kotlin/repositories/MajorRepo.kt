@@ -14,22 +14,22 @@ class MajorRepo {
             val hql = "FROM Major M WHERE M.majorName = :major_name"
             val majors = session.createQuery(hql, Major::class.java)
             majors.setParameter("major_name", name)
-            majors.uniqueResult().requirementID
+            majors.list().last().requirementID
         } catch (e: Exception) {
             println(e.message)
             0
         }
     }
 
-    fun getAllMajorNames(): List<String> {
+    fun getAllMajorNames(): Set<String> {
         return try {
             val session = sessionFactory.openSession()
             val hql = "FROM Major"
             val majors = session.createQuery(hql, Major::class.java)
-            majors.list().map { it.majorName }
+            majors.list().map { it.majorName }.toSet()
         } catch (e: Exception) {
             println(e.message)
-            listOf()
+            setOf()
         }
     }
 

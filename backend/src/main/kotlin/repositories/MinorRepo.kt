@@ -22,15 +22,15 @@ class MinorRepo {
         }
     }
 
-    fun getAllMinorNames(): List<String> {
+    fun getAllMinorNames(): Set<String> {
         return try {
             val session = sessionFactory.openSession()
             val hql = "FROM Minor"
             val majors = session.createQuery(hql, Minor::class.java)
-            majors.list().map { it.minorName }
+            majors.list().map { it.minorName }.toSet()
         } catch (e: Exception) {
             println(e.message)
-            listOf()
+            setOf()
         }
     }
 }
