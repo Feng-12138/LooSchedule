@@ -12,13 +12,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.androidapp.R
 
 @Composable
 fun GetStartScreen(navController: NavController) {
+    val indiaFlower = FontFamily(
+        Font(R.font.indieflower, FontWeight.Light),
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -28,8 +34,9 @@ fun GetStartScreen(navController: NavController) {
     ) {
         Text(
             text = "Welcome to LooSchedule!",
-            style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(bottom = 16.dp)
+            style = TextStyle(fontSize = 36.sp, fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(bottom = 16.dp),
+            fontFamily = indiaFlower
         )
 
         Button(

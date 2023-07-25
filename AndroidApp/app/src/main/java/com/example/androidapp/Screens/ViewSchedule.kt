@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
@@ -71,7 +72,7 @@ private fun CourseDescription(course: Course, navController: NavController, sche
     println(course.courseName)
     println(course.color)
     Card(
-        shape = MaterialTheme.shapes.medium,
+        shape = RoundedCornerShape(30.dp),
         modifier = Modifier.padding(10.dp,5.dp,10.dp,10.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation =  10.dp,
@@ -259,7 +260,9 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
     ) {
         LazyColumn(
             state = rememberLazyListState(),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 10.dp)
         ) {
             items(courses) { course, ->
                 val index = courses.indexOf(course)

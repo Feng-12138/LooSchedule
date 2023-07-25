@@ -7,7 +7,14 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class Course(var courseId: String, var name: String, var rating: Float, var descript: String) : Parcelable {
+class Course(
+    var courseId: String,
+    var name: String,
+    var rating: Float,
+    var descript: String,
+    var colorType : String
+    ) : Parcelable {
+
     @SerializedName("courseID")
     var courseID : String = courseId
 
@@ -48,7 +55,7 @@ class Course(var courseId: String, var name: String, var rating: Float, var desc
     var usefulRating: Float = 0.0f
 
     @SerializedName("color")
-    var color: String = "red"
+    var color: String = colorType
 
     lateinit var prereqs: Prerequisite
 }
