@@ -170,11 +170,8 @@ class CoursePlanner {
         val chosenCourses = mutableListOf<Course>()
         for (course in selectedCourses) {
             val result = checkConstraint(course, parsedDataList, majors)
-            if (course.courseID == "MATH 237" || course.courseID == "MATH 247") {
-                println("here")
-                println(result)
-            }
             if (result) {
+                course.color = "red"
                 chosenCourses.add(course)
                 listofTakenCourses.add(course.courseID)
                 computeAndUpdateTermCourses(course)
@@ -205,8 +202,8 @@ class CoursePlanner {
         countTakenNonMathCourse++
         sortedList1Courses.removeAt(0)
         val sortedComCourses: List<Course> = (sortedList1Courses + communicationRepo.getListNByYear(startYear.toInt(), 2).toList()).sortedWith(courseComparator)
-        computeAndUpdateTermCourses(sortedComCourses[0])
         sortedComCourses[0].color = "green"
+        computeAndUpdateTermCourses(sortedComCourses[0])
         nonMathCourses.add(sortedComCourses[0])
         countTakenNonMathCourse++
     }
