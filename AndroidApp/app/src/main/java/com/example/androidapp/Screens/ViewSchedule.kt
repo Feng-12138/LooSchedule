@@ -55,19 +55,23 @@ import kotlinx.coroutines.launch
 import java.lang.Integer.min
 
 @Composable
-fun getCourseColor(color: String): Color {
-    val green = Color(0xFF4CAF50) // Material Design Green 500
+fun getCourseColor(color: String?): Color {
+    if (color == null) {
+        return MaterialTheme.colorScheme.secondaryContainer
+    }
 
     return when (color) {
-        "blue" -> MaterialTheme.colorScheme.secondaryContainer
+        "red" -> MaterialTheme.colorScheme.errorContainer
         "green" -> Color(182, 233, 187)
-        else -> MaterialTheme.colorScheme.errorContainer // default color if none matches
+        else -> MaterialTheme.colorScheme.secondaryContainer // default color if none matches
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CourseDescription(course: Course, navController: NavController, schedule: Schedule, term: String, index: Int, position: Int) {
+    println(course.courseName)
+    println(course.color)
     Card(
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier.padding(10.dp,5.dp,10.dp,10.dp),
