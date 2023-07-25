@@ -1,6 +1,7 @@
 package com.example.androidapp.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,14 +21,29 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.androidapp.R
 import com.example.androidapp.ui.theme.AndroidAppTheme
 import kotlinx.coroutines.launch
+
+@Composable
+fun getTopBarColor(screen: String): Color {
+    if (screen == "LooSchedule") {
+        return Color(123,142,193)
+    }
+
+    return Color.White
+}
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +52,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
     AndroidAppTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = Color(123,142,193)
         ) {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
@@ -92,20 +108,30 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                 }
             ) {
                 Scaffold(
-                    topBar = { TopAppBar(
-                        title = { Text(name) },
-                        navigationIcon = { IconButton(
-                            onClick = {
-                                scope.launch {
-                                    drawerState.apply {
-                                        if (isClosed) open() else close()
+                    topBar = {
+                        TopAppBar(
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = getTopBarColor(
+                                    screen = name
+                                )
+                            ),
+                            modifier = Modifier.padding(0.dp),
+                            title = { Text(name) },
+                            navigationIcon = {
+                                IconButton(
+                                    onClick = {
+                                        scope.launch {
+                                            drawerState.apply {
+                                            if (isClosed) open() else close()
+                                        }
                                     }
                                 }
-                            }
-                        ) {
-                            Icon(imageVector = Icons.Outlined.Menu, contentDescription = "")
-                        }},
-                    )},
+                            ) {
+                                Icon(imageVector = Icons.Outlined.Menu, contentDescription = "")
+                                }
+                            },
+                        )
+                    },
                 ) {
                     Box(modifier = Modifier.padding(it)) {
                         content()
