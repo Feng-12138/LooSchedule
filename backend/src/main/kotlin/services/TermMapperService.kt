@@ -218,7 +218,7 @@ class TermMapperService {
                 }
                 if (course.courseID == "MATH 136" || course.courseID == "MATH 146" || course.courseID == "MATH 138" ||
                     course.courseID == "MATH 148" || course.courseID == "CS 136" || course.courseID == "CS 116"
-                    || course.courseID == "CS 146" || course.courseID == "STAT 230" || course.courseID == "STAT 240"
+                    || course.courseID == "CS 146" || course.courseID == "STAT 230"
                 ) {
                     retvalList.add(course)
                     takenCourses.add(course.courseID)
