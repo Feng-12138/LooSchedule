@@ -134,7 +134,6 @@ class Service: IService {
     override fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>> {
         val requirements = getRequirements(plan)
         println(requirements.mandatoryCourses)
-        println("???????????????")
         println(requirements.optionalCourses)
         val takenCourses = plan.coursesTaken
         val currentTerm = plan.currentTerm
