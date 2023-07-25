@@ -90,6 +90,16 @@ class ScheduleValidator {
         val courseCoReq = courseConstraints[course.courseID] ?: return ValidationResult.NoSuchCourse
         if (courseCoReq.coreqCourses.isEmpty() || courseCoReq.coreqCourses.all {it.isEmpty()}) return ValidationResult.Success
 
+        for (requirement in courseCoReq.courses) {
+            var meetOneRequirement = true
+            for (coReqCourse in requirement) {
+                if (coReqCourse !in takenAndTakingCourses) {
+                    meetOneRequirement = false
+                }
+            }
+            if (meetOneRequirement) return ValidationResult.Success
+        }
+
         return ValidationResult.Success
     }
 
@@ -115,7 +125,7 @@ class ScheduleValidator {
             return OverallValidationResult.CommunicationCourseTooLate
         }
 
-        // For other degrees, need to take list 1 communication course before going into 2A
+        // For other math programs, need to take list 1 communication course before going into 2A
         val termKeys = listOf("1A", "1B", "WT1")
         val courses = termKeys.flatMap { schedule[it] ?: emptyList() }
         for (course in courses) {
@@ -131,7 +141,7 @@ class ScheduleValidator {
 
     private fun checkDegreeCourseRequirements(schedule: Schedule,
                                               requirements: Requirements): OverallValidationResult {
-        TODO()
+        return OverallValidationResult.Success
     }
     
     fun validateSchedule(schedule: Schedule, majors: List<String>, sequenceMap: Map<String, String>,
@@ -148,7 +158,7 @@ class ScheduleValidator {
          val commRes: OverallValidationResult = checkList1CommunicationCourse(schedule, majors)
          if (commRes != OverallValidationResult.Success) {
              degreeValidity.add(commRes)
-             // Currently, not satisfying communication timeline is only a warning.
+             // Currently, not satisfying communication course timeline is only a warning.
              // Will not result in schedule being invalid, but could change this later
          }
 
@@ -183,7 +193,8 @@ class ScheduleValidator {
         val degreeRes: OverallValidationResult = checkDegreeCourseRequirements(schedule, requirements)
         if (degreeRes != OverallValidationResult.Success) {
             degreeValidity.add(degreeRes)
-            // If not enough course selected in the schedule, then don't consider it as being invalid
+            // If not enough courses is selected in the schedule, then don't consider it as being invalid
+            // Only show as a warning since user may fill out full schedule later
             if (degreeRes == OverallValidationResult.NotMeetDegreeRequirement) overallResult = false
         }
 
