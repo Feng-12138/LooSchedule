@@ -71,29 +71,30 @@ class TermMapperService {
             val coursesTakeThisTerm = courseList.map { it.courseID }
             takenCourses.addAll(coursesTakeThisTerm)
             generatedSchedule[key] = courseList
+            println( coursesTakeThisTerm)
         }
         takenCourses.clear()
         courseData.fallCourses.clear()
         courseData.springCourses.clear()
         courseData.winterCourses.clear()
-        for ((key, value) in generatedSchedule) {
-            println("$key: ")
-            print("\t")
-            for (course in value) {
-                print("${course.courseID}, ")
-            }
-            println("")
-        }
+//        for ((key, value) in generatedSchedule) {
+//            println("$key: ")
+//            print("\t")
+//            for (course in value) {
+//                print("${course.courseID}, ")
+//            }
+//            println("")
+//        }
 //        val finalSchedule: MutableMap<String, MutableList<Course>> = finalizeSchedule(generatedSchedule, countCourseTerm, sequenceMap, prereqsData.toMutableMap())
         val finalSchedule = generatedSchedule
-        for ((key, value) in finalSchedule) {
-            println("$key: ")
-            print("\t")
-            for (course in value) {
-                print("${course.courseID}, ")
-            }
-            println("")
-        }
+//        for ((key, value) in finalSchedule) {
+//            println("$key: ")
+//            print("\t")
+//            for (course in value) {
+//                print("${course.courseID}, ")
+//            }
+//            println("")
+//        }
         return finalSchedule
     }
 
