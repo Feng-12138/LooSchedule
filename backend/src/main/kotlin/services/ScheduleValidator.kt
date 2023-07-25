@@ -59,23 +59,23 @@ class ScheduleValidator {
     }
 
     private fun checkCourseMinLevel(term: String, course: Course,
-                                    prerequisite: MutableMap<String, ParsedPrereqData>): ValidationResult {
-        val coursePrereq = prerequisite[course.courseID] ?: return ValidationResult.NoSuchCourse
-        return if (coursePrereq.minimumLevel <= term) {
+                                    courseConstraints: MutableMap<String, ParsedPrereqData>): ValidationResult {
+        val courseMinLvl = courseConstraints[course.courseID] ?: return ValidationResult.NoSuchCourse
+        return if (courseMinLvl.minimumLevel <= term) {
             ValidationResult.Success
         } else {
             ValidationResult.NotMeetMinLvl
         }
     }
 
-    private fun checkCoursePrereq(course: Course, takenCourses: List<String>,
-                          prerequisite: MutableMap<String, ParsedPrereqData>): ValidationResult {
-        val coursePrereq = prerequisite[course.courseID] ?: return ValidationResult.NoSuchCourse
-        if (coursePrereq.courses.isEmpty() || coursePrereq.courses.all {it.isEmpty()}) return ValidationResult.Success
-        for (requirement in coursePrereq.courses) {
+    private fun checkCoursePreReq(course: Course, takenCourses: List<String>,
+                                  courseConstraints: MutableMap<String, ParsedPrereqData>): ValidationResult {
+        val coursePreReq = courseConstraints[course.courseID] ?: return ValidationResult.NoSuchCourse
+        if (coursePreReq.courses.isEmpty() || coursePreReq.courses.all {it.isEmpty()}) return ValidationResult.Success
+        for (requirement in coursePreReq.courses) {
             var meetOneRequirement = true
-            for (prereqCourse in requirement) {
-                if (prereqCourse !in takenCourses) {
+            for (preReqCourse in requirement) {
+                if (preReqCourse !in takenCourses) {
                     meetOneRequirement = false
                 }
             }
@@ -85,13 +85,21 @@ class ScheduleValidator {
         return ValidationResult.NotMeetPreReq
     }
 
-    private fun checkCourseCoreq(course: Course, allCourses: List<String>,
-                         prerequisite: MutableMap<String, ParsedPrereqData>): ValidationResult {
+    private fun checkCourseCoReq(course: Course, takenAndTakingCourses: List<String>,
+                                 courseConstraints: MutableMap<String, ParsedPrereqData>): ValidationResult {
+        val courseCoReq = courseConstraints[course.courseID] ?: return ValidationResult.NoSuchCourse
+        if (courseCoReq.coreqCourses.isEmpty() || courseCoReq.coreqCourses.all {it.isEmpty()}) return ValidationResult.Success
+
         return ValidationResult.Success
     }
 
-    private fun checkCourseAntireq(course: Course, allCourses: List<String>,
-                           prerequisite: MutableMap<String, ParsedPrereqData>): ValidationResult {
+    private fun checkCourseAntiReq(course: Course, takenAndTakingCourses: List<String>,
+                                   courseConstraints: MutableMap<String, ParsedPrereqData>): ValidationResult {
+        val courseAntiReq = courseConstraints[course.courseID] ?: return ValidationResult.NoSuchCourse
+        if (courseAntiReq.antireqCourses.isEmpty()) return ValidationResult.Success
+        for (antiReqCourse in courseAntiReq.antireqCourses) {
+            if (takenAndTakingCourses.contains(antiReqCourse)) return ValidationResult.NotMeetAntiReq
+        }
         return ValidationResult.Success
     }
 
@@ -125,7 +133,8 @@ class ScheduleValidator {
         var overallResult = true
         val courseList: List<String> = schedule.values.flatten().map { it.courseID }
         val takenSoFar: MutableList<String> = mutableListOf()
-        val prerequisite = prerequisiteRepo.getParsedPrereqData(courseList)
+        val takenAndTakingSoFar: MutableList<String> = mutableListOf()
+        val courseConstraints = prerequisiteRepo.getParsedPrereqData(courseList)
 
         // First check communication courses
          val commRes: OverallValidationResult = checkList1CommunicationCourse(schedule, degree)
@@ -137,19 +146,20 @@ class ScheduleValidator {
 
         // Check single course validity
         for ((term, scheduledCourses) in schedule) {
+            takenAndTakingSoFar.addAll(scheduledCourses.map { it.courseID })
             val termResult = mutableListOf<List<ValidationResult>>()
             for (course in scheduledCourses) {
-                if (prerequisite[course.courseID] == null) {
+                if (courseConstraints[course.courseID] == null) {
                     termResult.add(listOf(ValidationResult.NoSuchCourse))
                     overallResult = false
                     continue
                 }
                 val courseResult: MutableSet<ValidationResult> = mutableSetOf(
                     checkCourseAvailability(sequenceMap[term]!!, course),
-                    checkCourseMinLevel(term, course, prerequisite),
-                    checkCoursePrereq(course, takenSoFar, prerequisite),
-                    checkCourseCoreq(course, courseList, prerequisite),
-                    checkCourseAntireq(course, courseList, prerequisite),
+                    checkCourseMinLevel(term, course, courseConstraints),
+                    checkCoursePreReq(course, takenSoFar, courseConstraints),
+                    checkCourseCoReq(course, takenAndTakingSoFar, courseConstraints),
+                    checkCourseAntiReq(course, takenAndTakingSoFar, courseConstraints),
                     checkOpenTo(course, degree)
                 )
                 // Only keep the invalid reasons for that course
