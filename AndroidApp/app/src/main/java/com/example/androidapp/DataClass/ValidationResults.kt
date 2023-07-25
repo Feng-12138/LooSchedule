@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-=======
+
 package com.example.androidapp.dataClass
 
 import com.example.androidapp.enum.OverallValidationResult
@@ -10,4 +9,3 @@ data class ValidationResults(
     var courseValidationResult: Map<String, MutableList<List<ValidationResult?>>>,
     var degreeValidationResult: List<OverallValidationResult?>
 )
->>>>>>> 7584a9d (validate api works)

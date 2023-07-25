@@ -87,8 +87,6 @@ class ScheduleViewModel(input: Schedule) : ViewModel() {
             ) {
                 if (response.isSuccessful) {
                     val output = response.body()
-<<<<<<< HEAD
-=======
                     println(output)
                     var newSchedule = schedule
                     if (output != null) {
@@ -104,7 +102,6 @@ class ScheduleViewModel(input: Schedule) : ViewModel() {
 //                        val type = object : TypeToken<MutableList<Schedule>>() {}.type
 //                        val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
                     }
->>>>>>> 7584a9d (validate api works)
 
                 } else {
                     println(response.message())
