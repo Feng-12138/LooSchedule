@@ -42,6 +42,7 @@ import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.viewModels.ScheduleViewModel
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.util.Date
 
 @Composable
@@ -101,15 +102,15 @@ fun CourseScreen(
                     updatedSchedule.termSchedule[term]?.removeAt(index)
                     updatedSchedule.time = Date()
                     val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-
-                    val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
-                    val scheduleList = (existingList?.map { Gson().fromJson(it, Schedule::class.java) } ?: emptyList()).toMutableList()
+                    val existingList = sharedPreferences.getString("scheduleList", "[]")
+                    val type = object : TypeToken<MutableList<Schedule>>() {}.type
+                    val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
                     scheduleList.removeAt(position)
-                    scheduleList.add(scheduleList.size, updatedSchedule)
+                    scheduleList.add(0, updatedSchedule)
 
-                    val jsonList = scheduleList.map { Gson().toJson(it) }?.toSet()
+                    val jsonList = Gson().toJson(scheduleList)
                     val editor = sharedPreferences.edit()
-                    editor.putStringSet("scheduleList", jsonList)
+                    editor.putString("scheduleList", jsonList)
                     editor.apply()
 
                     navController.navigate(route = Screen.ViewSchedule.route)

@@ -16,6 +16,7 @@ class Course(Base):
     likedRating = Column(DECIMAL)
     easyRating = Column(DECIMAL)
     usefulRating = Column(DECIMAL)
+    filledCount = Column(Integer)
     
 
         

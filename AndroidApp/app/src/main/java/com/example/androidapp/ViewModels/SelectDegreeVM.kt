@@ -2,6 +2,7 @@ package com.example.androidapp.viewModels
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.androidapp.dataClass.MyDegree
@@ -10,6 +11,7 @@ import com.example.androidapp.models.Schedule
 import com.example.androidapp.screens.Screen
 import com.example.androidapp.services.RetrofitClient
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -88,18 +90,17 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
                 if (response.isSuccessful) {
                     val output = response.body()
                     val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-                    val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
-                    val scheduleList =
-                        (existingList?.map { Gson().fromJson(it, Schedule::class.java) } ?: emptyList()).toMutableList()
+                    val existingList = sharedPreferences.getString("scheduleList", "[]")
+                    val type = object : TypeToken<MutableList<Schedule>>() {}.type
+                    val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
                     var position = 0
-                    if(scheduleList.size > 0){
-                        position = scheduleList.size
-                    }
                     val schedule = output?.let { Schedule(it as MutableMap<String, MutableList<Course>>, myDegree = inputMajor, mySequence = sequence) }
-                    scheduleList.add(position , schedule)
+                    if (schedule != null) {
+                        scheduleList.add(position , schedule)
+                    }
                     val editor = sharedPreferences.edit()
-                    val jsonList = scheduleList.map { Gson().toJson(it) }.toSet()
-                    editor.putStringSet("scheduleList", jsonList)
+                    val jsonList = Gson().toJson(scheduleList)
+                    editor.putString("scheduleList", jsonList)
                     editor.apply()
                     navController.navigate(Screen.ViewSchedule.route)
                 } else {

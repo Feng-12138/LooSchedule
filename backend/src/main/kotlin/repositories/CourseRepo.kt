@@ -59,4 +59,20 @@ class CourseRepo {
             emptySet<Course>() as MutableSet<Course>
         }
     }
+
+    fun getBySubject(courseSubjects: Set<String>, include: Boolean = true): MutableSet<Course> {
+        return try {
+            val session = sessionFactory.openSession()
+            var hql = "FROM Course WHERE subject in :subjects and availability != '' and filledCount >= 30"
+            if (!include) {
+                hql = "FROM Course WHERE subject not in :subjects and availability != '' and filledCount >= 30"
+            }
+            val query = session.createQuery(hql, Course::class.java)
+            val courses = query.setParameterList("subjects", courseSubjects)
+            courses.list().toMutableSet()
+        } catch (e: Exception) {
+            println(e.message)
+            emptySet<Course>() as MutableSet<Course>
+        }
+    }
 }

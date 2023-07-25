@@ -1,6 +1,5 @@
 package com.example.androidapp.screens
 
-import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,17 +30,16 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -49,13 +47,12 @@ import androidx.navigation.NavController
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.viewModels.ScheduleViewModel
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.lang.Integer.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CourseDescription(course: Course, navController: NavController, schedule: Schedule, term: String, index: Int) {
+private fun CourseDescription(course: Course, navController: NavController, schedule: Schedule, term: String, index: Int, position: Int) {
     Card(
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier.padding(10.dp,5.dp,10.dp,10.dp),
@@ -70,6 +67,7 @@ private fun CourseDescription(course: Course, navController: NavController, sche
             navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
             navController.currentBackStackEntry?.arguments?.putInt("index", index)
             navController.currentBackStackEntry?.arguments?.putString("term", term)
+            navController.currentBackStackEntry?.arguments?.putInt("position", position)
             navController.navigate(Screen.CourseDetail.route)
         },
     ) {
@@ -121,26 +119,6 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
         scheduleViewModel.onTermSelected(currentTerm)
     }
 
-//    val sharedPreferences = LocalContext.current.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-//    val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
-//    val scheduleList = existingList?.map { Gson().fromJson(it, Schedule::class.java) } ?: emptyList()
-//    val scheduleViewModel = ScheduleViewModel(scheduleList[0])
-//
-//    LaunchedEffect(scheduleViewModel) {
-//        snapshotFlow { scheduleViewModel.schedule }
-//            .collect { updatedSchedule ->
-//                val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-//                val jsonUpdatedSchedule = Gson().toJson(updatedSchedule)
-//                val existingSchedules = sharedPreferences.getStringSet("scheduleList", emptySet())?.toMutableList() ?: mutableListOf()
-//                existingSchedules.remove(Gson().toJson(scheduleList[updatedSchedule.position]))
-//                existingSchedules.add(updatedSchedule.position, jsonUpdatedSchedule)
-//                val jsonList = existingSchedules.map { Gson().toJson(it) }.toSet()
-//                val editor = sharedPreferences.edit()
-//                editor.putStringSet("scheduleList", jsonList)
-//                editor.apply()
-//            }
-//    }
-
     Surface(
         modifier = Modifier
             .padding(horizontal = 8.dp)
@@ -182,14 +160,99 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                     ?: scheduleViewModel.schedule.termSchedule[termList[page]].also {
                         it?.let { pagerCourses[page] = it }
                     } ?: emptyList()
-                CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position)
+                CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position, isValidated = isValidated)
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun CourseSchedulePage(courses: List<Course>, navController: NavController, schedule: Schedule, term: String, position: Int, isValidated: MutableState<Boolean>) {
+    if (courses.isEmpty()) {
+        Box(
+            contentAlignment = Alignment.TopCenter,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "No courses warning",
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    modifier = Modifier.size(64.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "No courses selected for this term",
+                    style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)),
+                    textAlign = TextAlign.Center
+                )
+            }
+            Box(
+                contentAlignment = Alignment.BottomEnd,
+                modifier = Modifier
+                    .padding(vertical = 24.dp)
+                    .fillMaxSize(),
+            ) {
+                Column() {
+                    FloatingActionButton(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = Color.White,
+                        shape = CircleShape,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        onClick = {
+                            navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
+                            navController.currentBackStackEntry?.arguments?.putString("term", term)
+                            navController.currentBackStackEntry?.arguments?.putInt("position", position)
+                            navController.navigate(Screen.SearchCourse.route)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add"
+                        )
+                    }
+
+                    FloatingActionButton(
+                        containerColor = if (isValidated.value) MaterialTheme.colorScheme.secondary else Color.Red,
+                        contentColor = Color.White,
+                        shape = CircleShape,
+                        onClick = {
+
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Done,
+                            contentDescription = "Validate"
+                        )
+                    }
+                }
+            }
+        }
+        return
+    }
+
+    Box(
+       modifier = Modifier.fillMaxSize()
+    ) {
+        LazyColumn(
+            state = rememberLazyListState(),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(courses) { course, ->
+                val index = courses.indexOf(course)
+                CourseDescription(course = course, navController = navController, schedule = schedule, term = term, index = index, position = position)
             }
         }
 
         Box(
             contentAlignment = Alignment.BottomEnd,
             modifier = Modifier
-                .padding(vertical = 24.dp, horizontal = 12.dp)
+                .padding(vertical = 24.dp)
+                .fillMaxSize(),
         ) {
             Column() {
                 FloatingActionButton(
@@ -197,7 +260,12 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                     contentColor = Color.White,
                     shape = CircleShape,
                     modifier = Modifier.padding(bottom = 12.dp),
-                    onClick = { /* Handle button click here */ }
+                    onClick = {
+                        navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
+                        navController.currentBackStackEntry?.arguments?.putString("term", term)
+                        navController.currentBackStackEntry?.arguments?.putInt("position", position)
+                        navController.navigate(Screen.SearchCourse.route)
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -218,50 +286,6 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                         contentDescription = "Validate"
                     )
                 }
-            }
-        }
-    }
-}
-
-
-@Composable
-private fun CourseSchedulePage(courses: List<Course>, navController: NavController, schedule: Schedule, term: String, position: Int) {
-    if (courses.isEmpty()) {
-        Box(
-            contentAlignment = Alignment.TopCenter,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(vertical = 56.dp)
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = "No courses warning",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                    modifier = Modifier.size(64.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "No courses selected for this term",
-                    style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-        return
-    }
-
-    Box(
-       modifier = Modifier.fillMaxSize()
-    ) {
-        LazyColumn(
-            state = rememberLazyListState()
-        ) {
-            items(courses) { course, ->
-                val index = courses.indexOf(course)
-                CourseDescription(course = course, navController = navController, schedule = schedule, term = term, index = index)
             }
         }
     }

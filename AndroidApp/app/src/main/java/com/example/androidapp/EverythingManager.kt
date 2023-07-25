@@ -1,6 +1,7 @@
 package com.example.androidapp
 
 import com.example.androidapp.dataClass.Everything
+import com.example.androidapp.models.Course
 
 class EverythingManager private constructor() {
     // Data fields that you want to share
@@ -22,7 +23,7 @@ class EverythingManager private constructor() {
         everything = data
     }
 
-    fun getCourses(): List<String>? {
+    fun getCourses(): List<Course>? {
         return everything?.courses
     }
 

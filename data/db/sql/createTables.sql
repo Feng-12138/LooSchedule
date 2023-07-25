@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS Course
     likedRating DECIMAL(21, 20),
     easyRating DECIMAL(21, 20),
     usefulRating DECIMAL(21, 20),
+    filledCount INT,
     PRIMARY KEY (courseID)
 );
 
