@@ -402,6 +402,7 @@ class CoursePlanner {
             computeAndUpdateTermCourses(course)
         }
         selectCommunication(startYear, nonMathCourses)
+        println(listofTakenCourses)
         // non math courses are more flexible
 
         val courses = getCompleteOptionCourse(modifiedMajors.toList(), parsedDataList)

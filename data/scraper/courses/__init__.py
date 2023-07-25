@@ -6,7 +6,10 @@ import os
 # Change the .env file to your personal one
 # config = dotenv_values(".env")
 # please use your own path
-pathToDB = "/Users/keqinyang/Desktop/CS446/LooSchedule/data/db/LooSchedule.db"
+
+# pathToDB = "/Users/keqinyang/Desktop/CS446/LooSchedule/data/db/LooSchedule.db"
+
+pathToDB="/Users/samsun/LooSchedule/data/db/LooSchedule.db"
 engine = create_engine(f'sqlite:///{pathToDB}')
 Session = scoped_session(
     sessionmaker(bind=engine)
