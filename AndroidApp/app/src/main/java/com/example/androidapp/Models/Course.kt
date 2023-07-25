@@ -1,6 +1,8 @@
 package com.example.androidapp.models
 
 import android.os.Parcelable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
@@ -44,6 +46,9 @@ class Course(var courseId: String, var name: String, var rating: Float, var desc
 
     @SerializedName("usefulRating")
     var usefulRating: Float = 0.0f
+
+    @SerializedName("color")
+    var color: String = "red"
 
     lateinit var prereqs: Prerequisite
 }

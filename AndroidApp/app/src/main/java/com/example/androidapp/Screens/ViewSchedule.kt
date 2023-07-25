@@ -1,5 +1,6 @@
 package com.example.androidapp.screens
 
+import android.graphics.ColorSpace.Rgb
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,11 +45,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.androidapp.R
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.viewModels.ScheduleViewModel
 import kotlinx.coroutines.launch
 import java.lang.Integer.min
+
+@Composable
+fun getCourseColor(color: String): Color {
+    val green = Color(0xFF4CAF50) // Material Design Green 500
+
+    return when (color) {
+        "blue" -> MaterialTheme.colorScheme.secondaryContainer
+        "green" -> Color(182, 233, 187)
+        else -> MaterialTheme.colorScheme.errorContainer // default color if none matches
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +73,7 @@ private fun CourseDescription(course: Course, navController: NavController, sche
             defaultElevation =  10.dp,
         ),
         colors = CardDefaults.cardColors(
-            containerColor =  MaterialTheme.colorScheme.primaryContainer,
+            containerColor = getCourseColor(course.color),
         ),
         onClick = {
             navController.currentBackStackEntry?.arguments?.putParcelable("course", course)
