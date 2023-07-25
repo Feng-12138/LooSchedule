@@ -41,7 +41,7 @@ python3 -B breadth.py
 
 Add requirement data (major, minor, specialization, joint, etc.) [TEMPORARY]:
 ```
-python3 -B program.py
+python3 -B requirement.py
 ```
 Add course data:
 ```
