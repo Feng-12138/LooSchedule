@@ -95,7 +95,17 @@ fun CourseScreen(
         SwapAndDelete(
             modifier = Modifier
                 .align(Alignment.BottomCenter),
-            onSwap = { /* handle swapping logic */ },
+            onSwap = {
+                course?.let {
+                    navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
+                    navController.currentBackStackEntry?.arguments?.putString("term", term)
+                    navController.currentBackStackEntry?.arguments?.putInt("position", position)
+                    navController.currentBackStackEntry?.arguments?.putBoolean("swap", true)
+                    navController.currentBackStackEntry?.arguments?.putInt("index", index)
+                    navController.navigate(Screen.SearchCourse.route)
+                }
+
+            },
             onDelete = {
                 course?.let {
                     var updatedSchedule = schedule

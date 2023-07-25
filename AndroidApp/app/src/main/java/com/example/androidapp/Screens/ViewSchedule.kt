@@ -207,6 +207,8 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                             navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
                             navController.currentBackStackEntry?.arguments?.putString("term", term)
                             navController.currentBackStackEntry?.arguments?.putInt("position", position)
+                            navController.currentBackStackEntry?.arguments?.putBoolean("swap", false)
+                            navController.currentBackStackEntry?.arguments?.putInt("index", 0)
                             navController.navigate(Screen.SearchCourse.route)
                         }
                     ) {
@@ -264,6 +266,8 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                         navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
                         navController.currentBackStackEntry?.arguments?.putString("term", term)
                         navController.currentBackStackEntry?.arguments?.putInt("position", position)
+                        navController.currentBackStackEntry?.arguments?.putBoolean("swap", false)
+                        navController.currentBackStackEntry?.arguments?.putInt("index", 0)
                         navController.navigate(Screen.SearchCourse.route)
                     }
                 ) {

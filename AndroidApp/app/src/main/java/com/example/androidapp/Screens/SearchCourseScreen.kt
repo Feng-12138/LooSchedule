@@ -42,7 +42,7 @@ import java.util.Date
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 //, term: String, schedule: Schedule, position: Int
-fun SearchCourseScreen(navController: NavController, term: String, schedule: Schedule, position: Int){
+fun SearchCourseScreen(navController: NavController, term: String, schedule: Schedule, position: Int, swap: Boolean, courseIndex: Int){
     var text by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
     val courses: List<Course>? = EverythingManager.getInstance().getCourses()
@@ -76,7 +76,7 @@ fun SearchCourseScreen(navController: NavController, term: String, schedule: Sch
         ){
         }
         if (courses != null) {
-            CourseList(navController = navController, courseList = courses, searchQuery = text, term = term, schedule = schedule, position = position)
+            CourseList(navController = navController, courseList = courses, searchQuery = text, term = term, schedule = schedule, position = position, swap = swap, courseIndex = courseIndex)
         }
         else{
             Text("Nothing")
@@ -86,7 +86,7 @@ fun SearchCourseScreen(navController: NavController, term: String, schedule: Sch
 
 
 @Composable
-fun CourseList(navController: NavController, courseList: List<Course>, searchQuery: String, term: String, schedule: Schedule, position: Int) {
+fun CourseList(navController: NavController, courseList: List<Course>, searchQuery: String, term: String, schedule: Schedule, position: Int, swap: Boolean, courseIndex: Int) {
     var filteredCourses = remember { mutableStateListOf<Course>() }
     var showAlert by remember { mutableStateOf(false) }
     var selectedCourse = remember { mutableStateListOf<Course>() }
@@ -137,23 +137,46 @@ fun CourseList(navController: NavController, courseList: List<Course>, searchQue
                 Button(
                     onClick = {
                         showAlert = !showAlert
-                        var updatedSchedule = schedule
-                        updatedSchedule.termSchedule[term]?.add(selectedCourse[0])
-                        selectedCourse.clear()
-                        updatedSchedule.time = Date()
-                        val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-                        val existingList = sharedPreferences.getString("scheduleList", "[]")
-                        val type = object : TypeToken<MutableList<Schedule>>() {}.type
-                        val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
-                        scheduleList.removeAt(position)
-                        scheduleList.add(0, updatedSchedule)
 
-                        val jsonList = Gson().toJson(scheduleList)
-                        val editor = sharedPreferences.edit()
-                        editor.putString("scheduleList", jsonList)
-                        editor.apply()
+                        if(swap){
+                            var updatedSchedule = schedule
+                            updatedSchedule.termSchedule[term]?.add(selectedCourse[0])
+                            updatedSchedule.termSchedule[term]?.removeAt(courseIndex)
+                            selectedCourse.clear()
+                            updatedSchedule.time = Date()
+                            val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
+                            val existingList = sharedPreferences.getString("scheduleList", "[]")
+                            val type = object : TypeToken<MutableList<Schedule>>() {}.type
+                            val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
+                            scheduleList.removeAt(position)
+                            scheduleList.add(0, updatedSchedule)
 
-                        navController.navigate(route = Screen.ViewSchedule.route)
+                            val jsonList = Gson().toJson(scheduleList)
+                            val editor = sharedPreferences.edit()
+                            editor.putString("scheduleList", jsonList)
+                            editor.apply()
+
+                            navController.navigate(route = Screen.ViewSchedule.route)
+                        }
+                        else{
+                            var updatedSchedule = schedule
+                            updatedSchedule.termSchedule[term]?.add(selectedCourse[0])
+                            selectedCourse.clear()
+                            updatedSchedule.time = Date()
+                            val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
+                            val existingList = sharedPreferences.getString("scheduleList", "[]")
+                            val type = object : TypeToken<MutableList<Schedule>>() {}.type
+                            val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
+                            scheduleList.removeAt(position)
+                            scheduleList.add(0, updatedSchedule)
+
+                            val jsonList = Gson().toJson(scheduleList)
+                            val editor = sharedPreferences.edit()
+                            editor.putString("scheduleList", jsonList)
+                            editor.apply()
+
+                            navController.navigate(route = Screen.ViewSchedule.route)
+                        }
                     }) {
                     Text("Confirm")
                 }
