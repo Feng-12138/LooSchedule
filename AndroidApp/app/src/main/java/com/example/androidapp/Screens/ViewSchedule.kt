@@ -1,4 +1,6 @@
 package com.example.androidapp.screens
+
+import android.graphics.ColorSpace.Rgb
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,7 +63,7 @@ fun getCourseColor(color: String?): Color {
     return when (color) {
         "red" -> MaterialTheme.colorScheme.errorContainer
         "green" -> Color(182, 233, 187)
-        else -> MaterialTheme.colorScheme.secondaryContainer // default color if none matches
+        else -> MaterialTheme.colorScheme.secondaryContainer // default color if blue
     }
 }
 
