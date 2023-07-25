@@ -2,7 +2,7 @@ package com.example.androidapp.models
 
 import android.os.Parcelable
 import com.example.androidapp.enum.OverallValidationResult
-import com.example.androidapp.enum.ValidateResults
+import com.example.androidapp.enum.ValidationResult
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 import java.util.Date
@@ -24,10 +24,10 @@ class Schedule(var terms: MutableMap<String, MutableList<Course>>,
     var validated: Boolean = false
 
     @SerializedName("CourseValidation")
-    var courseValidation: Map<String, MutableList<List<ValidateResults>>> = mutableMapOf()
+    var courseValidation: Map<String, MutableList<List<ValidationResult?>>> = mutableMapOf()
 
     @SerializedName("DegreeValidation")
-    var degreeValidation: List<OverallValidationResult> = listOf()
+    var degreeValidation: List<OverallValidationResult?> = listOf()
 
     @SerializedName("Degree")
     var degree: List<String> = myDegree
