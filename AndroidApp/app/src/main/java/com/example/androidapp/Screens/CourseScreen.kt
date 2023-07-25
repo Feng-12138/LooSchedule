@@ -1,5 +1,6 @@
 package com.example.androidapp.screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,14 +39,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
 import com.example.androidapp.models.Course
+import com.example.androidapp.models.Schedule
 import com.example.androidapp.viewModels.ScheduleViewModel
+import com.google.gson.Gson
+import java.util.Date
 
 @Composable
 fun CourseScreen(
     course: Course?,
     navController: NavController,
-    viewModel: ScheduleViewModel
+    index: Int,
+    term: String,
+    schedule: Schedule,
+    position: Int
 ) {
+    val context = LocalContext.current
     Box(
         Modifier
             .fillMaxWidth()
@@ -88,8 +97,22 @@ fun CourseScreen(
             onSwap = { /* handle swapping logic */ },
             onDelete = {
                 course?.let {
-                    viewModel.deleteCourse(viewModel.currentTerm, it)
-                    navController.popBackStack() // to go back to previous screen
+                    var updatedSchedule = schedule
+                    updatedSchedule.termSchedule[term]?.removeAt(index)
+                    updatedSchedule.time = Date()
+                    val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
+
+                    val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
+                    val scheduleList = (existingList?.map { Gson().fromJson(it, Schedule::class.java) } ?: emptyList()).toMutableList()
+                    scheduleList.removeAt(position)
+                    scheduleList.add(scheduleList.size, updatedSchedule)
+
+                    val jsonList = scheduleList.map { Gson().toJson(it) }?.toSet()
+                    val editor = sharedPreferences.edit()
+                    editor.putStringSet("scheduleList", jsonList)
+                    editor.apply()
+
+                    navController.navigate(route = Screen.ViewSchedule.route)
                 }
             }
         )

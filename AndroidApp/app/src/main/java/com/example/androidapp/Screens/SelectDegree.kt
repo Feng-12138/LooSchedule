@@ -65,11 +65,11 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
             SelectList(sequence.toTypedArray(), context, FieldType.SEQUENCE, viewModel)
-            Text("Minor: ",
+            Text("Minor (Optional): ",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
             SelectList(everythingManager.getMinors().toTypedArray(), context, FieldType.MINOR, viewModel)
-            Text("Specialization: ",
+            Text("Specialization (Optional): ",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
             SelectList(everythingManager.getSpecializations().toTypedArray(), context, FieldType.SPECIALIZATION, viewModel)
