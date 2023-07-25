@@ -22,12 +22,13 @@ class TermMapperService {
     val ListOneCourses = listOf("COMMST 100", "COMMST 223", "EMLS 101R", "EMLS 102R", "EMLS 129R", "ENGL 129R", "ENGL 109")
 
     fun mapCoursesToSequence(courseData: CourseDataClass, sequenceMap: Map<String, String>): MutableMap<String, MutableList<Course>> {
-        val list = courseData.mathCourses.map { it.courseID }.toMutableList()
-        list.addAll(courseData.nonMathCourses.map { it.courseID })
-        var prereqsData = prerequisiteRepo.getParsedPrereqData(list)
+        val list = courseData.fallCourses.map { it.courseID }.toMutableList()
+        list.addAll(courseData.winterCourses.map { it.courseID })
+        list.addAll(courseData.springCourses.map{it.courseID})
+        var prereqsData = courseData.prereqMap.filterKeys { it in list }
         val countCourseTerm = mutableMapOf<String, Int>()
         val generatedSchedule = mutableMapOf<String, MutableList<Course>>()
-        val totalNumberCourses = courseData.nonMathCourses.size + courseData.mathCourses.size
+        val totalNumberCourses = courseData.fallCourses.size + courseData.winterCourses.size + courseData.springCourses.size
         var coursePerTerm : Int
         var remainder: Int
         if (takeCourseInWT) {
@@ -62,19 +63,17 @@ class TermMapperService {
             }
         }
         for ((key, value) in sequenceMap) {
-            val courseList = generateCourseForTerm(
-                mathCourse = courseData.mathCourses,
-                nonMathCourse = courseData.nonMathCourses,
-                numCourse = countCourseTerm[key]!!.toInt(),
-                season = value,
-                prereqMap = prereqsData,
-                termName = key,
-            )
+            val courseList = generateCourseForTermSeason(season = value, parsedPrereqDataMap = prereqsData.toMutableMap(), fallCourses = courseData.fallCourses,
+                springCourses = courseData.springCourses, winterCourses = courseData.winterCourses, numCourse = countCourseTerm[key]!!.toInt(), termName = key)
             val coursesTakeThisTerm = courseList.map{it.courseID}
             takenCourses.addAll(coursesTakeThisTerm)
             generatedSchedule[key] = courseList
+            println(coursesTakeThisTerm)
         }
         takenCourses.clear()
+        courseData.fallCourses.clear()
+        courseData.springCourses.clear()
+        courseData.winterCourses.clear()
         return generatedSchedule
     }
 
@@ -104,6 +103,51 @@ class TermMapperService {
             }
             return false
         }
+    }
+
+    private fun checkConstraint(course: Course, parsedDataMap:MutableMap<String, ParsedPrereqData>, retvalList: List<String>) : Boolean {
+        val selectedCourseData = parsedDataMap[course.courseID]
+
+        var satisfyPrereq = false
+        var satisfyCoreq = false
+        for (prereqCourseOption in selectedCourseData!!.courses) {
+            var satisfy = true
+            if (prereqCourseOption.size == 0) {
+                continue
+            }
+            for (course in prereqCourseOption) {
+                if (course !in takenCourses) {
+                    satisfy = false
+                    break
+                }
+            }
+            if (satisfy) {
+                satisfyPrereq = satisfy
+            }
+        }
+        if (selectedCourseData.courses.size == 0) {
+            satisfyPrereq = true
+        }
+
+        for (coreqCourseOption in selectedCourseData!!.coreqCourses) {
+            var satisfy = true
+            if (coreqCourseOption.size == 0) {
+                continue
+            }
+            for (course in coreqCourseOption) {
+                if (course !in takenCourses && course !in retvalList) {
+                    satisfy = false
+                    break
+                }
+            }
+            if (satisfy) {
+                satisfyCoreq = satisfy
+            }
+        }
+        if (selectedCourseData!!.coreqCourses.size == 0 || course.courseID == "CS 136" || course.courseID == "CS 146" || course.courseID == "CS 136L") {
+            satisfyCoreq = true
+        }
+        return !(!satisfyPrereq || !satisfyCoreq)
     }
 
     enum class NonMathAddStatus {
@@ -138,6 +182,70 @@ class TermMapperService {
             }
             return NonMathAddStatus.DontAdd
         }
+    }
+
+    private fun generateCourseForTermSeason(
+        termName: String,
+        season: String,
+        numCourse: Int,
+        fallCourses: MutableSet<Course>,
+        winterCourses: MutableSet<Course>,
+        springCourses: MutableSet<Course>,
+        parsedPrereqDataMap: MutableMap<String, ParsedPrereqData>
+    ) : MutableList<Course> {
+        var arrangeCourses = mutableSetOf<Course>()
+        if (season == "F") {
+            arrangeCourses = fallCourses
+        } else if (season == "W") {
+            arrangeCourses = winterCourses
+        } else if (season == "S") {
+            arrangeCourses = springCourses
+        }
+        var countAdded = 0
+        val notTakenCourses = mutableListOf<Course>()
+        val retvalList = mutableListOf<Course>()
+        for (course in arrangeCourses) {
+            if (course.courseID !in takenCourses) {
+                notTakenCourses.add(course)
+            }
+        }
+        if (termName == "1A" || termName == "1B") {
+            for (course in notTakenCourses) {
+                if (countAdded >= numCourse) {
+                    break
+                }
+                if (course.courseID == "MATH 135" || course.courseID == "CS 135" || course.courseID == "MATH 145"
+                    || course.courseID == "MATH 137" || course.courseID == "CS 115"
+                    || course.courseID == "MATH 147" || course.courseID == "CS 145" || course.courseID in ListOneCourses) {
+                    retvalList.add(course)
+                    takenCourses.add(course.courseID)
+                    countAdded++
+                    continue
+                }
+                if (course.courseID == "MATH 136" || course.courseID == "MATH 146" || course.courseID == "MATH 138" ||
+                    course.courseID == "MATH 148" || course.courseID == "CS 136" || course.courseID == "CS 116"
+                    || course.courseID == "CS 146" || course.courseID == "STAT 230" || course.courseID == "STAT 240") {
+                    retvalList.add(course)
+                    takenCourses.add(course.courseID)
+                    countAdded++
+                    continue
+                }
+            }
+        }
+        for (course in notTakenCourses) {
+            if (countAdded >= numCourse) {
+                break
+            }
+            if (course.courseID in takenCourses) {
+                continue
+            }
+            val result = checkConstraint(course, parsedDataMap = parsedPrereqDataMap, retvalList=retvalList.map { it.courseID })
+            if (result) {
+                retvalList.add(course)
+                countAdded++
+            }
+        }
+        return retvalList
     }
 
     private fun generateCourseForTerm(
@@ -182,8 +290,7 @@ class TermMapperService {
                 satisfyConstraintNonMathCourse.add(course)
             }
         }
-//        println(satisfyConstraintNonMathCourse.map { it.courseID })
-//        println(satisfyConstraintOnlineNonMathCourse.map{it.courseID})
+
         var newSatisfyConstraintMathCourse = satisfyConstraintMathCourse.sortedBy { it.courseID }
         var newSatisfyConstraintNonMathCourse = satisfyConstraintNonMathCourse.sortedBy { it.courseID }
         var newSatisfyConstraintOnlineNonMathCourse = satisfyConstraintOnlineNonMathCourse.sortedBy { it.courseID }
@@ -268,6 +375,7 @@ class TermMapperService {
                 i = counter
             }
         }
+        takenCourses.clear()
         return retvalList
     }
 
@@ -312,4 +420,8 @@ data class CourseDataClass(
     var takeCourseInWT: Boolean = false,
     var mathCourses: MutableSet<Course> = mutableSetOf(),
     var nonMathCourses: MutableSet<Course> = mutableSetOf(),
+    var fallCourses: MutableSet<Course> = mutableSetOf(),
+    var springCourses: MutableSet<Course> = mutableSetOf(),
+    var winterCourses: MutableSet<Course> = mutableSetOf(),
+    var prereqMap: MutableMap<String, ParsedPrereqData>
 )

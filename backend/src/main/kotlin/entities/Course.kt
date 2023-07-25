@@ -15,6 +15,7 @@ typealias Antireqs = String
 typealias LikedRating = Double
 typealias EasyRating = Double
 typealias UsefulRating = Double
+typealias FilledCount = Int
 
 @Entity
 @Table(name = "Course")
@@ -64,6 +65,9 @@ class Course {
 
     @Column(name = "usefulRating")
     var usefulRating: UsefulRating? = 0.0
+
+    @Column(name = "filledCount")
+    var filledCount: FilledCount? = 0
 
 //    @OneToOne(cascade = [CascadeType.ALL])
 //    @PrimaryKeyJoinColumn

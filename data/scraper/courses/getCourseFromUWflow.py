@@ -122,6 +122,7 @@ def wrapperCourseDataFunc(curYear: int):
             easy
             liked
             useful
+            filled_count
         }
         sections {
             term_id
@@ -158,6 +159,7 @@ def wrapperCourseDataFunc(curYear: int):
             courseDict[courseNum].usefulRating = course['rating']['useful']
             courseDict[courseNum].coreqs = course["coreqs"]
             courseDict[courseNum].antireqs = course['antireqs']
+            courseDict[courseNum].filledCount = course['rating']['filled_count']
             # courseDict[courseNum].prereqs = course['prereqs']
             if len(course['sections']) == 0:
                 courseDict[courseNum].availability = ""
@@ -356,8 +358,6 @@ def parseStrCourses(prereq: str, oneOfCourseList = [], courseList = []):
     retvalList = []
     for course in courseList:
         course = course.replace(" ", "")
-        # if course == "ACTSC232" and prereq.find('or a corequisite of STAT230 or STAT240); Level at least 2A; Not open to students who have received credit for ACTSC232.') != -1:
-        #     continue
         startIdx = prereq.find(course)
         if startIdx != -1:
             if startIdx == 0:
@@ -541,12 +541,12 @@ def parseByBracket(prereq: str, courseCode: str, courseList: list):
         if not parsedByOpenBracket:
             if item[:2] == "or" or item[:1] == "/":
                 orConnectionsBetweenBracket.append(idx)
-            elif item[:3] == "and" or item[:1] == ";" or parsedBySemiColon:
+            elif item[:3] == "and" or item[:1] == ";" or parsedBySemiColon or item[:1] == ",":
                 andConnectionBetweeenBracket.append(idx)
         else:
             if item[-2:] == "or" or item[-1:] == "/":
                 orConnectionsBetweenBracket.append(idx + 1)
-            elif item[-3:] == "and" or item[-1:] == ";":
+            elif item[-3:] == "and" or item[-1:] == ";" or item[-1:] == ",":
                 andConnectionBetweeenBracket.append(idx + 1)
             
         oneofOr, courseStr = handleOneOf(item)
@@ -611,6 +611,10 @@ def parseByBracket(prereq: str, courseCode: str, courseList: list):
             newCourseStr += f"{modifiedCourse},"
         newCourseStr =  newCourseStr[:-1] + ";"
         addedPlaceStr += newCourseStr
+        
+    # inaccurate info from uwflow
+    if (courseCode == "CS 245"):
+        addedPlaceStr += "CS 136,MATH 145;CS 138,MATH 145;CS 146,MATH 145;"
     return addedPlaceStr
     
                 
@@ -710,10 +714,9 @@ def parsePrereqs(programList: list):
                                     continue
                                 program = "Faculty of Mathematics"
                             notOpenToStr += f"{program},"
-                notOpenToStr = notOpenToStr[:-1]
             else:
                 for program in programList:
-                    if item.find(program) != -1:
+                    if prereq.find(program) != -1:
                         if program == "Engineering Students":
                             if onlyOpenToStr.find("Engineering") != -1:
                                 continue
@@ -741,9 +744,10 @@ def parsePrereqs(programList: list):
                             program = "Faculty of Mathematics"
                         onlyOpenToStr += f"{program},"
                 onlyOpenToStr = onlyOpenToStr[:-1]
-            # if key == "CS 136":
-            #     print("Here")
-            #     print(onlyOpenToStr)
+            if (prereq.find("Engineering") != -1):
+                notOpenToStr += f"Faculty of Mathematics,"
+            if len(notOpenToStr) >= 1:
+                notOpenToStr = notOpenToStr[:-1]
             prereqList[-1].notOpenTo = notOpenToStr
             prereqList[-1].onlyOpenTo = onlyOpenToStr
                 
