@@ -94,8 +94,10 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
                     val type = object : TypeToken<MutableList<Schedule>>() {}.type
                     val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
                     var position = 0
-                    val schedule = output?.let { Schedule(it as MutableMap<String, MutableList<Course>>, myDegree = inputMajor, mySequence = sequence) }
+                    val schedule = output?.let { Schedule(it as MutableMap<String, MutableList<Course>>, myDegree = inputMajor, mySequence = sequence, startYear = year) }
                     if (schedule != null) {
+                        schedule.minor = inputMinor
+                        schedule.specialization = inputSpecialization
                         scheduleList.add(position , schedule)
                     }
                     val editor = sharedPreferences.edit()

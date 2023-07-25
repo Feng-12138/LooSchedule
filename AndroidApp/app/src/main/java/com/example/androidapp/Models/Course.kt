@@ -8,18 +8,14 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class Course(
-    var courseId: String,
-    var name: String,
-    var rating: Float,
-    var descript: String,
     var colorType : String
     ) : Parcelable {
 
     @SerializedName("courseID")
-    var courseID : String = courseId
+    var courseID : String = "courseId"
 
     @SerializedName("courseName")
-    var courseName : String = name
+    var courseName : String = "name"
 
     @SerializedName("subject")
     var subject : String = ""
@@ -28,7 +24,7 @@ class Course(
     var code : String = ""
 
     @SerializedName("description")
-    var description : String = descript
+    var description : String = "descript"
 
     @SerializedName("credit")
     var credit : Float = 0.0f
@@ -45,8 +41,8 @@ class Course(
     @SerializedName("antireqs")
     var antireqs : String = ""
 
-    @SerializedName("likeRating")
-    var likeRating : Float = rating
+    @SerializedName("likedRating")
+    var likedRating : Float = 0.0f
 
     @SerializedName("easyRating")
     var easyRating : Float = 0.0f

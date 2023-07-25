@@ -41,7 +41,6 @@ fun GetStartScreen(navController: NavController) {
             contentScale = ContentScale.FillBounds,
             modifier = Modifier.matchParentSize())
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
