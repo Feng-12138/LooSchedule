@@ -165,7 +165,7 @@ class Service: IService {
     }
 
     @Override
-    override fun validateSchedule(input: ScheduleValidator.ScheduleValidationInput): ScheduleValidationResult {
+    override fun validateSchedule(input: ScheduleValidator.ScheduleValidationInput): ScheduleValidator.ScheduleValidationOutput {
         return scheduleValidator.validateSchedule(input.schedule,
                                                   input.degree,
                                                   sequenceGenerator.generateSequence(input.sequence))

@@ -7,7 +7,7 @@ import repositories.ParsedPrereqData
 import repositories.PrerequisiteRepo
 
 typealias Schedule = MutableMap<String, MutableList<Course>>
-typealias ScheduleValidationResult = Map<String, MutableSet<ScheduleValidator.ValidationResult>>
+typealias ScheduleValidationResult = Map<String, MutableList<List<ScheduleValidator.ValidationResult>>>
 
 class ScheduleValidator {
     @Inject
@@ -22,6 +22,11 @@ class ScheduleValidator {
         val sequence: String = "Regular",
     )
 
+    data class ScheduleValidationOutput (
+        val validationDetails: ScheduleValidationResult = mapOf(),
+        val overallResult: Boolean = false
+    )
+
     enum class ValidationResult {
         Success,
         TermUnavailable,
@@ -34,8 +39,8 @@ class ScheduleValidator {
         NoSuchMajor,
     }
 
-    val List1CommunicationCourses = listOf("COMMST 100", "COMMST 223", "EMLS 101R", "EMLS 102R",
-                                           "EMLS 129R", "ENGL 129R", "ENGL 109")
+    private val listOneCommunicationCourses = listOf("COMMST 100", "COMMST 223", "EMLS 101R", "EMLS 102R",
+                                                   "EMLS 129R", "ENGL 129R", "ENGL 109")
 
     private fun checkCourseAvailability(termSeason: String, course: Course): ValidationResult {
         return if (course.availability!!.contains(termSeason)) {
@@ -87,7 +92,7 @@ class ScheduleValidator {
         // Double degree programs need to take list 1 communication course in 1A
         if (major.isDoubleDegree) {
             for (course in schedule["1A"]!!) {
-                if (course.courseID in List1CommunicationCourses) return ValidationResult.Success
+                if (course.courseID in listOneCommunicationCourses) return ValidationResult.Success
             }
             return ValidationResult.CommunicationCourseTooLate
         }
@@ -96,7 +101,7 @@ class ScheduleValidator {
         val termKeys = listOf("1A", "1B", "WT1")
         val courses = termKeys.flatMap { schedule[it] ?: emptyList() }
         for (course in courses) {
-            if (course.courseID in List1CommunicationCourses) return ValidationResult.Success
+            if (course.courseID in listOneCommunicationCourses) return ValidationResult.Success
         }
         return ValidationResult.CommunicationCourseTooLate
     }
@@ -106,24 +111,27 @@ class ScheduleValidator {
         return ValidationResult.Success
     }
     
-    fun validateSchedule(schedule: Schedule, degree: String, sequenceMap: Map<String, String>,): ScheduleValidationResult {
-        val scheduleValidity = mutableMapOf<String, MutableSet<ValidationResult>>()
+    fun validateSchedule(schedule: Schedule, degree: String, sequenceMap: Map<String, String>): ScheduleValidationOutput {
+        val scheduleValidity = mutableMapOf<String, MutableList<List<ValidationResult>>>()
+        var overallResult = true
         val courseList: List<String> = schedule.values.flatten().map { it.courseID }
         val takenSoFar: MutableList<String> = mutableListOf()
         val prerequisite = prerequisiteRepo.getParsedPrereqData(courseList)
 
         // First check communication courses
-        val commRes: ValidationResult = checkList1CommunicationCourse(schedule, degree)
-        if (commRes != ValidationResult.Success) scheduleValidity["Communication"] = mutableSetOf(commRes)
+        // val commRes: ValidationResult = checkList1CommunicationCourse(schedule, degree)
+        // if (commRes != ValidationResult.Success) scheduleValidity["Communication"] = mutableSetOf(commRes)
 
         // Check schedule validity
         for ((term, scheduledCourses) in schedule) {
+            val termResult = mutableListOf<List<ValidationResult>>()
             for (course in scheduledCourses) {
                 if (prerequisite[course.courseID] == null) {
-                    scheduleValidity[course.courseID] = mutableSetOf(ValidationResult.NoSuchCourse)
+                    termResult.add(listOf(ValidationResult.NoSuchCourse))
+                    overallResult = false
                     continue
                 }
-                val result: MutableSet<ValidationResult> = mutableSetOf(
+                val courseResult: MutableSet<ValidationResult> = mutableSetOf(
                     checkCourseAvailability(sequenceMap[term]!!, course),
                     checkCourseMinLevel(term, course, prerequisite),
                     checkCoursePrereq(course, takenSoFar, prerequisite),
@@ -132,18 +140,14 @@ class ScheduleValidator {
                     checkOpenTo(course, degree)
                 )
                 // Only keep the invalid reasons for that course
-                result.removeIf { it == ValidationResult.Success }
-                if (result.isNotEmpty()) scheduleValidity[course.courseID] = result
+                courseResult.removeIf { it == ValidationResult.Success }
+                if (courseResult.isNotEmpty()) overallResult = false
+                termResult.add(courseResult.toList())
                 takenSoFar.add(course.courseID)
             }
+            scheduleValidity[term] = termResult
         }
 
-        return if (scheduleValidity.isEmpty()) {
-            mapOf(
-                "All" to mutableSetOf(ValidationResult.Success)
-            )
-        } else {
-            scheduleValidity.toMap()
-        }
+        return ScheduleValidationOutput(scheduleValidity, overallResult)
     }
 }
