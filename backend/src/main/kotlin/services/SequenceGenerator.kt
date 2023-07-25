@@ -1,81 +1,123 @@
 package services
 
 class SequenceGenerator {
-    fun generateSequence(sequence: String): MutableMap<String, String> {
+    private val regular = mutableMapOf(
+        "1A" to "F",
+        "1B" to "W",
+        "2A" to "F",
+        "2B" to "W",
+        "3A" to "F",
+        "3B" to "W",
+        "4A" to "F",
+        "4B" to "W"
+    )
+
+    private val sequence1 = mutableMapOf(
+        "1A" to "F",
+        "1B" to "W",
+        "WT1" to "S",
+        "2A" to "F",
+        "WT2" to "W",
+        "2B" to "S",
+        "WT3" to "F",
+        "3A" to "W",
+        "WT4" to "S",
+        "3B" to "F",
+        "WT5" to "W",
+        "4A" to "S",
+        "WT6" to "F",
+        "4B" to "W"
+    )
+
+    private val sequence2 = mutableMapOf(
+        "1A" to "F",
+        "1B" to "W",
+        "WT1" to "S",
+        "2A" to "F",
+        "2B" to "W",
+        "WT2" to "S",
+        "3A" to "F",
+        "WT3" to "W",
+        "3B" to "S",
+        "WT4" to "F",
+        "4A" to "W",
+        "WT5" to "S",
+        "WT6" to "F",
+        "4B" to "W"
+    )
+
+    private val sequence3 = mutableMapOf(
+        "1A" to "F",
+        "1B" to "W",
+        "2A" to "F",
+        "WT1" to "W",
+        "2B" to "S",
+        "WT2" to "F",
+        "3A" to "W",
+        "WT3" to "S",
+        "3B" to "F",
+        "WT4" to "W",
+        "4A" to "S",
+        "WT5" to "F",
+        "WT6" to "W",
+        "4B" to "S"
+    )
+
+    val sequence4 = mutableMapOf(
+        "1A" to "F",
+        "1B" to "W",
+        "2A" to "S",
+        "WT1" to "F",
+        "2B" to "W",
+        "WT2" to "S",
+        "3A" to "F",
+        "WT3" to "W",
+        "3B" to "S",
+        "WT4" to "F",
+        "4A" to "W",
+        "WT5" to "S",
+        "WT6" to "F",
+        "4B" to "W"
+    )
+
+    fun generateSequence(sequence: String, currentTerm: String? = null): MutableMap<String, String> {
         val generatedSequence = mutableMapOf<String, String>()
-        generatedSequence["1A"] = "F"
-        generatedSequence["1B"] = "W"
+        var sequenceMap = mutableMapOf<String, String>()
         when (sequence) {
             "Regular" -> {
-                generatedSequence["2A"] = "F"
-                generatedSequence["2B"] = "W"
-                generatedSequence["3A"] = "F"
-                generatedSequence["3B"] = "W"
-                generatedSequence["4A"] = "F"
-                generatedSequence["4B"] = "W"
+                sequenceMap = regular
             }
             "Sequence 1" -> {
-                generatedSequence["WT1"] = "S"
-                generatedSequence["2A"] = "F"
-                generatedSequence["WT2"] = "W"
-                generatedSequence["2B"] = "S"
-                generatedSequence["WT3"] = "F"
-                generatedSequence["3A"] = "W"
-                generatedSequence["WT4"] = "S"
-                generatedSequence["3B"] = "F"
-                generatedSequence["WT5"] = "W"
-                generatedSequence["4A"] = "S"
-                generatedSequence["WT6"] = "F"
-                generatedSequence["4B"] = "W"
+                sequenceMap = sequence1
             }
             "Sequence 2" -> {
-                generatedSequence["WT1"] = "S"
-                generatedSequence["2A"] = "F"
-                generatedSequence["2B"] = "W"
-                generatedSequence["WT2"] = "S"
-                generatedSequence["3A"] = "F"
-                generatedSequence["WT3"] = "W"
-                generatedSequence["3B"] = "S"
-                generatedSequence["WT4"] = "F"
-                generatedSequence["4A"] = "W"
-                generatedSequence["WT5"] = "S"
-                generatedSequence["WT6"] = "F"
-                generatedSequence["4B"] = "W"
+                sequenceMap = sequence2
             }
             "Sequence 3" -> {
-                generatedSequence["2A"] = "F"
-                generatedSequence["WT1"] = "W"
-                generatedSequence["2B"] = "S"
-                generatedSequence["WT2"] = "F"
-                generatedSequence["3A"] = "W"
-                generatedSequence["WT3"] = "S"
-                generatedSequence["3B"] = "F"
-                generatedSequence["WT4"] = "W"
-                generatedSequence["4A"] = "S"
-                generatedSequence["WT5"] = "F"
-                generatedSequence["WT6"] = "W"
-                generatedSequence["4B"] = "S"
+                sequenceMap = sequence3
             }
             "Sequence 4" -> {
-                generatedSequence["2A"] = "S"
-                generatedSequence["WT1"] = "F"
-                generatedSequence["2B"] = "W"
-                generatedSequence["WT2"] = "S"
-                generatedSequence["3A"] = "F"
-                generatedSequence["WT3"] = "W"
-                generatedSequence["3B"] = "S"
-                generatedSequence["WT4"] = "F"
-                generatedSequence["4A"] = "W"
-                generatedSequence["WT5"] = "S"
-                generatedSequence["WT6"] = "F"
-                generatedSequence["4B"] = "W"
+                sequenceMap = sequence4
             }
             else -> {
                 generatedSequence.clear()
             }
         }
-        println("/////////////")
-        println(generatedSequence)
-        return generatedSequence
+        return mapAfterTerm(sequenceMap, currentTerm)
+    }
+
+    private fun mapAfterTerm(map: Map<String, String>, key: String?): MutableMap<String, String> {
+        val result = mutableMapOf<String, String>()
+        var addElements = key == null
+
+        for ((mapKey, mapValue) in map) {
+            if (key != null && mapKey == key) {
+                addElements = true
+            }
+            if (addElements) {
+                result[mapKey] = mapValue
+            }
+        }
+        return result
     }
 }
