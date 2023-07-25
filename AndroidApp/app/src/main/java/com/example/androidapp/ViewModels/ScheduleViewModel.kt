@@ -73,8 +73,6 @@ class ScheduleViewModel(input: Schedule) : ViewModel() {
                 startYear = schedule.year
             )
         )
-        println(validateData.toString())
-
         val gson = Gson()
         val jsonBody = gson.toJson(validateData)
         println(jsonBody)
@@ -106,8 +104,8 @@ class ScheduleViewModel(input: Schedule) : ViewModel() {
                     }
 
                 } else {
-                    println(response.message())
-                    Toast.makeText(context, response.code().toString(), Toast.LENGTH_SHORT).show()
+                    println(response)
+                    Toast.makeText(context, response.message(), Toast.LENGTH_SHORT).show()
                 }
             }
 

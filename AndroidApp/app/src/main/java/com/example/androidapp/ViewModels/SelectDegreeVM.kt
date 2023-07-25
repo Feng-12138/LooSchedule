@@ -96,8 +96,8 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
                     var position = 0
                     val schedule = output?.let { Schedule(it as MutableMap<String, MutableList<Course>>, myDegree = inputMajor, mySequence = sequence, startYear = year) }
                     if (schedule != null) {
-                        schedule.minor = listOf(minor)
-                        schedule.specialization = listOf(specialization)
+                        schedule.minor = inputMinor
+                        schedule.specialization = inputSpecialization
                         scheduleList.add(position , schedule)
                     }
                     val editor = sharedPreferences.edit()
