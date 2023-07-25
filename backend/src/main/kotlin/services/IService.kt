@@ -18,9 +18,9 @@ interface IService {
 }
 
 data class Plans (
-    val majors: List<String>,
-    val minors: List<String>,
-    val specializations: List<String>,
+    val majors: Set<String>,
+    val minors: Set<String>,
+    val specializations: Set<String>,
     val courses: List<Course>,
 )
 

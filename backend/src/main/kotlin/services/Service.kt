@@ -133,6 +133,9 @@ class Service: IService {
     @Override
     override fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>> {
         val requirements = getRequirements(plan)
+        println(requirements.mandatoryCourses)
+        println("???????????????")
+        println(requirements.optionalCourses)
         val takenCourses = plan.coursesTaken
         val currentTerm = plan.currentTerm
 
@@ -153,6 +156,10 @@ class Service: IService {
             }
         }
 
+//        println("------------------")
+//        println(requirements)
+//        println("------------------")
+
         val sequenceMap = sequenceGenerator.generateSequence(plan.sequence)
         val selectedCourses = coursePlanner.getCoursesPlanToTake(
             plan.startYear,
@@ -160,9 +167,13 @@ class Service: IService {
             plan.majors,
             sequenceMap = sequenceMap
         )
-        println(selectedCourses["F"]!!.map { it.courseID })
-        println(selectedCourses["W"]!!.map { it.courseID })
-        println(selectedCourses["S"]!!.map { it.courseID })
+
+//        println("????????????")
+//        println(selectedCourses.map{it.value})
+//        println("?????????????/")
+//        println(selectedCourses["F"]!!.map { it.courseID })
+//        println(selectedCourses["W"]!!.map { it.courseID })
+//        println(selectedCourses["S"]!!.map { it.courseID })
 
 
         return termMapperService.mapCoursesToSequence(
@@ -195,6 +206,9 @@ class Service: IService {
             }
 
             val requirementsData = requirementRepo.getRequirementCoursesByIds(requirementsId)
+//            println("----------------")
+//            println(requirementsData)
+//            println("----------------")
             return requirementsParser.parseRequirements(requirementsData)
         } catch (e: Exception) {
             println(e)
