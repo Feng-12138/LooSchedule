@@ -1,5 +1,6 @@
 package com.example.androidapp.screens
 
+import android.content.Context
 import android.graphics.ColorSpace.Rgb
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -179,7 +180,7 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                     ?: scheduleViewModel.schedule.termSchedule[termList[page]].also {
                         it?.let { pagerCourses[page] = it }
                     } ?: emptyList()
-                CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position, scheduleViewModel = scheduleViewModel)
+                CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position, isValidated = isValidated)
             }
         }
     }
@@ -187,9 +188,7 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
 
 
 @Composable
-private fun CourseSchedulePage(courses: List<Course>, navController: NavController, schedule: Schedule, term: String, position: Int, scheduleViewModel: ScheduleViewModel) {
-    val context = LocalContext.current
-    var isValidated = remember { mutableStateOf(scheduleViewModel.schedule.validated) }
+private fun CourseSchedulePage(courses: List<Course>, navController: NavController, schedule: Schedule, term: String, position: Int, isValidated: MutableState<Boolean>) {
     if (courses.isEmpty()) {
         Box(
             contentAlignment = Alignment.TopCenter,

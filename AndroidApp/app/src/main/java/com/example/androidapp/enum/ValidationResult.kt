@@ -1,4 +1,3 @@
-package com.example.androidapp.enum
 
 enum class ValidationResult {
     Success,

@@ -2,12 +2,14 @@ package com.example.androidapp.viewModels
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import com.example.androidapp.dataClass.ValidationResults
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.services.RetrofitClient
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
 import okhttp3.MediaType
 import okhttp3.RequestBody
@@ -70,6 +72,7 @@ class ScheduleViewModel(input: Schedule) : ViewModel() {
                 startYear = schedule.year
             )
         )
+
         val gson = Gson()
         val jsonBody = gson.toJson(validateData)
         println(jsonBody)
@@ -86,24 +89,9 @@ class ScheduleViewModel(input: Schedule) : ViewModel() {
             ) {
                 if (response.isSuccessful) {
                     val output = response.body()
-                    println(output)
-                    var newSchedule = schedule
-                    if (output != null) {
-                        newSchedule.validated = output.overallResult
-                        newSchedule.courseValidation = output.courseValidationResult
-                        newSchedule.degreeValidation = output.degreeValidationResult
-
-                        _schedule.value.validated = output.overallResult
-                        _schedule.value.courseValidation = output.courseValidationResult
-                        _schedule.value.degreeValidation = output.degreeValidationResult
-//                        val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-//                        val existingList = sharedPreferences.getString("scheduleList", "[]")
-//                        val type = object : TypeToken<MutableList<Schedule>>() {}.type
-//                        val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
-                    }
 
                 } else {
-                    println(response)
+                    println(response.message())
                     Toast.makeText(context, response.message(), Toast.LENGTH_SHORT).show()
                 }
             }
