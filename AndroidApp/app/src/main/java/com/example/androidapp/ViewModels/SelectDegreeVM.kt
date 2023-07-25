@@ -79,7 +79,6 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
         val api = RetrofitClient.create()
         val requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody)
 
-
         val call = api.getCourseSchedule(requestBody)
         call.enqueue(object : Callback<Map<String, List<Course>>> {
             override fun onResponse(
@@ -88,8 +87,6 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
             ) {
                 if (response.isSuccessful) {
                     val output = response.body()
-                    val schedule = output?.let { Schedule(it as MutableMap<String, List<Course>>) }
-
                     val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
                     val existingList = sharedPreferences.getStringSet("scheduleList", emptySet())?.toList()
                     val scheduleList =
@@ -98,12 +95,12 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
                     if(scheduleList.size > 0){
                         position = scheduleList.size
                     }
+                    val schedule = output?.let { Schedule(it as MutableMap<String, MutableList<Course>>, myDegree = inputMajor, mySequence = sequence) }
                     scheduleList.add(position , schedule)
                     val editor = sharedPreferences.edit()
                     val jsonList = scheduleList.map { Gson().toJson(it) }.toSet()
                     editor.putStringSet("scheduleList", jsonList)
                     editor.apply()
-
                     navController.navigate(Screen.ViewSchedule.route)
                 } else {
                     println(response.message())

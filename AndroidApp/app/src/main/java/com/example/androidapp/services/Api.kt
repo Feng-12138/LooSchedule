@@ -1,6 +1,7 @@
 package com.example.androidapp.services
 
 import com.example.androidapp.dataClass.Everything
+import com.example.androidapp.enum.ValidationResults
 import com.example.androidapp.models.Communication
 import com.example.androidapp.models.Course
 import okhttp3.RequestBody
@@ -20,4 +21,6 @@ interface Api {
     @GET("api/Communications")
     fun getCommunications(): Call<List<Communication>>
 
+    @GET("api/validate")
+    fun validateSchedule(@Body requestBody: RequestBody): Call<Map<String, MutableSet<ValidationResults>>>
 }
