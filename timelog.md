@@ -26,13 +26,13 @@
 | June 15  |               |     3.5h      |               |               |               |               | Created data scraper for breadth & depth courses
 | June 15  |               |      2h       |               |               |               |               | Refactored database-related functions to switch from MySQL to SQLite
 | June 16  |               |     1.5h      |               |               |               |               | Added sample data for program requirements
-| June 24  |               |      1.5h     |               |               |               |               | Designed and set up requirement parser for scheduler
-| June 25  |               |      4h       |               |               |               |               | Finalize requirements for an academic plan and fix repo
-| June 26  |               |      2h       |               |               |               |               | Consider prereq in scheduler and add specializations
-| June 26  |               |      0.5h     |               |               |               |               | Functioning sequence generator
-| June 26  |               |      4h       |               |               |               |               | Functioning termMapperService
-| June 26  |               |      2.5h     |               |               |               |               | Functioning scheduler with pre-req/availabiity considerations
-| June 26  |               |      2h       |               |               |               |               | More bug fixes for all existent functions
+| June 24  |      1.5h     |               |               |               |               |               | Designed and set up requirement parser for scheduler
+| June 25  |      4h       |               |               |               |               |               | Finalize requirements for an academic plan and fix repo
+| June 26  |      2h       |               |               |               |               |               | Consider prereq in scheduler and add specializations
+| June 26  |      0.5h     |               |               |               |               |               | Functioning sequence generator
+| June 26  |      4h       |               |               |               |               |               | Functioning termMapperService
+| June 26  |      2.5h     |               |               |               |               |               | Functioning scheduler with pre-req/availabiity considerations
+| June 26  |      3h       |               |               |               |               |               | More bug fixes for all existent functions
 | June 26  |               |      4h       |               |               |               |               | Created component diagram for demo presentation (D3)
 | June 26  |               |      5h       |               |               |               |               | Updated data scraper to retrieve partial 2023 ACTSC program requirements
 | June 27  |               |     1.5h      |               |               |               |               | Created backend functions for course and communication repositories
