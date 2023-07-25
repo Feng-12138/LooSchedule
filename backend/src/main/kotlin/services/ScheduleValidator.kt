@@ -7,7 +7,8 @@ import repositories.ParsedPrereqData
 import repositories.PrerequisiteRepo
 
 typealias Schedule = MutableMap<String, MutableList<Course>>
-typealias ScheduleValidationResult = Map<String, MutableList<List<ScheduleValidator.ValidationResult>>>
+typealias CourseValidationResult = Map<String, MutableList<List<ScheduleValidator.ValidationResult>>>
+typealias DegreeValidationResult = List<ScheduleValidator.OverallValidationResult>
 
 class ScheduleValidator {
     @Inject
@@ -23,7 +24,8 @@ class ScheduleValidator {
     )
 
     data class ScheduleValidationOutput (
-        val validationDetails: ScheduleValidationResult = mapOf(),
+        val courseValidationResult: CourseValidationResult = mapOf(),
+        val degreeValidationResult: DegreeValidationResult = listOf(),
         val overallResult: Boolean = false
     )
 
@@ -35,12 +37,18 @@ class ScheduleValidator {
         NotMeetCoReq,
         NotMeetAntiReq,
         NoSuchCourse,
-        CommunicationCourseTooLate,
+    }
+
+    enum class OverallValidationResult {
+        Success,
         NoSuchMajor,
+        CommunicationCourseTooLate,
+        NotEnoughCourse,
+        NotMeetDegreeRequirement,
     }
 
     private val listOneCommunicationCourses = listOf("COMMST 100", "COMMST 223", "EMLS 101R", "EMLS 102R",
-                                                   "EMLS 129R", "ENGL 129R", "ENGL 109")
+                                                     "EMLS 129R", "ENGL 129R", "ENGL 109")
 
     private fun checkCourseAvailability(termSeason: String, course: Course): ValidationResult {
         return if (course.availability!!.contains(termSeason)) {
@@ -87,23 +95,23 @@ class ScheduleValidator {
         return ValidationResult.Success
     }
 
-    private fun checkList1CommunicationCourse(schedule: Schedule, degree: String): ValidationResult {
-        val major: entities.Major = majorRepo.getMajorByName(degree) ?: return ValidationResult.NoSuchMajor
+    private fun checkList1CommunicationCourse(schedule: Schedule, degree: String): OverallValidationResult {
+        val major: entities.Major = majorRepo.getMajorByName(degree) ?: return OverallValidationResult.NoSuchMajor
         // Double degree programs need to take list 1 communication course in 1A
         if (major.isDoubleDegree) {
             for (course in schedule["1A"]!!) {
-                if (course.courseID in listOneCommunicationCourses) return ValidationResult.Success
+                if (course.courseID in listOneCommunicationCourses) return OverallValidationResult.Success
             }
-            return ValidationResult.CommunicationCourseTooLate
+            return OverallValidationResult.CommunicationCourseTooLate
         }
 
         // For other degrees, need to take list 1 communication course before going into 2A
         val termKeys = listOf("1A", "1B", "WT1")
         val courses = termKeys.flatMap { schedule[it] ?: emptyList() }
         for (course in courses) {
-            if (course.courseID in listOneCommunicationCourses) return ValidationResult.Success
+            if (course.courseID in listOneCommunicationCourses) return OverallValidationResult.Success
         }
-        return ValidationResult.CommunicationCourseTooLate
+        return OverallValidationResult.CommunicationCourseTooLate
     }
     
     private fun checkOpenTo(course: Course, degree: String): ValidationResult {
@@ -112,17 +120,22 @@ class ScheduleValidator {
     }
     
     fun validateSchedule(schedule: Schedule, degree: String, sequenceMap: Map<String, String>): ScheduleValidationOutput {
-        val scheduleValidity = mutableMapOf<String, MutableList<List<ValidationResult>>>()
+        val courseValidity = mutableMapOf<String, MutableList<List<ValidationResult>>>()
+        val degreeValidity = mutableListOf<OverallValidationResult>()
         var overallResult = true
         val courseList: List<String> = schedule.values.flatten().map { it.courseID }
         val takenSoFar: MutableList<String> = mutableListOf()
         val prerequisite = prerequisiteRepo.getParsedPrereqData(courseList)
 
         // First check communication courses
-        // val commRes: ValidationResult = checkList1CommunicationCourse(schedule, degree)
-        // if (commRes != ValidationResult.Success) scheduleValidity["Communication"] = mutableSetOf(commRes)
+         val commRes: OverallValidationResult = checkList1CommunicationCourse(schedule, degree)
+         if (commRes != OverallValidationResult.Success) {
+             degreeValidity.add(commRes)
+             // Currently, not satisfying communication timeline is only a warning.
+             // Will not result in schedule being invalid, but could change this later
+         }
 
-        // Check schedule validity
+        // Check single course validity
         for ((term, scheduledCourses) in schedule) {
             val termResult = mutableListOf<List<ValidationResult>>()
             for (course in scheduledCourses) {
@@ -145,9 +158,11 @@ class ScheduleValidator {
                 termResult.add(courseResult.toList())
                 takenSoFar.add(course.courseID)
             }
-            scheduleValidity[term] = termResult
+            courseValidity[term] = termResult
         }
 
-        return ScheduleValidationOutput(scheduleValidity, overallResult)
+        // Check if degree requirements are satisfied
+
+        return ScheduleValidationOutput(courseValidity, degreeValidity, overallResult)
     }
 }
