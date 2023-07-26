@@ -28,7 +28,9 @@ data class RequestData(
     val startYear: String,
     val sequence: String,
     val minors: List<String>,
-    val specializations: List<String>
+    val specializations: List<String>,
+    var coursesTaken: List<String> = listOf(),
+    var currentTerm: String? = null,
 )
 
 class SelectDegreeVM(context: Context, navController: NavController) : ViewModel() {

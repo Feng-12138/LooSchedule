@@ -68,21 +68,21 @@ import retrofit2.Response
 @Composable
 fun ChatgptScreen(schedule: Schedule, position: Int, navController: NavController){
     val terms: List<String> = schedule.termSchedule.keys.toList()
-    val courses: List<String> = EverythingManager.getInstance().getCourses()?.map{ course -> "${course.courseID} ${course.courseName}" } ?: listOf()
+    val courses: List<Course> = EverythingManager.getInstance().getCourses()?.map{ course -> course } ?: listOf()
     val context = LocalContext.current
     var selectedTerm by remember { mutableStateOf(terms.first()) }
     var expanded by remember { mutableStateOf(false) }
 
     var text by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
-    var filteredCourses = remember { mutableStateListOf<String>() }
-    var selectedCourses = remember { mutableStateListOf<String>() }
+    var filteredCourses = remember { mutableStateListOf<Course>() }
+    var selectedCourses = remember { mutableStateListOf<Course>() }
 
     LaunchedEffect(text) {
         filteredCourses.clear()
         if (text.isNotEmpty()) {
             filteredCourses.addAll(courses.filter { course ->
-                containsWithOrder(course.lowercase(), text.lowercase())
+                containsWithOrder("${course.courseID} ${course.courseName}".lowercase(), text.lowercase())
             })
         } else {
             filteredCourses.addAll(courses)
@@ -172,7 +172,7 @@ fun ChatgptScreen(schedule: Schedule, position: Int, navController: NavControlle
                         }
                     ) {
                         Text(
-                            text = course,
+                            text = "${course.courseID} ${course.courseName}",
                             modifier = Modifier.padding(16.dp)
                         )
                     }
@@ -191,7 +191,7 @@ fun ChatgptScreen(schedule: Schedule, position: Int, navController: NavControlle
                     modifier = Modifier
                         .padding(16.dp)) {
                     Text(
-                        text = course,
+                        text = "${course.courseID} ${course.courseName}",
                         modifier = Modifier.fillMaxWidth(0.8f)
                     )
                     Checkbox(
@@ -225,11 +225,14 @@ fun ChatgptScreen(schedule: Schedule, position: Int, navController: NavControlle
                         startYear = schedule.startYear,
                         sequence = schedule.sequence,
                         minors = schedule.minor,
-                        specializations = schedule.specialization
+                        specializations = schedule.specialization,
+                        currentTerm = selectedTerm,
+                        coursesTaken = selectedCourses.map { course -> course.courseID }
                     )
 
                     val gson = Gson()
                     val jsonBody = gson.toJson(requestData)
+                    println(jsonBody)
 
                     val api = RetrofitClient.create()
                     val requestBody =
