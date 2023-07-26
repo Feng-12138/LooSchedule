@@ -86,6 +86,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                 drawerState = drawerState,
                 drawerContent = {
                     ModalDrawerSheet {
+
                         Box {
                             Image(
                                 painter = painterResource(id = R.drawable.nav_bar2),

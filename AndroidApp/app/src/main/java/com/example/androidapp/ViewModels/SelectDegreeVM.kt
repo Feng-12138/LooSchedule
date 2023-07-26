@@ -6,6 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.androidapp.dataClass.MyDegree
+import com.example.androidapp.dataClass.TermSchedule
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.screens.Screen
@@ -61,7 +62,7 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
             emptyList()
         }
         val inputSpecialization = if (specialization != "Select your specialization"){
-            listOf(minor)
+            listOf(specialization)
         } else{
             emptyList()
         }
@@ -82,10 +83,10 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
         val requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody)
 
         val call = api.getCourseSchedule(requestBody)
-        call.enqueue(object : Callback<Map<String, List<Course>>> {
+        call.enqueue(object : Callback<TermSchedule> {
             override fun onResponse(
-                call: Call<Map<String, List<Course>>>,
-                response: Response<Map<String, List<Course>>>
+                call: Call<TermSchedule>,
+                response: Response<TermSchedule>
             ) {
                 if (response.isSuccessful) {
                     val output = response.body()
@@ -94,7 +95,7 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
                     val type = object : TypeToken<MutableList<Schedule>>() {}.type
                     val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
                     var position = 0
-                    val schedule = output?.let { Schedule(it as MutableMap<String, MutableList<Course>>, myDegree = inputMajor, mySequence = sequence, startYear = year) }
+                    val schedule = output?.let { Schedule(it.schedule as MutableMap<String, MutableList<Course>>, myDegree = inputMajor, mySequence = sequence, startYear = year) }
                     if (schedule != null) {
                         schedule.minor = inputMinor
                         schedule.specialization = inputSpecialization
@@ -111,7 +112,7 @@ class SelectDegreeVM(context: Context, navController: NavController) : ViewModel
                 }
             }
 
-            override fun onFailure(call: Call<Map<String, List<Course>>>, t: Throwable) {
+            override fun onFailure(call: Call<TermSchedule>, t: Throwable) {
                 Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
                 println(t.message)
                 call.cancel()
