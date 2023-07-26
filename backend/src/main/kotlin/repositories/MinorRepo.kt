@@ -15,7 +15,7 @@ class MinorRepo {
             val hql = "FROM Minor M WHERE M.minorName = :minor_name"
             val minors = session.createQuery(hql, Minor::class.java)
             minors.setParameter("minor_name", name)
-            minors.uniqueResult().requirementID
+            minors.list().last().requirementID
         } catch (e: Exception) {
             println(e.message)
             0

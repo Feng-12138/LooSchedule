@@ -27,8 +27,8 @@ class CoursePlanner {
 
     val ListOneCourses = listOf("COMMST 100", "COMMST 223", "EMLS 101R", "EMLS 102R", "EMLS 129R", "ENGL 129R", "ENGL 109")
 
-    val majorMap = mapOf<String, String>("Statistics" to "STAT", "Computer Science" to "CS",
-        "Applied Mathematics" to "AMATH", "Combinatorics and Optimization" to "CO", "Pure Mathematics" to "PMath")
+    val majorMap = mapOf("Statistics" to "STAT", "Computer Science" to "CS", "Actuarial Science" to "ACTSC",
+        "Applied Mathematics" to "AMATH", "Combinatorics and Optimization" to "CO", "Pure Mathematics" to "PMATH")
 
 
     val listofTakenCourses = mutableListOf<String>()
@@ -278,7 +278,7 @@ class CoursePlanner {
                                     numMathNeeded: Int,
                                     majors: List<String>, returnedCourseList : List<Course>, item: Int = 1) {
         var countMathCourse = countMathCourse
-        var returnedCourseList = returnedCourseList.toMutableList()
+        val returnedCourseList = returnedCourseList.toMutableList()
         val courses = courseRepo.getBySubject(subjectSet, included).sortedWith(courseComparator)
         val parsedDataMap = prerequisiteRepo.getParsedPrereqData(courses.map{it.courseID}.take(350))
         prereqMap.putAll(parsedDataMap)
@@ -361,7 +361,8 @@ class CoursePlanner {
         requirements: Requirements,
         majors: List<String>,
         sequenceMap: MutableMap<String, String>,
-        takenCourses: List<String>
+        takenCourses: List<String>,
+        recommendedCourses: Set<Course>,
     ): Map<String, MutableSet<Course>> {
         val mathCourses: MutableSet<Course> = mutableSetOf()
         val nonMathCourses: MutableSet<Course> = mutableSetOf()
@@ -431,6 +432,7 @@ class CoursePlanner {
             }
         }
 
+        // select courses from optional courses requirements
         var incompleteOptionalList = mutableSetOf<OptionalCourses>()
         for (optionalCourseList in optionalCourses) {
             val result = selectCoursesFromOptional(optionalCourseList, parsedDataList, modifiedMajors.toList(), mathCourses, nonMathCourses)
@@ -448,6 +450,28 @@ class CoursePlanner {
         }
         selectCommunication(startYear, nonMathCourses, takenCourses)
 
+//        // consider recommended courses
+//        val takeRecommendedCoursesList = mutableSetOf<Course>()
+//        val parsedDataMap = prerequisiteRepo.getParsedPrereqData(recommendedCourses.map { it.courseID })
+//        prereqMap.putAll(parsedDataMap)
+//        var idx = 0
+//        for (course in recommendedCourses) {
+//            if (countTakenMathCourse >= numMathNeeded) {
+//                break
+//            }
+//            idx++
+//            val result = checkConstraint(course, parsedDataMap = parsedDataMap, majors = majors)
+//            if (result) {
+//                course.color = "blue"
+//                computeAndUpdateTermCourses(course)
+//                takeRecommendedCoursesList.add(course)
+//                countTakenMathCourse++
+//            }
+//        }
+
+
+
+        // select actually elective courses
         // non math courses are more flexible
         val courses = getCompleteOptionCourse(modifiedMajors.toList())
         for (course in courses) {

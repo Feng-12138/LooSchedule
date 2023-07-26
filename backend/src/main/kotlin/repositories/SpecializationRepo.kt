@@ -16,7 +16,7 @@ class SpecializationRepo {
             val hql = "FROM Specialization S WHERE S.specializationName = :specialization_name"
             val specializations = session.createQuery(hql, Specialization::class.java)
             specializations.setParameter("specialization_name", name)
-            specializations.uniqueResult().requirementID
+            specializations.list().last().requirementID
         } catch (e: Exception) {
             println(e.message)
             0

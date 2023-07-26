@@ -71,10 +71,11 @@ class Api {
     @Path("gpt")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    fun tryGpt(request: Message): Response = runBlocking {
+    fun tryGpt(request: RecommendationPlan): Response = runBlocking {
         try {
-            println(request.position)
-            val message = service.recommendCourses(request.position)
+            val recommendedCourses = service.recommendCourses(request.position)
+            println(recommendedCourses.map { it.subject + " " + it.code })
+            val message = service.generateSchedule(request.academicPlan, recommendedCourses.toMutableList())
             return@runBlocking Response.ok(message).build()
         } catch (e: Exception) {
             println(e.message)

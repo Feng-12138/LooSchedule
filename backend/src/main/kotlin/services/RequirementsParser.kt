@@ -104,16 +104,26 @@ class RequirementsParser {
         val mandatoryCourses = requirements.mandatoryCourses.toMutableList()
         val commonTable: ConcurrentHashMap<Course, Int> = ConcurrentHashMap()
 
+        println("ttttttttttttttttt")
+        println(optionalCoursesList)
+        println("ttttttttttttttttt")
         for (i in 0 until optionalCoursesList.size) {
             for (j in i + 1 until optionalCoursesList.size) {
                 val coursesI = optionalCoursesList[i]
                 val coursesJ = optionalCoursesList[j]
                 val commonCourses = coursesJ.courses.filter { coursesI.courses.contains(it) }.toSet()
+
+                println("aaaaaaaaaaaaaaaaa")
+                println(commonCourses)
+                println("aaaaaaaaaaaaaaaaa")
                 for (commonCourse in commonCourses) {
                     commonTable.compute(commonCourse) { _, count -> count?.plus(1) ?: 1 }
                 }
             }
         }
+        println("----------------")
+        println(commonTable.keys)
+        println("----------------")
 
         val remainingOptionalCourses = mutableListOf<OptionalCourses>()
         for (optionalCourses in optionalCoursesList) {
@@ -159,8 +169,33 @@ class RequirementsParser {
             mandatoryCourses = mandatoryCourses.toMutableSet(),
         )
     }
-}
 
+    fun combineOptionalRequirements(
+        requirements: Requirements,
+        checkCourses: List<String>,
+    ): CommonRequirementsData {
+        var commonSize = 0
+        if (checkCourses.isNotEmpty()) {
+            val iterator = requirements.optionalCourses.iterator()
+
+            while (iterator.hasNext()) {
+                val optionalReq = iterator.next()
+                val commonCourses = optionalReq.courses.filter { "${it.subject} ${it.code}" in checkCourses }
+                commonSize = commonCourses.size
+                if (commonSize >= optionalReq.nOf) {
+                    iterator.remove()
+                } else {
+                    optionalReq.nOf -= commonSize
+                    optionalReq.courses.removeAll(commonCourses.toSet())
+                }
+            }
+        }
+        return CommonRequirementsData(
+            requirements = requirements,
+            commonSize = commonSize,
+        )
+    }
+}
 
 data class Course (
     val subject: String,
@@ -175,4 +210,9 @@ data class OptionalCourses (
 data class Requirements (
     val optionalCourses: MutableSet<OptionalCourses> = mutableSetOf(),
     val mandatoryCourses: MutableSet<Course> = mutableSetOf(),
+)
+
+data class CommonRequirementsData (
+    val requirements: Requirements,
+    val commonSize: Int,
 )

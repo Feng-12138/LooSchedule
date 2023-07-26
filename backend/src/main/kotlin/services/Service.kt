@@ -111,6 +111,7 @@ class Service: IService {
 
         val response = client.newCall(request).execute()
         val responseBody = response.body?.string()
+        println(responseBody)
         val data = JSONObject(responseBody)
         val courses = data.getJSONArray("choices")
             .getJSONObject(0)
@@ -128,14 +129,18 @@ class Service: IService {
     }
 
     @Override
-    override fun generateSchedule(plan: AcademicPlan): MutableMap<String, MutableList<Course>> {
+    override fun generateSchedule(
+        plan: AcademicPlan,
+        recommendedCourses: MutableList<services.Course>,
+    ): MutableMap<String, MutableList<Course>> {
         val requirements = getRequirements(plan)
         println(requirements.mandatoryCourses)
         println(requirements.optionalCourses)
         val takenCourses = plan.coursesTaken
+        var data = CommonRequirementsData(requirements, 0)
 
         if (takenCourses.isNotEmpty()) {
-            // remove 136L if 136 is taken means it's not coreq
+            // remove 136L if 136 is taken means it's not a co-req
             if (takenCourses.contains("CS 136")) {
                 requirements.mandatoryCourses.remove(Course("CS", "136L"))
             }
@@ -143,28 +148,31 @@ class Service: IService {
                 val course = mandatoryCourse.subject + " " + mandatoryCourse.code
                 takenCourses.contains(course)
             }
+            data = requirementsParser.combineOptionalRequirements(requirements, takenCourses)
+        }
 
-            val iterator = requirements.optionalCourses.iterator()
-
-            while (iterator.hasNext()) {
-                val optionalReq = iterator.next()
-                val commonCourses = optionalReq.courses.filter { "${it.subject} ${it.code}" in takenCourses }
-                if (commonCourses.size >= optionalReq.nOf) {
-                    iterator.remove()
-                } else {
-                    optionalReq.nOf -= commonCourses.size
-                    optionalReq.courses.removeAll(commonCourses.toSet())
-                }
+        var recommendSuccess = 0
+        if (recommendedCourses.isNotEmpty()) {
+            val initialSize = recommendedCourses.size
+            recommendedCourses.removeIf { recCourse ->
+                requirements.mandatoryCourses.contains(recCourse)
             }
+            recommendSuccess += initialSize - recommendedCourses.size
+
+            data = requirementsParser.combineOptionalRequirements(
+                requirements = data.requirements,
+                checkCourses = recommendedCourses.map { it.subject + " " + it.code })
+            recommendSuccess += data.commonSize
         }
 
         val sequenceMap = sequenceGenerator.generateSequence(plan.sequence, plan.currentTerm)
         val selectedCourses = coursePlanner.getCoursesPlanToTake(
             plan.startYear,
-            requirements,
+            data.requirements,
             plan.majors,
             sequenceMap = sequenceMap,
             takenCourses,
+            courseRepo.getBySubjectCode(recommendedCourses.toSet()),
         )
 
         println(selectedCourses["F"]!!.map { it.courseID })
@@ -213,9 +221,9 @@ class Service: IService {
             }
 
             val requirementsData = requirementRepo.getRequirementCoursesByIds(requirementsId)
-//            println("----------------")
-//            println(requirementsData)
-//            println("----------------")
+            println("----------------")
+            println(requirementsData)
+            println("----------------")
             return requirementsParser.parseRequirements(requirementsData)
         } catch (e: Exception) {
             println(e)
@@ -237,9 +245,10 @@ data class AcademicPlan(
     constructor() : this(listOf(), "2023", "Regular", listOf(), listOf(), listOf(), null)
 }
 
-data class Message(
-    val position: String
+data class RecommendationPlan (
+    val position: String,
+    val academicPlan: AcademicPlan,
 ){
     // Default constructor
-    constructor() : this("")
+    constructor() : this("", AcademicPlan())
 }
