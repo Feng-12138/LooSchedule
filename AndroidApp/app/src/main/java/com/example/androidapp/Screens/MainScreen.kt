@@ -48,9 +48,22 @@ import kotlinx.coroutines.launch
 fun getTopBarColor(screen: String): Color {
     if (screen == "LooSchedule") {
         return Color(123, 142, 193)
+    } else if (screen == "History") {
+        return Color(94, 96, 134)
     }
 
     return Color.White
+}
+
+@Composable
+fun getTitleColor(screen: String): Color {
+    if (screen == "LooSchedule") {
+        return Color.White
+    } else if (screen == "History") {
+        return Color.White
+    }
+
+    return Color.Black
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -179,7 +192,12 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                                 )
                             ),
                             modifier = Modifier.padding(0.dp),
-                            title = { Text(name) },
+                            title = {
+                                Text(
+                                    text = name,
+                                    color = getTitleColor(screen = name),
+                                    fontFamily = FontFamily(
+                                    Font(R.font.indieflower, FontWeight.Light))) },
                             navigationIcon = {
                                 IconButton(
                                     onClick = {
