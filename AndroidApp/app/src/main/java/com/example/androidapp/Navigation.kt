@@ -66,7 +66,7 @@ fun Navigation(){
             }
         }
         composable(route = Screen.RealChatgptScreen.route){
-            MainScreen (navController = navController, name = "Ask ChatGPT") {
+            MainScreen (navController = navController, name = "Build Career Plan") {
                 RealChatgptScreen(
                     major = selectDegreeVM.uiState.value.major,
                     minor = selectDegreeVM.uiState.value.minor,

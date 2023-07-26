@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Create
@@ -77,7 +79,8 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
         }
 
         Column(modifier = Modifier
-            .align(Alignment.BottomCenter)) {
+            .align(Alignment.BottomCenter)
+            .padding(bottom = 16.dp)) {
             Button(onClick =
             {
                 viewModel.generateSchedule(
@@ -100,16 +103,18 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
                 Text("Create Course Schedule")
             }
 
-            Button(onClick = {
-                if (viewModel.uiState.value.major == "Select your degree" ||
-                    viewModel.uiState.value.year == "Select your academic year" ||
-                    viewModel.uiState.value.year == "Select your Coop sequence") {
-                    showAlert = true
-                }
-                else{
-                    navController.navigate(Screen.RealChatgptScreen.route)
-                }
-            }) {
+            Button(
+                onClick = {
+                    if (viewModel.uiState.value.major == "Select your degree" ||
+                        viewModel.uiState.value.year == "Select your academic year" ||
+                        viewModel.uiState.value.year == "Select your Coop sequence") {
+                        showAlert = true
+                    }  else{
+                        navController.navigate(Screen.RealChatgptScreen.route)
+                    }
+                },
+                modifier = Modifier.width(230.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Default.Create,
                     contentDescription = "modify"
@@ -117,7 +122,7 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
 
                 Spacer(modifier = Modifier.size(8.dp))
 
-                Text("Get Help From ChatGPT")
+                Text("Build Your Career Plan")
             }
         }
 
