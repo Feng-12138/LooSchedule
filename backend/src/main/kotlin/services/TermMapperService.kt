@@ -72,7 +72,7 @@ class TermMapperService {
             val coursesTakeThisTerm = courseList.map { it.courseID }
             takenCourses.addAll(coursesTakeThisTerm)
             generatedSchedule[key] = courseList
-            println( coursesTakeThisTerm)
+            println(coursesTakeThisTerm)
         }
         takenCourses.clear()
         courseData.fallCourses.clear()

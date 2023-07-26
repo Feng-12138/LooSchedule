@@ -719,7 +719,7 @@ def parsePrereqs(programList: list):
                             if program == "Honours Math":
                                 if notOpenToStr.find(program) != -1:
                                     continue
-                            program = "Faculty of Mathematics"
+                                program = "Faculty of Mathematics"
                             notOpenToStr += f"{program},"
             else:
                 for program in programList:

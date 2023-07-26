@@ -11,8 +11,8 @@ import repositories.PrerequisiteRepo
 import kotlin.math.floor
 
 val TOTAL_COURSES = 45
-val TOTAL_MATH = 30
-val TOTAL_NON_MATH = 15
+val TOTAL_MATH = 33
+val TOTAL_NON_MATH = 12
 class CoursePlanner {
     @Inject
     private lateinit var courseRepo: CourseRepo
@@ -312,8 +312,8 @@ class CoursePlanner {
         } else if (numMathNeeded < 0) {
             numNonMathNeeded += numMathNeeded
         }
-        if (numMathNeeded <= 0 || numNonMathNeeded <= 0) {
-            return returnedCourseList.toList()
+        if (numMathNeeded <= 0 && numNonMathNeeded <= 0) {
+            return listOf()
         }
         var countMajors = 0
         for (major in majors) {
@@ -385,6 +385,10 @@ class CoursePlanner {
                 seasonCourseCounter[value] = count + 5
             }
         }
+        println(seasonCourseCounter["F"])
+        println(seasonCourseCounter["W"])
+        println(seasonCourseCounter["S"])
+
         for (major in majors) {
             if (major.contains("Computer Science")) {
                 modifiedMajors.add("Computer Science")
