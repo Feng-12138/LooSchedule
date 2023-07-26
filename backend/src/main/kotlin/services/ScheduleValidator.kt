@@ -36,6 +36,7 @@ class ScheduleValidator {
         NotMeetPreReq,
         NotMeetCoReq,
         NotMeetAntiReq,
+        NotOpenTo,
         NoSuchCourse,
     }
 
@@ -100,7 +101,7 @@ class ScheduleValidator {
             if (meetOneRequirement) return ValidationResult.Success
         }
 
-        return ValidationResult.Success
+        return ValidationResult.NotMeetCoReq
     }
 
     private fun checkCourseAntiReq(course: Course, takenAndTakingCourses: List<String>,
@@ -114,9 +115,7 @@ class ScheduleValidator {
     }
 
     private fun checkList1CommunicationCourse(schedule: Schedule, majorNames: List<String>): OverallValidationResult {
-        // Since major names stored in the DB does not contain "Bachelor of ", so need to adjust names
-        val adjustedMajorNames: List<String> = majorNames.map { it.replace("Bachelor of ", "") }.toList()
-        val majors: List<Major> = adjustedMajorNames.mapNotNull { majorName ->
+        val majors: List<Major> = majorNames.mapNotNull { majorName ->
             majorRepo.getMajorByName(majorName)
         }
         if (majorNames.size != majors.size) return OverallValidationResult.InvalidMajor
@@ -138,8 +137,23 @@ class ScheduleValidator {
         return OverallValidationResult.CommunicationCourseTooLate
     }
     
-    private fun checkOpenTo(course: Course, majors: List<String>): ValidationResult {
-        // Check if course satisfies not open to and only open to
+    private fun checkOpenTo(course: Course, majors: List<String>,
+                            courseConstraints: MutableMap<String, ParsedPrereqData>): ValidationResult {
+//        // Only consider for math programs, and since there is no mapping between programs and faculties,
+//        // so have to include explicit elements for math faculty
+//        val facultyIncludedMajors: Set<String> = (majors + "Faculty of Mathematics").toSet()
+//
+//        // Currently only checks for majors. Not sure if minors or specializations would satisfy this requirement
+//        val notOpenTo: Set<String> = courseConstraints[course.courseID]!!.notOpenTo.toSet()
+//        val onlyOpenTo: Set<String> = courseConstraints[course.courseID]!!.onlyOpenTo.toSet()
+//        var commonMajors: Set<String> = notOpenTo.intersect(facultyIncludedMajors)
+//        if (commonMajors.isNotEmpty()) {
+//            return ValidationResult.NotOpenTo
+//        }
+//        commonMajors = onlyOpenTo.intersect(facultyIncludedMajors)
+//        if (onlyOpenTo.isNotEmpty() and commonMajors.isEmpty()) {
+//            return ValidationResult.NotOpenTo
+//        }
         return ValidationResult.Success
     }
 
@@ -150,6 +164,8 @@ class ScheduleValidator {
     
     fun validateSchedule(schedule: Schedule, majors: List<String>, sequenceMap: Map<String, String>,
                          requirements: Requirements): ScheduleValidationOutput {
+        // Since major names stored in the DB does not contain "Bachelor of ", so need to adjust names
+        val adjustedMajorNames: List<String> = majors.map { it.replace("Bachelor of ", "") }.toList()
         val courseValidity = mutableMapOf<String, MutableList<List<ValidationResult>>>()
         val degreeValidity = mutableListOf<OverallValidationResult>()
         var overallResult = true
@@ -159,7 +175,7 @@ class ScheduleValidator {
         val courseConstraints = prerequisiteRepo.getParsedPrereqData(courseList)
 
         // First check communication courses
-         val commRes: OverallValidationResult = checkList1CommunicationCourse(schedule, majors)
+         val commRes: OverallValidationResult = checkList1CommunicationCourse(schedule, adjustedMajorNames)
          if (commRes != OverallValidationResult.Success) {
              degreeValidity.add(commRes)
              // Currently, not satisfying communication course timeline is only a warning.
@@ -182,7 +198,7 @@ class ScheduleValidator {
                     checkCoursePreReq(course, takenSoFar, courseConstraints),
                     checkCourseCoReq(course, takenAndTakingSoFar, courseConstraints),
                     checkCourseAntiReq(course, takenAndTakingSoFar, courseConstraints),
-                    checkOpenTo(course, majors)
+                    checkOpenTo(course, adjustedMajorNames, courseConstraints)
                 )
                 // Only keep the invalid reasons for that course
                 courseResult.removeIf { it == ValidationResult.Success }
