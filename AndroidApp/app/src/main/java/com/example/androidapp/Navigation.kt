@@ -99,7 +99,7 @@ fun Navigation(){
             val index = navController.previousBackStackEntry?.arguments?.getInt("index")
             val term = navController.previousBackStackEntry?.arguments?.getString("term")
             val position = navController.previousBackStackEntry?.arguments?.getInt("position")
-            MainScreen(navController = navController, name = "") {
+            MainScreen(navController = navController, name = "Course") {
                 if (index != null && term != null && schedule != null && position != null) {
                     CourseScreen(
                         course = course,

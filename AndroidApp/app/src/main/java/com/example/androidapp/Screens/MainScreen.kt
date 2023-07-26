@@ -57,6 +57,8 @@ fun getTopBarColor(screen: String): Color {
         return Color(137, 179, 225)
     } else if (screen == "Current Schedule") {
         return Color(130, 156, 173)
+    } else if (screen == "Course") {
+        return Color(107, 119, 151)
     }
 
     return Color.White
@@ -69,6 +71,10 @@ fun getTitleColor(screen: String): Color {
     } else if (screen == "History") {
         return Color.White
     } else if (screen == "Current Schedule") {
+        return Color.White
+    } else if (screen == "Course") {
+        return Color.White
+    } else if (screen == "Contact Us") {
         return Color.White
     }
 
@@ -185,7 +191,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                                             modifier = Modifier.align(Alignment.Center),
                                             style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                         ) },
-                                        selected = name == "About",
+                                        selected = name == "Contact Us",
                                         shape = RoundedCornerShape(30.dp),
                                         onClick = { navController.navigate(Screen.About.route) }
                                     )

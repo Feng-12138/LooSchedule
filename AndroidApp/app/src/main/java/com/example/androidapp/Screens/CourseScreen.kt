@@ -1,6 +1,8 @@
 package com.example.androidapp.screens
 
 import android.content.Context
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -30,13 +33,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.androidapp.R
 
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
@@ -58,9 +67,17 @@ fun CourseScreen(
     Box(
         Modifier
             .fillMaxWidth()
+            .background(color = Color(107, 119, 151))
             .fillMaxHeight(),
     )
     {
+//        Image(
+//            painter = painterResource(id = R.drawable.course_card),
+//            contentDescription = "",
+//            contentScale = ContentScale.FillBounds,
+//            modifier = Modifier.fillMaxSize()
+//        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -73,7 +90,8 @@ fun CourseScreen(
                     text = it,
                     style = MaterialTheme.typography.displayLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    color = Color.White
                 )
             }
 
@@ -81,7 +99,8 @@ fun CourseScreen(
                 Text(
                     text = it,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    color = Color.White
                 )
             }
 
@@ -133,13 +152,16 @@ fun CourseScreen(
 
 @Composable
 fun RatingBar(rating: Float) {
-    Column {
+    Row {
         Text(
             text = "Rating",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 4.dp)
+            modifier = Modifier.padding(bottom = 4.dp),
+            color = Color.White
         )
+
+        Spacer(modifier = Modifier.size(12.dp))
 
         Row {
             repeat(5) {index ->
@@ -147,7 +169,10 @@ fun RatingBar(rating: Float) {
                     Icon(
                         imageVector = Icons.Outlined.Star,
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier
+                            .size(36.dp)
+                            .padding(top = 5.dp),
+                        tint = Color.White
                     )
                 }
 
@@ -159,17 +184,30 @@ fun RatingBar(rating: Float) {
 @Composable
 fun Description(description: String) {
     Column {
-        Text(
-            text = "Course Description",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 0.dp)
-        )
+        Row {
+            Icon(
+                imageVector = Icons.Default.Create,
+                contentDescription = "description",
+                tint = Color.White,
+                modifier = Modifier.padding(top = 7.dp)
+            )
+
+            Spacer(modifier = Modifier.size(8.dp))
+
+            Text(
+                text = "description:",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 0.dp),
+                color = Color.White
+            )
+        }
         
         Text(
             text = description,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = 16.dp),
+            color = Color.White
         )
     }
 }
