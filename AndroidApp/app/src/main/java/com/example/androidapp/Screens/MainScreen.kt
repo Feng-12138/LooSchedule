@@ -231,7 +231,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                                     Icon(
                                         imageVector = Icons.Outlined.Menu,
                                         contentDescription = "",
-                                        tint = Color.White
+                                        tint = getTitleColor(name)
                                     )
                                 }
                             },

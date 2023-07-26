@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -229,6 +230,10 @@ fun SwapAndDelete(modifier: Modifier = Modifier, onSwap: () -> Unit, onDelete: (
             Spacer(modifier = Modifier.weight(1f))
 
             Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(90, 118, 142),
+                    contentColor = Color.White
+                ),
                 modifier = Modifier.height(56.dp),
                 onClick = { onSwap() }
             ) {
@@ -245,6 +250,10 @@ fun SwapAndDelete(modifier: Modifier = Modifier, onSwap: () -> Unit, onDelete: (
             Spacer(modifier = Modifier.weight(1f))
 
             Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(90, 118, 142),
+                    contentColor = Color.White
+                ),
                 modifier = Modifier.height(56.dp),
                 onClick = { onDelete() }
             ) {

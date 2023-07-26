@@ -5,6 +5,7 @@ import com.example.androidapp.dataClass.TermSchedule
 import com.example.androidapp.dataClass.ValidationResults
 import com.example.androidapp.models.Communication
 import com.example.androidapp.models.Course
+import com.example.androidapp.screens.RecommendationPlan
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Response
@@ -25,4 +26,7 @@ interface Api {
 
     @POST("api/validate")
     suspend fun validateSchedule(@Body requestBody: RequestBody): Response<ValidationResults>
+
+    @POST("api/recommendations")
+    fun getRecommendation(@Body request: RequestBody): Call<TermSchedule>
 }

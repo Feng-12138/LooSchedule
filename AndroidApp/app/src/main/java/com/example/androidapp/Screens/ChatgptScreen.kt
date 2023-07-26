@@ -11,16 +11,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -40,6 +41,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -179,7 +181,9 @@ fun ChatgptScreen(schedule: Schedule, position: Int, navController: NavControlle
 
         }
         LazyColumn(
-            modifier = Modifier.fillMaxHeight(0.9f).fillMaxWidth(1.0f)
+            modifier = Modifier
+                .fillMaxHeight(0.8f)
+                .fillMaxWidth(1.0f)
         ) {
             items(selectedCourses) { course ->
                 Row(verticalAlignment = CenterVertically,
@@ -202,66 +206,93 @@ fun ChatgptScreen(schedule: Schedule, position: Int, navController: NavControlle
             }
         }
 
-        Button(onClick = {
-            val requestData = RequestData(
-                majors = schedule.degree,
-                startYear = schedule.startYear,
-                sequence = schedule.sequence,
-                minors = schedule.minor,
-                specializations = schedule.specialization
-            )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center // Align the button to the center horizontally and vertically
+        ) {
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(90, 118, 142),
+                    contentColor = Color.White
+                ),
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(100.dp)
+                    .padding(16.dp),
+                onClick = {
+                    val requestData = RequestData(
+                        majors = schedule.degree,
+                        startYear = schedule.startYear,
+                        sequence = schedule.sequence,
+                        minors = schedule.minor,
+                        specializations = schedule.specialization
+                    )
 
-            val gson = Gson()
-            val jsonBody = gson.toJson(requestData)
+                    val gson = Gson()
+                    val jsonBody = gson.toJson(requestData)
 
-            val api = RetrofitClient.create()
-            val requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody)
+                    val api = RetrofitClient.create()
+                    val requestBody =
+                        RequestBody.create(MediaType.parse("application/json"), jsonBody)
 
-            val call = api.getCourseSchedule(requestBody)
-            call.enqueue(object : Callback<TermSchedule> {
-                override fun onResponse(
-                    call: Call<TermSchedule>,
-                    response: Response<TermSchedule>
-                ) {
-                    if (response.isSuccessful) {
-                        val output = response.body()
-                        val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-                        val existingList = sharedPreferences.getString("scheduleList", "[]")
-                        val type = object : TypeToken<MutableList<Schedule>>() {}.type
-                        val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
-                        var position = 0
-                        val newSchedule = output?.let { Schedule(it.schedule as MutableMap<String, MutableList<Course>>, myDegree = schedule.degree, mySequence = schedule.sequence, startYear = schedule.startYear) }
-                        if (newSchedule != null) {
-                            newSchedule.minor = schedule.minor
-                            newSchedule.specialization = schedule.specialization
-                            scheduleList.add(position , newSchedule)
+                    val call = api.getCourseSchedule(requestBody)
+                    call.enqueue(object : Callback<TermSchedule> {
+                        override fun onResponse(
+                            call: Call<TermSchedule>,
+                            response: Response<TermSchedule>
+                        ) {
+                            if (response.isSuccessful) {
+                                val output = response.body()
+                                val sharedPreferences = context.getSharedPreferences(
+                                    "MySchedules",
+                                    Context.MODE_PRIVATE
+                                )
+                                val existingList = sharedPreferences.getString("scheduleList", "[]")
+                                val type = object : TypeToken<MutableList<Schedule>>() {}.type
+                                val scheduleList: MutableList<Schedule> =
+                                    Gson().fromJson(existingList, type)
+                                var position = 0
+                                val newSchedule = output?.let {
+                                    Schedule(
+                                        it.schedule as MutableMap<String, MutableList<Course>>,
+                                        myDegree = schedule.degree,
+                                        mySequence = schedule.sequence,
+                                        startYear = schedule.startYear
+                                    )
+                                }
+                                if (newSchedule != null) {
+                                    newSchedule.minor = schedule.minor
+                                    newSchedule.specialization = schedule.specialization
+                                    scheduleList.add(position, newSchedule)
+                                }
+                                val editor = sharedPreferences.edit()
+                                val jsonList = Gson().toJson(scheduleList)
+                                editor.putString("scheduleList", jsonList)
+                                editor.apply()
+                                navController.navigate(Screen.ViewSchedule.route)
+                            } else {
+                                println(response.message())
+                                Toast.makeText(context, response.message(), Toast.LENGTH_SHORT)
+                                    .show()
+                            }
                         }
-                        val editor = sharedPreferences.edit()
-                        val jsonList = Gson().toJson(scheduleList)
-                        editor.putString("scheduleList", jsonList)
-                        editor.apply()
-                        navController.navigate(Screen.ViewSchedule.route)
-                    } else {
-                        println(response.message())
-                        Toast.makeText(context, response.message(), Toast.LENGTH_SHORT).show()
-                    }
-                }
 
-                override fun onFailure(call: Call<TermSchedule>, t: Throwable) {
-                    Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
-                    println(t.message)
-                    call.cancel()
-                }
-            })
-        }) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Modify"
-            )
-            Spacer(modifier = Modifier.size(8.dp))
-            Text("Modify Course Schedule")
+                        override fun onFailure(call: Call<TermSchedule>, t: Throwable) {
+                            Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
+                            println(t.message)
+                            call.cancel()
+                        }
+                    })
+                }) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Modify"
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(text = "Modify Course Schedule", fontSize = 16.sp)
+            }
+
         }
-
     }
 }
 

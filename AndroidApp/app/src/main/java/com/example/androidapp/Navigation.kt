@@ -1,5 +1,6 @@
 package com.example.androidapp
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -18,6 +19,7 @@ import com.example.androidapp.screens.ErrorScreen
 import com.example.androidapp.screens.GetStartScreen
 import com.example.androidapp.screens.HistoryScreen
 import com.example.androidapp.screens.MainScreen
+import com.example.androidapp.screens.RealChatgptScreen
 import com.example.androidapp.screens.Screen
 import com.example.androidapp.screens.SearchCourseScreen
 import com.example.androidapp.screens.SelectDegree
@@ -27,6 +29,7 @@ import com.example.androidapp.viewModels.SelectDegreeVM
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun Navigation(){
@@ -60,6 +63,18 @@ fun Navigation(){
                 if (schedule != null && position != null) {
                     ChatgptScreen(schedule = schedule, position = position, navController = navController)
                 }
+            }
+        }
+        composable(route = Screen.RealChatgptScreen.route){
+            MainScreen (navController = navController, name = "Ask ChatGPT") {
+                RealChatgptScreen(
+                    major = selectDegreeVM.uiState.value.major,
+                    minor = selectDegreeVM.uiState.value.minor,
+                    sequence = selectDegreeVM.uiState.value.sequence,
+                    year = selectDegreeVM.uiState.value.year,
+                    specialization = selectDegreeVM.uiState.value.specialization,
+                    navController = navController
+                )
             }
         }
         composable(route = Screen.About.route){
