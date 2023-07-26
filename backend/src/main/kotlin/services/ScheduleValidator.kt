@@ -166,6 +166,13 @@ class ScheduleValidator {
 
     private fun checkDegreeCourseRequirements(schedule: Schedule,
                                               requirements: Requirements): MutableSet<OverallValidationResult> {
+        // Hard-coded to ignore validation for any lab courses for now
+        requirements.mandatoryCourses.removeIf { it.code.contains("L") }
+        for (optionalCourses in requirements.optionalCourses) {
+            optionalCourses.courses.removeIf { it.code.contains("L") }
+        }
+
+
         val validationResult = mutableSetOf<OverallValidationResult>()
         val allSchedulesCourses: List<String> = schedule.values.flatten().map { it.courseID }
         val totalRequiredCourseCount: Int = getTotalRequiredCourses(requirements)
@@ -211,7 +218,7 @@ class ScheduleValidator {
         val courseConstraints = prerequisiteRepo.getParsedPrereqData(courseList)
 
         // First check communication courses
-         val commRes: OverallValidationResult = checkList1CommunicationCourse(schedule, adjustedMajorNames)
+         val commRes: OverallValidationResult = checkList1CommunicationCourse(schedule, majors)
          if (commRes != OverallValidationResult.Success) {
              degreeValidity.add(commRes)
              // Currently, not satisfying communication course timeline is only a warning.
