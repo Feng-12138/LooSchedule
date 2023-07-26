@@ -231,8 +231,8 @@ fun SwapAndDelete(modifier: Modifier = Modifier, onSwap: () -> Unit, onDelete: (
 
             Button(
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(90, 118, 142),
-                    contentColor = Color.White
+                    containerColor = Color.White,
+                    contentColor = Color(90, 118, 142)
                 ),
                 modifier = Modifier.height(56.dp),
                 onClick = { onSwap() }
@@ -251,8 +251,8 @@ fun SwapAndDelete(modifier: Modifier = Modifier, onSwap: () -> Unit, onDelete: (
 
             Button(
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(90, 118, 142),
-                    contentColor = Color.White
+                    containerColor = Color.White,
+                    contentColor = Color(90, 118, 142)
                 ),
                 modifier = Modifier.height(56.dp),
                 onClick = { onDelete() }
