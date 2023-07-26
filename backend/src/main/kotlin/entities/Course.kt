@@ -69,15 +69,17 @@ class Course {
     @Column(name = "filledCount")
     var filledCount: FilledCount? = 0
 
-//    @OneToOne(cascade = [CascadeType.ALL])
-//    @PrimaryKeyJoinColumn
-//    lateinit var breadth: Breadth
+    @Column(name = "priorityPoint")
+    var priorityPoint: Int? = 1
+
+    @Column(name = "color")
+    var color: String? = "blue"
+
 
     @OneToOne(cascade = [CascadeType.ALL])
     @PrimaryKeyJoinColumn
     lateinit var prereqs: Prerequisite
 
-    var color: String = "blue"
 }
 
 

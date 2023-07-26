@@ -172,6 +172,12 @@ class CoursePlanner {
             val result = checkConstraint(course, parsedDataList, majors)
             if (result) {
                 course.color = "red"
+                if (course.subject in mathSubjects) {
+                    course.priorityPoint = 6
+                } else {
+                    course.priorityPoint = 3
+                }
+                course.priorityPoint = 6
                 chosenCourses.add(course)
                 listofTakenCourses.add(course.courseID)
                 computeAndUpdateTermCourses(course)
@@ -201,6 +207,7 @@ class CoursePlanner {
     ) {
         val sortedList1Courses = communicationRepo.getListNByYear(startYear.toInt(), 1).toList().sortedWith(courseComparator).toMutableList()
         sortedList1Courses[0].color = "green"
+        sortedList1Courses[0].priorityPoint = 2
         if (!sortedList1Courses.any { it.subject + " " + it.courseID in takenCourses }) {
             computeAndUpdateTermCourses(sortedList1Courses[0])
             countTakenNonMathCourse++
@@ -209,6 +216,7 @@ class CoursePlanner {
         sortedList1Courses.removeAt(0)
         val sortedComCourses: List<Course> = (sortedList1Courses + communicationRepo.getListNByYear(startYear.toInt(), 2).toList()).sortedWith(courseComparator)
         sortedComCourses[0].color = "green"
+        sortedComCourses[0].priorityPoint = 2
         countTakenNonMathCourse++
         if (!sortedComCourses.any { it.subject + " " + it.courseID in takenCourses }) {
             computeAndUpdateTermCourses(sortedComCourses[0])
@@ -282,6 +290,11 @@ class CoursePlanner {
             idx++
             val result = checkConstraint(course, parsedDataMap = parsedDataMap, majors = majors)
             if (result) {
+                if (course.subject in mathSubjects) {
+                    course.priorityPoint = 2
+                } else {
+                    course.priorityPoint = 1
+                }
                 course.color = "blue"
                 computeAndUpdateTermCourses(course)
                 returnedCourseList.add(course)
@@ -387,11 +400,13 @@ class CoursePlanner {
         var mandatoryCourseNonMath = mutableListOf<Course>()
         for (mandatoryCourse in mandatoryCourses) {
             mandatoryCourse.color = "red"
+            mandatoryCourse.priorityPoint = 6
             if (mathSubjects.contains(mandatoryCourse.subject)) {
                 mathCourses.add(mandatoryCourse)
                 computeAndUpdateTermCourses(mandatoryCourse)
                 countTakenMathCourse++
             } else {
+                mandatoryCourse.priorityPoint = 3
                 nonMathCourses.add(mandatoryCourse)
                 mandatoryCourseNonMath.add(mandatoryCourse)
                 countTakenNonMathCourse++

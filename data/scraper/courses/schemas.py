@@ -17,6 +17,8 @@ class Course(Base):
     easyRating = Column(DECIMAL)
     usefulRating = Column(DECIMAL)
     filledCount = Column(Integer)
+    priorityPoint = Column(Integer)
+    color = Column(String)
     
 
         

@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS Course
     easyRating DECIMAL(21, 20),
     usefulRating DECIMAL(21, 20),
     filledCount INT,
+    priorityPoint INT,
+    color VARCHAR(20),
     PRIMARY KEY (courseID)
 );
 
