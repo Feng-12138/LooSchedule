@@ -11,8 +11,8 @@ import repositories.PrerequisiteRepo
 import kotlin.math.floor
 
 val TOTAL_COURSES = 45
-val TOTAL_MATH = 37
-val TOTAL_NON_MATH = 8
+val TOTAL_MATH = 33
+val TOTAL_NON_MATH = 12
 class CoursePlanner {
     @Inject
     private lateinit var courseRepo: CourseRepo
