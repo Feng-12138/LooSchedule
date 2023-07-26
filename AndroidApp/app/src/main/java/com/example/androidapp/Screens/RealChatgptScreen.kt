@@ -201,7 +201,13 @@ fun RealChatgptScreen(major: String, minor: String, specialization: String, year
             DialogBoxLoading()
         }
         Text(
-            text = "What do you want to work in the future? (Please enter Career name)",
+            text = "What do you want to work in the future?",
+            modifier = Modifier.padding(start = 11.dp),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            text = "(Please enter Career name)",
             modifier = Modifier.padding(start = 11.dp),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
