@@ -78,24 +78,8 @@ class TermMapperService {
         courseData.fallCourses.clear()
         courseData.springCourses.clear()
         courseData.winterCourses.clear()
-//        for ((key, value) in generatedSchedule) {
-//            println("$key: ")
-//            print("\t")
-//            for (course in value) {
-//                print("${course.courseID}, ")
-//            }
-//            println("")
-//        }
 //        val finalSchedule: MutableMap<String, MutableList<Course>> = finalizeSchedule(generatedSchedule, countCourseTerm, sequenceMap, prereqsData.toMutableMap())
         val finalSchedule = generatedSchedule
-//        for ((key, value) in finalSchedule) {
-//            println("$key: ")
-//            print("\t")
-//            for (course in value) {
-//                print("${course.courseID}, ")
-//            }
-//            println("")
-//        }
         return finalSchedule
     }
 
@@ -136,6 +120,9 @@ class TermMapperService {
         retvalList: List<String>
     ): Boolean {
         val selectedCourseData = parsedDataMap[course.courseID]
+        if (course.courseID in takenCourses || course.courseID in retvalList) {
+            return false
+        }
 
         var satisfyPrereq = false
         var satisfyCoreq = false
@@ -173,6 +160,12 @@ class TermMapperService {
                 satisfyCoreq = satisfy
             }
         }
+        if (course.courseID == "PMATH 333") {
+            println("here")
+            println(satisfyCoreq)
+            println(satisfyPrereq)
+            println("here")
+        }
         if (selectedCourseData.coreqCourses.size == 0 || course.courseID == "CS 136" || course.courseID == "CS 146" || course.courseID == "CS 136L") {
             satisfyCoreq = true
         }
@@ -204,6 +197,7 @@ class TermMapperService {
                 notTakenCourses.add(course)
             }
         }
+        notTakenCourses.sortByDescending { it.priorityPoint }
         if (termName == "1A" || termName == "1B") {
             for (course in notTakenCourses) {
                 if (countAdded >= numCourse) {
@@ -214,7 +208,6 @@ class TermMapperService {
                     || course.courseID == "MATH 147" || course.courseID == "CS 145" || course.courseID in ListOneCourses
                 ) {
                     retvalList.add(course)
-                    takenCourses.add(course.courseID)
                     countAdded++
                     continue
                 }
@@ -223,7 +216,6 @@ class TermMapperService {
                     || course.courseID == "CS 146" || course.courseID == "STAT 230"
                 ) {
                     retvalList.add(course)
-                    takenCourses.add(course.courseID)
                     countAdded++
                     continue
                 }
@@ -236,15 +228,21 @@ class TermMapperService {
             if (course.courseID in takenCourses) {
                 continue
             }
+
             val result = checkConstraint(
                 course,
                 parsedDataMap = parsedPrereqDataMap,
                 retvalList = retvalList.map { it.courseID })
+            if (course.courseID == "PMATH 333") {
+                println(termName)
+                println(season)
+            }
             if (result) {
                 retvalList.add(course)
                 countAdded++
             }
         }
+        takenCourses.addAll(retvalList.map{it.courseID})
         return retvalList
     }
 }

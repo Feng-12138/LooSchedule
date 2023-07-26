@@ -612,6 +612,8 @@ def parseByBracket(prereq: str, courseCode: str, courseList: list):
     # inaccurate info from uwflow
     if (courseCode == "CS 245"):
         addedPlaceStr += "CS 136,MATH 145;CS 138,MATH 145;CS 146,MATH 145;"
+    if (courseCode == "PMATH 333"):
+        addedPlaceStr = "MATH 128;MATH 138;MATH 148;"
     return addedPlaceStr
     
                 
