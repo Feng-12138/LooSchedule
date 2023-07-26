@@ -54,7 +54,14 @@
 |          |               |               |               |               |               |               |
 | July 19  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D5: Design Pattern Examples
 |          |               |               |               |               |               |               |
+| July 22  |      0.5h     |               |               |               |               |               | Implement all programs endpoint to use in FE
+| July 22  |      3h       |               |               |               |               |               | Recommend course base on career position with openAI API
+| July 22  |      2h       |               |               |               |               |               | Parse requirements with taken courses logic 
 | July 22  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2022 MATH program requirements
 |July 22-24|               |      20h      |               |               |               |               | Updated data scraper to retrieve all 2019-2021 MATH program requirements
+| July 25  |      6h       |               |               |               |               |               | Integrate recommended courses and taken courses into schedule API to complete backend feature
+| July 26  |      4h       |               |               |               |               |               | Mobile UI Optimization
+| June 26  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | Final Demo preparation and recording
+| July 26  |      1h       |               |               |               |               |               | Demo Video Audio edit
 |          |               |               |               |               |               |               |
 |  Total   |               |               |               |               |               |               |
