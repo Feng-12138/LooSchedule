@@ -2,6 +2,7 @@ package com.example.androidapp.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -73,6 +74,17 @@ fun getCourseColor(color: String?): Painter {
         "blue" -> painterResource(id = R.drawable.card_blue)
         else -> painterResource(id = R.drawable.card_recommend) // default background if recommend
     }
+}
+
+@Composable
+fun getSelectedColor(selected: Boolean): Pair<Color, Color> {
+    if (selected) {
+        val textColor = Color.White
+        val backGroundColor = Color(130, 156, 173)
+        return Pair(backGroundColor, textColor)
+    }
+
+    return Pair(Color.White, Color(130, 156, 173))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -153,13 +165,22 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
 
     Surface(
         modifier = Modifier
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 0.dp)
             .fillMaxSize()
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.current_schedule),
+            contentDescription = "current schedule",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize()
+        )
+
         Column(modifier = Modifier.padding(horizontal = 10.dp)) {
+
             ScrollableTabRow(
                 selectedTabIndex = min(termList.count(), pagerPage),
-                edgePadding = 0.dp
+                edgePadding = 0.dp,
+                containerColor = Color.White
             ) {
                 scheduleViewModel.schedule.termSchedule.keys.forEachIndexed { index, tabName ->
                     Tab(
@@ -173,7 +194,8 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                                 pagerState.animateScrollToPage(index)
                             }
                         },
-                        text = { Text(tabName) }
+                        modifier = Modifier.background(color = getSelectedColor(selected = index == pagerPage).first),
+                        text = { Text(text = tabName, color = getSelectedColor(selected = index == pagerPage).second) }
                     )
                 }
             }
@@ -212,10 +234,12 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                 .fillMaxSize()
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(modifier = Modifier.height(88.dp))
+
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = "No courses warning",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    tint = Color.White,
                     modifier = Modifier.size(64.dp)
                 )
 
@@ -223,7 +247,7 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
 
                 Text(
                     text = "No courses selected for this term",
-                    style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)),
+                    style = MaterialTheme.typography.displayMedium.copy(color = Color.White),
                     textAlign = TextAlign.Center
                 )
             }

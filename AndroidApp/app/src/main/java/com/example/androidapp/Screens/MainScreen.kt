@@ -55,6 +55,8 @@ fun getTopBarColor(screen: String): Color {
         return Color(51, 49, 72)
     } else if (screen == "Contact Us") {
         return Color(137, 179, 225)
+    } else if (screen == "Current Schedule") {
+        return Color(130, 156, 173)
     }
 
     return Color.White
@@ -65,6 +67,8 @@ fun getTitleColor(screen: String): Color {
     if (screen == "LooSchedule") {
         return Color.White
     } else if (screen == "History") {
+        return Color.White
+    } else if (screen == "Current Schedule") {
         return Color.White
     }
 
