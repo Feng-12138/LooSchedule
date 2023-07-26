@@ -92,7 +92,7 @@ class ScheduleValidator {
         val courseCoReq = courseConstraints[course.courseID] ?: return ValidationResult.NoSuchCourse
         if (courseCoReq.coreqCourses.isEmpty() || courseCoReq.coreqCourses.all {it.isEmpty()}) return ValidationResult.Success
 
-        for (requirement in courseCoReq.courses) {
+        for (requirement in courseCoReq.coreqCourses) {
             var meetOneRequirement = true
             for (coReqCourse in requirement) {
                 if (coReqCourse !in takenAndTakingCourses) {
