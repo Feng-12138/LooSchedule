@@ -20,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +54,7 @@ import com.example.androidapp.R
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.viewModels.ScheduleViewModel
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import java.lang.Integer.min
 
@@ -188,7 +192,8 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
 @Composable
 private fun CourseSchedulePage(courses: List<Course>, navController: NavController, schedule: Schedule, term: String, position: Int, scheduleViewModel: ScheduleViewModel) {
     val context = LocalContext.current
-    var isValidated = remember { mutableStateOf(scheduleViewModel.schedule.validated) }
+    val showAlert = scheduleViewModel.showAlert.collectAsState().value
+    val isValidated = scheduleViewModel.isValidated.collectAsState().value
     if (courses.isEmpty()) {
         Box(
             contentAlignment = Alignment.TopCenter,
@@ -211,6 +216,7 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                     textAlign = TextAlign.Center
                 )
             }
+
             Box(
                 contentAlignment = Alignment.BottomEnd,
                 modifier = Modifier
@@ -239,11 +245,11 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                     }
 
                     FloatingActionButton(
-                        containerColor = if (isValidated.value) MaterialTheme.colorScheme.secondary else Color.Red,
+                        containerColor = if (isValidated) MaterialTheme.colorScheme.secondary else Color.Red,
                         contentColor = Color.White,
                         shape = CircleShape,
                         onClick = {
-                            scheduleViewModel.validateCourseSchedule(schedule = schedule, context = context)
+                            scheduleViewModel.validateCourseSchedule(schedule = schedule, context = context, position = position)
                         }
                     ) {
                         Icon(
@@ -254,7 +260,30 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                 }
             }
         }
-        return
+    }
+
+    if (showAlert) {
+        println("Here")
+        AlertDialog(
+            onDismissRequest = {
+                scheduleViewModel.toggleAlert()
+            },
+            title = {
+                Text(text = "Validation Result")
+            },
+            text = {
+                Text("Test")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        scheduleViewModel.toggleAlert()
+                        println(isValidated)
+                    }) {
+                    Text("Confirm")
+                }
+            }
+        )
     }
 
     Box(
@@ -300,11 +329,11 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                 }
 
                 FloatingActionButton(
-                    containerColor = if (isValidated.value) MaterialTheme.colorScheme.secondary else Color.Red,
+                    containerColor = if (isValidated) MaterialTheme.colorScheme.secondary else Color.Red,
                     contentColor = Color.White,
                     shape = CircleShape,
                     onClick = {
-                        scheduleViewModel.validateCourseSchedule(schedule = schedule, context = context)
+                        scheduleViewModel.validateCourseSchedule(schedule = schedule, context = context, position = position)
                     }
                 ) {
                     Icon(

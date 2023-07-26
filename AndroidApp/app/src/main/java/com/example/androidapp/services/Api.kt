@@ -6,6 +6,7 @@ import com.example.androidapp.models.Communication
 import com.example.androidapp.models.Course
 import okhttp3.RequestBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -22,5 +23,5 @@ interface Api {
     fun getCommunications(): Call<List<Communication>>
 
     @POST("api/validate")
-    fun validateSchedule(@Body requestBody: RequestBody): Call<ValidationResults>
+    suspend fun validateSchedule(@Body requestBody: RequestBody): Response<ValidationResults>
 }

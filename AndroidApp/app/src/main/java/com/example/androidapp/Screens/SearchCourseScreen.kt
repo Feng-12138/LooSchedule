@@ -41,7 +41,6 @@ import java.util.Date
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-//, term: String, schedule: Schedule, position: Int
 fun SearchCourseScreen(navController: NavController, term: String, schedule: Schedule, position: Int, swap: Boolean, courseIndex: Int){
     var text by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
@@ -149,6 +148,7 @@ fun CourseList(navController: NavController, courseList: List<Course>, searchQue
                             updatedSchedule.termSchedule[term]?.removeAt(courseIndex)
                             selectedCourse.clear()
                             updatedSchedule.time = Date()
+                            updatedSchedule.validated = false
                             val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
                             val existingList = sharedPreferences.getString("scheduleList", "[]")
                             val type = object : TypeToken<MutableList<Schedule>>() {}.type
@@ -168,6 +168,7 @@ fun CourseList(navController: NavController, courseList: List<Course>, searchQue
                             updatedSchedule.termSchedule[term]?.add(selectedCourse[0])
                             selectedCourse.clear()
                             updatedSchedule.time = Date()
+                            updatedSchedule.validated = false
                             val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
                             val existingList = sharedPreferences.getString("scheduleList", "[]")
                             val type = object : TypeToken<MutableList<Schedule>>() {}.type

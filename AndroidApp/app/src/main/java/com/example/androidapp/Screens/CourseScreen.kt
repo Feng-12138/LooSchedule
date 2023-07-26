@@ -111,6 +111,7 @@ fun CourseScreen(
                     var updatedSchedule = schedule
                     updatedSchedule.termSchedule[term]?.removeAt(index)
                     updatedSchedule.time = Date()
+                    updatedSchedule.validated = false
                     val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
                     val existingList = sharedPreferences.getString("scheduleList", "[]")
                     val type = object : TypeToken<MutableList<Schedule>>() {}.type
