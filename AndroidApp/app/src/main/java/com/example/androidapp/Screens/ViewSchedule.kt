@@ -1,7 +1,7 @@
 package com.example.androidapp.screens
 
-import android.graphics.ColorSpace.Rgb
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,7 +35,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -46,7 +45,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -55,20 +57,20 @@ import com.example.androidapp.R
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.viewModels.ScheduleViewModel
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import java.lang.Integer.min
 
 @Composable
-fun getCourseColor(color: String?): Color {
+fun getCourseColor(color: String?): Painter {
     if (color == null) {
-        return MaterialTheme.colorScheme.secondaryContainer
+        return painterResource(id = R.drawable.card_recommend)
     }
 
     return when (color) {
-        "red" -> MaterialTheme.colorScheme.errorContainer
-        "green" -> Color(182, 233, 187)
-        else -> MaterialTheme.colorScheme.secondaryContainer // default color if blue
+        "red" -> painterResource(id = R.drawable.card_red)
+        "green" -> painterResource(id = R.drawable.card_green)
+        "blue" -> painterResource(id = R.drawable.card_blue)
+        else -> painterResource(id = R.drawable.card_recommend) // default background if recommend
     }
 }
 
@@ -84,7 +86,7 @@ private fun CourseDescription(course: Course, navController: NavController, sche
             defaultElevation =  10.dp,
         ),
         colors = CardDefaults.cardColors(
-            containerColor = getCourseColor(course.color),
+//            containerColor = getCourseColor(course.color),
         ),
         onClick = {
             navController.currentBackStackEntry?.arguments?.putParcelable("course", course)
@@ -95,32 +97,41 @@ private fun CourseDescription(course: Course, navController: NavController, sche
             navController.navigate(Screen.CourseDetail.route)
         },
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = course.courseID,
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+        Box(modifier = Modifier.height(140.dp)) {
+            Image(
+                painter = getCourseColor(color = course.color),
+                contentDescription = "",
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.fillMaxSize()
             )
 
-            Spacer(modifier = Modifier.height(5.dp))
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = course.courseID,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 
-            Text(
-                text = course.courseName,
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+                Spacer(modifier = Modifier.height(5.dp))
 
-            Spacer(modifier = Modifier.height(15.dp))
+                Text(
+                    text = course.courseName,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 
-            Text(
-                text = course.description,
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
+                Spacer(modifier = Modifier.height(15.dp))
 
+                Text(
+                    text = course.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+
+            }
         }
     }
 }
