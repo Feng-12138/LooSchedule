@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -316,6 +317,23 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                 .fillMaxSize(),
         ) {
             Column() {
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    modifier = Modifier.padding(bottom = 12.dp),
+                    onClick = {
+                        navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
+                        navController.currentBackStackEntry?.arguments?.putInt("position", position)
+                        navController.navigate(Screen.ChatgptScreen.route)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Filter"
+                    )
+                }
+
                 FloatingActionButton(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = Color.White,

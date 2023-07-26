@@ -12,6 +12,7 @@ import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.screens.AboutScreen
 import com.example.androidapp.screens.ApiPlayGround
+import com.example.androidapp.screens.ChatgptScreen
 import com.example.androidapp.screens.CourseScreen
 import com.example.androidapp.screens.ErrorScreen
 import com.example.androidapp.screens.GetStartScreen
@@ -49,6 +50,15 @@ fun Navigation(){
                         swap = swap,
                         courseIndex = courseIndex
                     )
+                }
+            }
+        }
+        composable(route = Screen.ChatgptScreen.route){
+            MainScreen (navController = navController, name = "Filter") {
+                val schedule = navController.previousBackStackEntry?.arguments?.getParcelable("schedule", Schedule::class.java)
+                val position = navController.previousBackStackEntry?.arguments?.getInt("position")
+                if (schedule != null && position != null) {
+                    ChatgptScreen(schedule = schedule, position = position, navController = navController)
                 }
             }
         }

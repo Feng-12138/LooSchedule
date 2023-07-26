@@ -1,6 +1,7 @@
 package com.example.androidapp.services
 
 import com.example.androidapp.dataClass.Everything
+import com.example.androidapp.dataClass.TermSchedule
 import com.example.androidapp.dataClass.ValidationResults
 import com.example.androidapp.models.Communication
 import com.example.androidapp.models.Course
@@ -17,7 +18,7 @@ interface Api {
     fun getEverything(): Call<Everything>
 
     @POST("api/schedule")
-    fun getCourseSchedule(@Body request: RequestBody): Call<Map<String, List<Course>>>
+    fun getCourseSchedule(@Body request: RequestBody): Call<TermSchedule>
 
     @GET("api/Communications")
     fun getCommunications(): Call<List<Communication>>
