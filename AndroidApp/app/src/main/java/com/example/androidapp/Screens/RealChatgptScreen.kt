@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,7 +46,9 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -101,35 +105,35 @@ fun DialogBoxLoading(
         onDismissRequest = {
         }
     ) {
-            Column(
+        Column(
+            modifier = Modifier
+                .padding(start = paddingStart, end = paddingEnd, top = paddingTop),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            ProgressIndicatorLoading(
+                progressIndicatorSize = progressIndicatorSize,
+                progressIndicatorColor = progressIndicatorColor
+            )
+
+            // Gap between progress indicator and text
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Please wait text
+            Text(
                 modifier = Modifier
-                    .padding(start = paddingStart, end = paddingEnd, top = paddingTop),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                ProgressIndicatorLoading(
-                    progressIndicatorSize = progressIndicatorSize,
-                    progressIndicatorColor = progressIndicatorColor
-                )
-
-                // Gap between progress indicator and text
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Please wait text
-                Text(
-                    modifier = Modifier
-                        .padding(bottom = paddingBottom),
-                    text = "Please wait...",
-                    style = TextStyle(
-                        color = Color.Black,
-                        fontSize = 16.sp,
+                    .padding(bottom = paddingBottom),
+                text = "Please wait...",
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 16.sp,
 //                        fontFamily = FontFamily(
 //                            Font(R.font.roboto_regular, FontWeight.Normal)
 //                        )
-                    )
                 )
-            }
+            )
+        }
     }
 }
 
@@ -183,6 +187,13 @@ fun RealChatgptScreen(major: String, minor: String, specialization: String, year
     }
 
     val context = LocalContext.current
+    Image(
+        painter = painterResource(id = R.drawable.career_background),
+        contentDescription = "career",
+        contentScale = ContentScale.FillBounds,
+        modifier = Modifier.fillMaxSize()
+    )
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -191,87 +202,103 @@ fun RealChatgptScreen(major: String, minor: String, specialization: String, year
         if (showLoading) {
             DialogBoxLoading()
         }
-        Text(text = "What do you want to work in the future? (Please enter Career name)")
+        Text(
+            text = "What do you want to work in the future? (Please enter Career name)",
+            modifier = Modifier.padding(start = 11.dp),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         TextField(
             value = value.value,
             onValueChange = { newText ->
                 value.value = newText
             }
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Text(text = "eg. accountant, software developer and etc.")
-        Button(onClick = {
-            showLoading = true
-            val inputMajor = listOf(major)
-            val inputMinor = if (minor != "Select your minor"){
-                listOf(minor)
-            } else{
-                emptyList()
-            }
-            val inputSpecialization = if (specialization != "Select your specialization"){
-                listOf(specialization)
-            } else{
-                emptyList()
-            }
+        Button(
+            onClick = {
+                showLoading = true
+                val inputMajor = listOf(major)
+                val inputMinor = if (minor != "Select your minor"){
+                    listOf(minor)
+                } else{
+                    emptyList()
+                }
+                val inputSpecialization = if (specialization != "Select your specialization"){
+                    listOf(specialization)
+                } else{
+                    emptyList()
+                }
 
-            val requestData = RecommendationPlan(
-                position = value.value,
-                academicPlan = AcademicPlan(
-                    majors = inputMajor,
-                    startYear = year,
-                    sequence = sequence,
-                    minors = inputMinor,
-                    specializations = inputSpecialization
+                val requestData = RecommendationPlan(
+                    position = value.value,
+                    academicPlan = AcademicPlan(
+                        majors = inputMajor,
+                        startYear = year,
+                        sequence = sequence,
+                        minors = inputMinor,
+                        specializations = inputSpecialization
+                    )
                 )
-            )
 
-            val gson = Gson()
-            val jsonBody = gson.toJson(requestData)
-            println(jsonBody)
+                val gson = Gson()
+                val jsonBody = gson.toJson(requestData)
+                println(jsonBody)
 
-            val api = RetrofitClient.create()
-            val requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody)
+                val api = RetrofitClient.create()
+                val requestBody = RequestBody.create(MediaType.parse("application/json"), jsonBody)
 
-            val call = api.getRecommendation(requestBody)
-            call.enqueue(object : Callback<TermSchedule> {
-                override fun onResponse(
-                    call: Call<TermSchedule>,
-                    response: Response<TermSchedule>
-                ) {
-                    if (response.isSuccessful) {
-                        val output = response.body()
-                        val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
-                        val existingList = sharedPreferences.getString("scheduleList", "[]")
-                        val type = object : TypeToken<MutableList<Schedule>>() {}.type
-                        val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
-                        var position = 0
-                        val schedule = output?.let {
-                            popUpMessage.value = it.message.toString()
-                            Schedule(it.schedule as MutableMap<String, MutableList<Course>>, myDegree = inputMajor, mySequence = sequence, startYear = year)
+                val call = api.getRecommendation(requestBody)
+                call.enqueue(object : Callback<TermSchedule> {
+                    override fun onResponse(
+                        call: Call<TermSchedule>,
+                        response: Response<TermSchedule>
+                    ) {
+                        if (response.isSuccessful) {
+                            val output = response.body()
+                            val sharedPreferences = context.getSharedPreferences("MySchedules", Context.MODE_PRIVATE)
+                            val existingList = sharedPreferences.getString("scheduleList", "[]")
+                            val type = object : TypeToken<MutableList<Schedule>>() {}.type
+                            val scheduleList : MutableList<Schedule> = Gson().fromJson(existingList, type)
+                            var position = 0
+                            val schedule = output?.let {
+                                popUpMessage.value = it.message.toString()
+                                Schedule(it.schedule as MutableMap<String, MutableList<Course>>, myDegree = inputMajor, mySequence = sequence, startYear = year)
+                            }
+                            if (schedule != null) {
+                                schedule.minor = inputMinor
+                                schedule.specialization = inputSpecialization
+                                scheduleList.add(position , schedule)
+                            }
+                            val editor = sharedPreferences.edit()
+                            val jsonList = Gson().toJson(scheduleList)
+                            editor.putString("scheduleList", jsonList)
+                            editor.apply()
+
+                            showAlert = true
+                        } else {
+                            println(response.message())
+                            Toast.makeText(context, response.message(), Toast.LENGTH_SHORT).show()
                         }
-                        if (schedule != null) {
-                            schedule.minor = inputMinor
-                            schedule.specialization = inputSpecialization
-                            scheduleList.add(position , schedule)
-                        }
-                        val editor = sharedPreferences.edit()
-                        val jsonList = Gson().toJson(scheduleList)
-                        editor.putString("scheduleList", jsonList)
-                        editor.apply()
-
-                        showAlert = true
-                    } else {
-                        println(response.message())
-                        Toast.makeText(context, response.message(), Toast.LENGTH_SHORT).show()
                     }
-                }
 
-                override fun onFailure(call: Call<TermSchedule>, t: Throwable) {
-                    Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
-                    println(t.message)
-                    call.cancel()
-                }
-            })
-        },
+                    override fun onFailure(call: Call<TermSchedule>, t: Throwable) {
+                        Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
+                        println(t.message)
+                        call.cancel()
+                    }
+                })
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = Color.Gray
+            ),
             modifier = Modifier
                 .padding(16.dp)) {
             Text("Done!")

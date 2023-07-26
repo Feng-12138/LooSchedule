@@ -1,5 +1,6 @@
 package com.example.androidapp.screens
 
+import android.graphics.Paint.Align
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -86,7 +88,7 @@ fun CourseScheduleItem(scheduleItem: Schedule, navController: NavController, ind
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = scheduleItem.myDegree.last(),
-                    style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(

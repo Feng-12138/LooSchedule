@@ -56,6 +56,7 @@ fun getTopBarColor(screen: String): Color {
         screen == "Current Schedule" -> Color(130, 156, 173)
         screen == "Course" -> Color(107, 119, 151)
         screen.startsWith("Schedule") -> Color(130, 156, 173)
+        screen == "Build Career Plan" -> Color(184, 197, 212)
         else -> Color.White
     }
 }
@@ -69,6 +70,7 @@ fun getTitleColor(screen: String): Color {
         screen == "Current Schedule" -> Color.White
         screen == "Course" -> Color.White
         screen.startsWith("Schedule") -> Color.White
+        screen == "Build Career Plan" -> Color.White
         else -> Color.Black
     }
 }

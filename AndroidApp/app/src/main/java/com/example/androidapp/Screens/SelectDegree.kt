@@ -83,6 +83,11 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
             .padding(bottom = 16.dp)) {
             Button(onClick =
             {
+                if (viewModel.uiState.value.major == "Select your degree" ||
+                    viewModel.uiState.value.year == "Select your academic year" ||
+                    viewModel.uiState.value.sequence == "Select your Coop sequence") {
+                    showAlert = true
+                }
                 viewModel.generateSchedule(
                     viewModel.uiState.value.major,
                     viewModel.uiState.value.year,
@@ -91,7 +96,6 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
                     viewModel.uiState.value.specialization,
                     context,
                     navController)
-                showAlert = viewModel.showDialog
             }) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -107,7 +111,7 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
                 onClick = {
                     if (viewModel.uiState.value.major == "Select your degree" ||
                         viewModel.uiState.value.year == "Select your academic year" ||
-                        viewModel.uiState.value.year == "Select your Coop sequence") {
+                        viewModel.uiState.value.sequence == "Select your Coop sequence") {
                         showAlert = true
                     }  else{
                         navController.navigate(Screen.RealChatgptScreen.route)
