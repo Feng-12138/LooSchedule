@@ -117,10 +117,18 @@ class TermMapperService {
     private fun checkConstraint(
         course: Course,
         parsedDataMap: MutableMap<String, ParsedPrereqData>,
-        retvalList: List<String>
+        retvalList: List<String>,
+        season: String,
+        level: String
     ): Boolean {
         val selectedCourseData = parsedDataMap[course.courseID]
+        if (selectedCourseData!!.minimumLevel != "" && selectedCourseData!!.minimumLevel > level) {
+            return false
+        }
         if (course.courseID in takenCourses || course.courseID in retvalList) {
+            return false
+        }
+        if (!course.availability!!.contains(season)) {
             return false
         }
 
@@ -160,12 +168,6 @@ class TermMapperService {
                 satisfyCoreq = satisfy
             }
         }
-        if (course.courseID == "PMATH 333") {
-            println("here")
-            println(satisfyCoreq)
-            println(satisfyPrereq)
-            println("here")
-        }
         if (selectedCourseData.coreqCourses.size == 0 || course.courseID == "CS 136" || course.courseID == "CS 146" || course.courseID == "CS 136L") {
             satisfyCoreq = true
         }
@@ -182,13 +184,16 @@ class TermMapperService {
         parsedPrereqDataMap: MutableMap<String, ParsedPrereqData>
     ): MutableList<Course> {
         var arrangeCourses = mutableSetOf<Course>()
-        if (season == "F") {
-            arrangeCourses = fallCourses
-        } else if (season == "W") {
-            arrangeCourses = winterCourses
-        } else if (season == "S") {
-            arrangeCourses = springCourses
-        }
+        arrangeCourses.addAll(fallCourses)
+        arrangeCourses.addAll(winterCourses)
+        arrangeCourses.addAll(springCourses)
+//        if (season == "F") {
+//            arrangeCourses = fallCourses
+//        } else if (season == "W") {
+//            arrangeCourses = winterCourses
+//        } else if (season == "S") {
+//            arrangeCourses = springCourses
+//        }
         var countAdded = 0
         val notTakenCourses = mutableListOf<Course>()
         val retvalList = mutableListOf<Course>()
@@ -198,7 +203,7 @@ class TermMapperService {
             }
         }
         notTakenCourses.sortByDescending { it.priorityPoint }
-        if (termName == "1A" || termName == "1B") {
+        if (termName == "1A") {
             for (course in notTakenCourses) {
                 if (countAdded >= numCourse) {
                     break
@@ -211,6 +216,10 @@ class TermMapperService {
                     countAdded++
                     continue
                 }
+            }
+        }
+        if (termName == "1B") {
+            for (course in notTakenCourses) {
                 if (course.courseID == "MATH 136" || course.courseID == "MATH 146" || course.courseID == "MATH 138" ||
                     course.courseID == "MATH 148" || course.courseID == "CS 136" || course.courseID == "CS 116"
                     || course.courseID == "CS 146" || course.courseID == "STAT 230"
@@ -232,11 +241,7 @@ class TermMapperService {
             val result = checkConstraint(
                 course,
                 parsedDataMap = parsedPrereqDataMap,
-                retvalList = retvalList.map { it.courseID })
-            if (course.courseID == "PMATH 333") {
-                println(termName)
-                println(season)
-            }
+                retvalList = retvalList.map { it.courseID }, season = season, level = termName)
             if (result) {
                 retvalList.add(course)
                 countAdded++

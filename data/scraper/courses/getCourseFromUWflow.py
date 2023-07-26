@@ -200,7 +200,7 @@ def wrapperCourseDataFunc(curYear: int):
         coreq = courseDict[key].coreqs
         if coreq == None:
             continue
-        parsedCoreq = parseByBracket(coreq, key, keys)
+        parsedCoreq = parseByBracket(coreq, key, keys, False)
         courseDict[key].coreqs = parsedCoreq
     antireqStr = ""
     for key in keys:
@@ -506,7 +506,7 @@ def produceCourseStrList(courseStr: str):
     
 
 # parse the prereq according to precedence of bracket, or, and
-def parseByBracket(prereq: str, courseCode: str, courseList: list):
+def parseByBracket(prereq: str, courseCode: str, courseList: list, forPrereq = True):
     invalidCourseList = []
     if prereq.find("Not open") != -1:
         notOpenStr = prereq.split("Not open")[-1]
@@ -612,7 +612,7 @@ def parseByBracket(prereq: str, courseCode: str, courseList: list):
     # inaccurate info from uwflow
     if (courseCode == "CS 245"):
         addedPlaceStr += "CS 136,MATH 145;CS 138,MATH 145;CS 146,MATH 145;"
-    if (courseCode == "PMATH 333"):
+    if (courseCode == "PMATH 333" and forPrereq):
         addedPlaceStr = "MATH 128;MATH 138;MATH 148;"
     return addedPlaceStr
     
