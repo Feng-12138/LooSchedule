@@ -37,7 +37,7 @@ fun GetStartScreen(navController: NavController) {
     Box (modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.get_start),
-            contentDescription = "get start",
+            contentDescription = "get started",
             contentScale = ContentScale.FillBounds,
             modifier = Modifier.matchParentSize())
     }

@@ -60,7 +60,7 @@ fun CourseScheduleItem(scheduleItem: Schedule, navController: NavController, ind
         content = {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Schedule: ${listSize - index}",
+                    text = scheduleItem.myDegree.last(),
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Spacer(modifier = Modifier.height(5.dp))
