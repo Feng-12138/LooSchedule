@@ -114,8 +114,12 @@ class ScheduleValidator {
     }
 
     private fun checkList1CommunicationCourse(schedule: Schedule, majorNames: List<String>): OverallValidationResult {
-        val majors: List<Major> = majorRepo.getMajorsByNames(majorNames)
-        if (majors.size != majorNames.size) return OverallValidationResult.InvalidMajor
+        // Since major names stored in the DB does not contain "Bachelor of ", so need to adjust names
+        val adjustedMajorNames: List<String> = majorNames.map { it.replace("Bachelor of ", "") }.toList()
+        val majors: List<Major> = adjustedMajorNames.mapNotNull { majorName ->
+            majorRepo.getMajorByName(majorName)
+        }
+        if (majorNames.size != majors.size) return OverallValidationResult.InvalidMajor
 
         // Double degree programs need to take list 1 communication course in 1A
         if (majors.any { it.isDoubleDegree }) {
