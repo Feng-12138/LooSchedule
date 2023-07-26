@@ -22,18 +22,18 @@
 | June 11  |      5h       |               |               |               |               |               | Set up backend infrastructure with Gralde, Jersey, Guice and jaxb and example endpoints
 | June 11  |      2.5h     |               |               |               |               |       2h      | Set up Hibernate until with mySql
 | June 14  |      3h       |               |               |               |               |       2h       | Migrate backend to sqlite instead
-| June 15  |      2h       |               |               |               |               |               | Set up backend module injection and and application configuration
+| June 15  |      5h       |               |               |               |               |               | Set up backend module injection and and application configuration
 | June 15  |               |     3.5h      |               |               |               |               | Created data scraper for breadth & depth courses
 | June 15  |               |               |               |               |               |       3h      | Created data scraper for courses and prerequisites(set up)
 | June 15  |               |      2h       |               |               |               |        2h     | Refactored database-related functions to switch from MySQL to SQLite
 | June 16  |               |     1.5h      |               |               |               |               | Added sample data for program requirements
 | June 16  |               |               |               |               |               |       6h      | Created data scraper for courses
-| June 24  |      1.5h     |               |               |               |               |               | Designed and set up requirement parser for scheduler
+| June 24  |      2h       |               |               |               |               |               | Designed and set up requirement parser for scheduler
 | June 25  |      4h       |               |               |               |               |               | Finalize requirements for an academic plan and fix repo
 | June 26  |      2h       |               |               |               |               |               | Consider prereq in scheduler and add specializations
-| June 26  |      0.5h     |               |               |               |               |               | Functioning sequence generator
+| June 26  |      1h       |               |               |               |               |               | Functioning sequence generator
 | June 26  |      4h       |               |               |               |               |               | Functioning termMapperService
-| June 26  |      2.5h     |               |               |               |               |               | Functioning scheduler with pre-req/availabiity considerations
+| June 26  |      3h       |               |               |               |               |               | Functioning scheduler with pre-req/availabiity considerations
 | June 26  |      3h       |               |               |               |               |               | More bug fixes for all existent functions
 | June 26  |               |      4h       |               |               |               |               | Created component diagram for demo presentation (D3)
 | June 26  |               |      5h       |               |               |               |               | Updated data scraper to retrieve partial 2023 ACTSC program requirements
@@ -55,11 +55,12 @@
 | July 19  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D5: Design Pattern Examples
 |          |               |               |               |               |               |               |
 | July 22  |      0.5h     |               |               |               |               |               | Implement all programs endpoint to use in FE
-| July 22  |      3h       |               |               |               |               |               | Recommend course base on career position with openAI API
-| July 22  |      2h       |               |               |               |               |               | Parse requirements with taken courses logic 
+| July 22  |      4h       |               |               |               |               |               | Recommend course base on career position with openAI API
+| July 22  |      3h       |               |               |               |               |               | Parse requirements with taken courses logic 
 | July 22  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2022 MATH program requirements
 |July 22-24|               |      20h      |               |               |               |               | Updated data scraper to retrieve all 2019-2021 MATH program requirements
-| July 25  |      6h       |               |               |               |               |               | Integrate recommended courses and taken courses into schedule API to complete backend feature
+| July 25  |      7h       |               |               |               |               |               | Integrate recommended courses and taken courses into schedule API to complete backend feature
+| July 25  |      3h       |               |               |               |               |               | More bug fixes
 | July 26  |      4h       |               |               |               |               |               | Mobile UI Optimization
 | June 26  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | Final Demo preparation and recording
 | July 26  |      1h       |               |               |               |               |               | Demo Video Audio edit
