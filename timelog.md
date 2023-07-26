@@ -14,18 +14,20 @@
 | May 27   |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | Project Propsal Presentation Preperation
 | June 2   |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D1: Proposal Document
 |          |               |               |               |               |               |               |
-| June 5   |               |     6.5h      |               |               |               |               | Database design & setup
+| June 5   |               |     6.5h      |               |               |               |      3h       | Database design & setup
 | June 10  |               |      4h       |               |               |               |               | Created data scraper for communication courses
 |          |               |               |               |               |               |               |
 | June 11  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D2: Buddy Team's Evaluation
 |          |               |               |               |               |               |               |
 | June 11  |      5h       |               |               |               |               |               | Set up backend infrastructure with Gralde, Jersey, Guice and jaxb and example endpoints
-| June 11  |      2.5h     |               |               |               |               |               | Set up Hibernate until with mysql
-| June 14  |      3h       |               |               |               |               |               | Migrate backend to sqlite instead
+| June 11  |      2.5h     |               |               |               |               |       2h      | Set up Hibernate until with mySql
+| June 14  |      3h       |               |               |               |               |       2h       | Migrate backend to sqlite instead
 | June 15  |      2h       |               |               |               |               |               | Set up backend module injection and and application configuration
 | June 15  |               |     3.5h      |               |               |               |               | Created data scraper for breadth & depth courses
-| June 15  |               |      2h       |               |               |               |               | Refactored database-related functions to switch from MySQL to SQLite
+| June 15  |               |               |               |               |               |       3h      | Created data scraper for courses and prerequisites(set up)
+| June 15  |               |      2h       |               |               |               |        2h     | Refactored database-related functions to switch from MySQL to SQLite
 | June 16  |               |     1.5h      |               |               |               |               | Added sample data for program requirements
+| June 16  |               |               |               |               |               |       6h      | Created data scraper for courses
 | June 24  |      1.5h     |               |               |               |               |               | Designed and set up requirement parser for scheduler
 | June 25  |      4h       |               |               |               |               |               | Finalize requirements for an academic plan and fix repo
 | June 26  |      2h       |               |               |               |               |               | Consider prereq in scheduler and add specializations
