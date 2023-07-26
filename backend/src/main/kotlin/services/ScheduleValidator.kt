@@ -45,7 +45,8 @@ class ScheduleValidator {
         InvalidMajor,
         CommunicationCourseTooLate,
         NotEnoughCourse,
-        NotMeetDegreeRequirement,
+        NotMeetMandatoryCourses,
+        NotMeetOptionalCourses,
     }
 
     private val listOneCommunicationCourses = listOf("COMMST 100", "COMMST 223", "EMLS 101R", "EMLS 102R",
@@ -157,9 +158,44 @@ class ScheduleValidator {
         return ValidationResult.Success
     }
 
+    private fun getTotalRequiredCourses(requirements: Requirements): Int {
+        val mandatoryCoursesCount: Int = requirements.mandatoryCourses.size
+        val optionalCoursesCount: Int = requirements.optionalCourses.sumOf { it.nOf }
+        return mandatoryCoursesCount + optionalCoursesCount
+    }
+
     private fun checkDegreeCourseRequirements(schedule: Schedule,
-                                              requirements: Requirements): OverallValidationResult {
-        return OverallValidationResult.Success
+                                              requirements: Requirements): MutableSet<OverallValidationResult> {
+        val validationResult = mutableSetOf<OverallValidationResult>()
+        val allSchedulesCourses: List<String> = schedule.values.flatten().map { it.courseID }
+        val totalRequiredCourseCount: Int = getTotalRequiredCourses(requirements)
+
+        // If there is not enough courses, then result is guaranteed to not be success,
+        // Then there is no point checking afterwards
+        if (allSchedulesCourses.size < totalRequiredCourseCount) return mutableSetOf(OverallValidationResult.NotEnoughCourse)
+
+        // First check if all mandatory courses are present in the schedule
+        val mandatoryRes: Boolean = requirements.mandatoryCourses.all { course ->
+            val courseStr = "${course.subject} ${course.code}"
+            courseStr in allSchedulesCourses
+        }
+        if (!mandatoryRes) validationResult.add(OverallValidationResult.NotMeetMandatoryCourses)
+
+        // Check optional courses
+        val optionalRes: Boolean = requirements.optionalCourses.all { optionalCourses ->
+            var coursesNeeded = optionalCourses.nOf
+            optionalCourses.courses.forEach { course ->
+                val courseString = "${course.subject} ${course.code}"
+                if (courseString in allSchedulesCourses) {
+                    coursesNeeded--
+                }
+                if (coursesNeeded == 0) return@all true
+            }
+            false
+        }
+        if (!optionalRes) validationResult.add(OverallValidationResult.NotMeetOptionalCourses)
+        if (mandatoryRes and optionalRes) validationResult.add(OverallValidationResult.Success)
+        return validationResult
     }
     
     fun validateSchedule(schedule: Schedule, majors: List<String>, sequenceMap: Map<String, String>,
@@ -167,7 +203,7 @@ class ScheduleValidator {
         // Since major names stored in the DB does not contain "Bachelor of ", so need to adjust names
         val adjustedMajorNames: List<String> = majors.map { it.replace("Bachelor of ", "") }.toList()
         val courseValidity = mutableMapOf<String, MutableList<List<ValidationResult>>>()
-        val degreeValidity = mutableListOf<OverallValidationResult>()
+        val degreeValidity = mutableSetOf<OverallValidationResult>()
         var overallResult = true
         val courseList: List<String> = schedule.values.flatten().map { it.courseID }
         val takenSoFar: MutableList<String> = mutableListOf()
@@ -210,14 +246,15 @@ class ScheduleValidator {
         }
 
         // Check if degree course requirements are satisfied
-        val degreeRes: OverallValidationResult = checkDegreeCourseRequirements(schedule, requirements)
-        if (degreeRes != OverallValidationResult.Success) {
-            degreeValidity.add(degreeRes)
+        val degreeRes: MutableSet<OverallValidationResult> = checkDegreeCourseRequirements(schedule, requirements)
+        degreeRes.removeIf { it == OverallValidationResult.Success }
+        if (degreeRes.isNotEmpty()) {
+            degreeValidity.addAll(degreeRes)
             // If not enough courses is selected in the schedule, then don't consider it as being invalid
             // Only show as a warning since user may fill out full schedule later
-            if (degreeRes == OverallValidationResult.NotMeetDegreeRequirement) overallResult = false
+            if (OverallValidationResult.NotEnoughCourse !in degreeRes) overallResult = false
         }
 
-        return ScheduleValidationOutput(courseValidity, degreeValidity, overallResult)
+        return ScheduleValidationOutput(courseValidity, degreeValidity.toList(), overallResult)
     }
 }
