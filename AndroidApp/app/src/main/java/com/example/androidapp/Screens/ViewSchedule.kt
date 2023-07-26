@@ -86,9 +86,6 @@ private fun CourseDescription(course: Course, navController: NavController, sche
         elevation = CardDefaults.cardElevation(
             defaultElevation =  10.dp,
         ),
-        colors = CardDefaults.cardColors(
-//            containerColor = getCourseColor(course.color),
-        ),
         onClick = {
             navController.currentBackStackEntry?.arguments?.putParcelable("course", course)
             navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)

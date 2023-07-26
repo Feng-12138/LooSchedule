@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Divider
@@ -17,6 +19,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
@@ -96,7 +99,9 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                             )
 
                             Column(
-                                modifier = Modifier.padding(top = 13.dp),
+                                modifier = Modifier
+                                    .padding(top = 13.dp)
+                                    .verticalScroll(rememberScrollState()),
                                 verticalArrangement = Arrangement.spacedBy(25.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
@@ -118,7 +123,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                                             style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                         ) },
                                         modifier = Modifier.align(Alignment.Center),
-                                        selected = false,
+                                        selected = name == "LooSchedule",
                                         shape = RoundedCornerShape(30.dp),
                                         onClick = { navController.navigate(Screen.MainScreen.route) }
                                     )
@@ -132,7 +137,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                                             modifier = Modifier.align(Alignment.Center),
                                             style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                         ) },
-                                        selected = false,
+                                        selected = name == "Current Schedule",
                                         shape = RoundedCornerShape(30.dp),
                                         onClick = { navController.navigate(Screen.ViewSchedule.route) }
                                     )
@@ -146,7 +151,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                                             modifier = Modifier.align(Alignment.Center),
                                             style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                         ) },
-                                        selected = false,
+                                        selected = name == "Create Schedule",
                                         shape = RoundedCornerShape(30.dp),
                                         onClick = { navController.navigate(Screen.SelectDegree.route) }
                                     )
@@ -160,7 +165,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                                             modifier = Modifier.align(Alignment.Center),
                                             style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                         ) },
-                                        selected = false,
+                                        selected = name == "History",
                                         shape = RoundedCornerShape(30.dp),
                                         onClick = { navController.navigate(Screen.ScheduleHistory.route) }
                                     )
@@ -174,7 +179,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                                             modifier = Modifier.align(Alignment.Center),
                                             style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                         ) },
-                                        selected = false,
+                                        selected = name == "About",
                                         shape = RoundedCornerShape(30.dp),
                                         onClick = { navController.navigate(Screen.About.route) }
                                     )
@@ -197,6 +202,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                                 Text(
                                     text = name,
                                     color = getTitleColor(screen = name),
+                                    fontWeight = FontWeight.Bold,
                                     fontFamily = FontFamily(
                                     Font(R.font.indieflower, FontWeight.Light))) },
                             navigationIcon = {
@@ -211,7 +217,8 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                                 ) {
                                     Icon(
                                         imageVector = Icons.Outlined.Menu,
-                                        contentDescription = ""
+                                        contentDescription = "",
+                                        tint = Color.White
                                     )
                                 }
                             },
