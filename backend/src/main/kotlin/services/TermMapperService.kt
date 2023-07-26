@@ -9,7 +9,7 @@ class TermMapperService {
     private var takeCourseInWT = false
     private var takenCourses: MutableList<String> = mutableListOf()
 
-    val ListOneCourses =
+    private val ListOneCourses =
         listOf("COMMST 100", "COMMST 223", "EMLS 101R", "EMLS 102R", "EMLS 129R", "ENGL 129R", "ENGL 109")
 
     fun mapCoursesToSequence(
@@ -134,7 +134,7 @@ class TermMapperService {
 
         var satisfyPrereq = false
         var satisfyCoreq = false
-        for (prereqCourseOption in selectedCourseData!!.courses) {
+        for (prereqCourseOption in selectedCourseData.courses) {
             var satisfy = true
             if (prereqCourseOption.size == 0) {
                 continue

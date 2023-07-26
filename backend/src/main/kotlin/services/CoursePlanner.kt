@@ -433,7 +433,7 @@ class CoursePlanner {
         }
 
         // select courses from optional courses requirements
-        var incompleteOptionalList = mutableSetOf<OptionalCourses>()
+        val incompleteOptionalList = mutableSetOf<OptionalCourses>()
         for (optionalCourseList in optionalCourses) {
             val result = selectCoursesFromOptional(optionalCourseList, parsedDataList, modifiedMajors.toList(), mathCourses, nonMathCourses)
             if (result > 0) {
@@ -450,26 +450,39 @@ class CoursePlanner {
         }
         selectCommunication(startYear, nonMathCourses, takenCourses)
 
-//        // consider recommended courses
-//        val takeRecommendedCoursesList = mutableSetOf<Course>()
-//        val parsedDataMap = prerequisiteRepo.getParsedPrereqData(recommendedCourses.map { it.courseID })
-//        prereqMap.putAll(parsedDataMap)
-//        var idx = 0
-//        for (course in recommendedCourses) {
-//            if (countTakenMathCourse >= numMathNeeded) {
-//                break
-//            }
-//            idx++
-//            val result = checkConstraint(course, parsedDataMap = parsedDataMap, majors = majors)
-//            if (result) {
-//                course.color = "blue"
-//                computeAndUpdateTermCourses(course)
+        // consider recommended courses
+//        val takeRecommendedCoursesList = mutableListOf<Course>()
+
+        val parsedDataMap = prerequisiteRepo.getParsedPrereqData(recommendedCourses.map { it.courseID })
+        prereqMap.putAll(parsedDataMap)
+
+        for (course in recommendedCourses) {
+            val (takenCount, neededCount) = when (course.subject) {
+                in mathSubjects -> countTakenMathCourse to TOTAL_MATH
+                else -> countTakenNonMathCourse to TOTAL_NON_MATH
+            }
+            if (takenCount >= neededCount) continue
+
+            val result = checkConstraint(course, parsedDataMap = parsedDataMap, majors = modifiedMajors.toList())
+            if (result) {
+                course.color = "purple"
+                course.priorityPoint = 3
+                computeAndUpdateTermCourses(course)
 //                takeRecommendedCoursesList.add(course)
-//                countTakenMathCourse++
-//            }
-//        }
-
-
+                listofTakenCourses.add(course.courseID)
+                if (course.subject in mathSubjects) {
+                    countTakenMathCourse++
+                    mathCourses.add(course)
+                } else {
+                    countTakenNonMathCourse++
+                    nonMathCourses.add(course)
+                }
+            }
+        }
+//
+//        println("aaaaaaaaaaaa")
+//        println(takeRecommendedCoursesList.map { it.courseID })
+//        println("aaaaaaaaaaaaa")
 
         // select actually elective courses
         // non math courses are more flexible

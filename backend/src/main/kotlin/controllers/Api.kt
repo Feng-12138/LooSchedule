@@ -68,7 +68,7 @@ class Api {
     }
 
     @POST
-    @Path("gpt")
+    @Path("api/recommendations")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     fun tryGpt(request: RecommendationPlan): Response = runBlocking {

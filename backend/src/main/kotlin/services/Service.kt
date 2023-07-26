@@ -132,10 +132,12 @@ class Service: IService {
     override fun generateSchedule(
         plan: AcademicPlan,
         recommendedCourses: MutableList<services.Course>,
-    ): MutableMap<String, MutableList<Course>> {
+    ): TermSchedule {
         val requirements = getRequirements(plan)
-        println(requirements.mandatoryCourses)
-        println(requirements.optionalCourses)
+//        println("-------------------")
+//        println(requirements.mandatoryCourses.map { it.subject + " " + it.code })
+//        println(requirements.optionalCourses.map { course -> course.courses.map { it.subject + " " + it.code } })
+//        println("-------------------")
         val takenCourses = plan.coursesTaken
         var data = CommonRequirementsData(requirements, 0)
 
@@ -179,11 +181,33 @@ class Service: IService {
         println(selectedCourses["W"]!!.map { it.courseID })
         println(selectedCourses["S"]!!.map { it.courseID })
 
-        return termMapperService.mapCoursesToSequence(
+        val schedule = termMapperService.mapCoursesToSequence(
             courseData = CourseDataClass(fallCourses = selectedCourses["F"]!!, springCourses = selectedCourses["S"]!!, winterCourses = selectedCourses["W"]!!,
                 prereqMap = coursePlanner.getPrereqMap()),
             sequenceMap = sequenceMap,
             previousTakenCourses = takenCourses,
+        )
+
+        if (recommendedCourses.isEmpty()) return TermSchedule(schedule = schedule)
+
+        val countRecommendations = recommendedCourses.count { course ->
+            schedule.any { (_, courseListInMap) ->
+                courseListInMap.map { Course(it.subject, it.code) }.contains(course)
+            }
+        }
+
+        val message = if (countRecommendations >= 5) {
+            "success"
+        } else {
+            "We could only fit $countRecommendations recommended courses in your schedule, " +
+                    "consider review it or change a program"
+        }
+
+        return TermSchedule(
+            schedule = schedule,
+            successRecCount = countRecommendations,
+            recommendedCourses = recommendedCourses.map { it.subject + " " + it.code },
+            message = message,
         )
     }
 
@@ -221,9 +245,6 @@ class Service: IService {
             }
 
             val requirementsData = requirementRepo.getRequirementCoursesByIds(requirementsId)
-            println("----------------")
-            println(requirementsData)
-            println("----------------")
             return requirementsParser.parseRequirements(requirementsData)
         } catch (e: Exception) {
             println(e)
@@ -252,3 +273,10 @@ data class RecommendationPlan (
     // Default constructor
     constructor() : this("", AcademicPlan())
 }
+
+data class TermSchedule(
+    val schedule: Schedule,
+    val successRecCount: Int = 0,
+    val recommendedCourses: List<String> = listOf(),
+    val message: String? = "",
+)

@@ -15,7 +15,7 @@ interface IService {
     fun generateSchedule(
         plan: AcademicPlan,
         recommendedCourses: MutableList<services.Course> = mutableListOf(),
-    ): Schedule
+    ): TermSchedule
 
     fun validateSchedule(input: ScheduleValidator.ScheduleValidationInput): ScheduleValidator.ScheduleValidationOutput
 }

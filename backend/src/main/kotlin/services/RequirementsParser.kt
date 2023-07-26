@@ -104,26 +104,16 @@ class RequirementsParser {
         val mandatoryCourses = requirements.mandatoryCourses.toMutableList()
         val commonTable: ConcurrentHashMap<Course, Int> = ConcurrentHashMap()
 
-        println("ttttttttttttttttt")
-        println(optionalCoursesList)
-        println("ttttttttttttttttt")
         for (i in 0 until optionalCoursesList.size) {
             for (j in i + 1 until optionalCoursesList.size) {
                 val coursesI = optionalCoursesList[i]
                 val coursesJ = optionalCoursesList[j]
                 val commonCourses = coursesJ.courses.filter { coursesI.courses.contains(it) }.toSet()
-
-                println("aaaaaaaaaaaaaaaaa")
-                println(commonCourses)
-                println("aaaaaaaaaaaaaaaaa")
                 for (commonCourse in commonCourses) {
                     commonTable.compute(commonCourse) { _, count -> count?.plus(1) ?: 1 }
                 }
             }
         }
-        println("----------------")
-        println(commonTable.keys)
-        println("----------------")
 
         val remainingOptionalCourses = mutableListOf<OptionalCourses>()
         for (optionalCourses in optionalCoursesList) {
