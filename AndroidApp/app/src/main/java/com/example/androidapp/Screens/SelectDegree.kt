@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
@@ -74,36 +75,57 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
                 modifier = Modifier.padding(start = 12.dp))
             SelectList(everythingManager.getSpecializations().toTypedArray(), context, FieldType.SPECIALIZATION, viewModel)
         }
-        Button(onClick =
-        {
-            viewModel.generateSchedule(
-                viewModel.uiState.value.major,
-                viewModel.uiState.value.year,
-                viewModel.uiState.value.sequence,
-                viewModel.uiState.value.minor,
-                viewModel.uiState.value.specialization,
-                context,
-                navController)
-            showAlert = viewModel.showDialog
-        },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp)) {
-            Icon(
-                imageVector = Icons.Default.Create,
-                contentDescription = "Create"
-            )
 
-            Spacer(modifier = Modifier.size(8.dp))
+        Column(modifier = Modifier
+            .align(Alignment.BottomCenter)) {
+            Button(onClick =
+            {
+                viewModel.generateSchedule(
+                    viewModel.uiState.value.major,
+                    viewModel.uiState.value.year,
+                    viewModel.uiState.value.sequence,
+                    viewModel.uiState.value.minor,
+                    viewModel.uiState.value.specialization,
+                    context,
+                    navController)
+                showAlert = viewModel.showDialog
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Create"
+                )
 
-            Text("Create Course Schedule")
+                Spacer(modifier = Modifier.size(8.dp))
+
+                Text("Create Course Schedule")
+            }
+
+            Button(onClick = {
+                if (viewModel.uiState.value.major == "Select your degree" ||
+                    viewModel.uiState.value.year == "Select your academic year" ||
+                    viewModel.uiState.value.year == "Select your Coop sequence") {
+                    showAlert = true
+                }
+                else{
+                    navController.navigate(Screen.RealChatgptScreen.route)
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Create,
+                    contentDescription = "modify"
+                )
+
+                Spacer(modifier = Modifier.size(8.dp))
+
+                Text("Get Help From ChatGPT")
+            }
         }
+
 
         if (showAlert) {
             AlertDialog(
                 onDismissRequest = {
-                    viewModel.toggleDialog()
-                    showAlert = viewModel.showDialog
+                    showAlert = false
                 },
                 title = {
                     Text(text = "Warning")
@@ -114,8 +136,7 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
                 confirmButton = {
                     Button(
                         onClick = {
-                            viewModel.toggleDialog()
-                            showAlert = viewModel.showDialog
+                            showAlert = false
                         }) {
                         Text("Confirm")
                     }
@@ -125,11 +146,28 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
     }
 }
 
+@SuppressLint("RememberReturnType", "StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectList(choices: Array<String>, context: Context, type: FieldType, viewModel: SelectDegreeVM) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(choices.first()) }
+    var selectedText by remember { mutableStateOf("") }
+
+    if(type == FieldType.MAJOR){
+        selectedText = viewModel.uiState.value.major
+    }
+    if(type == FieldType.MINOR){
+        selectedText = viewModel.uiState.value.minor
+    }
+    if(type == FieldType.SPECIALIZATION){
+        selectedText = viewModel.uiState.value.specialization
+    }
+    if(type == FieldType.YEAR){
+        selectedText = viewModel.uiState.value.year
+    }
+    if(type == FieldType.SEQUENCE){
+        selectedText = viewModel.uiState.value.sequence
+    }
 
     Box(Modifier.padding(12.dp)) {
         ExposedDropdownMenuBox(
