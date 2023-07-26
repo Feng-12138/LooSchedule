@@ -157,6 +157,9 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
     val scope = rememberCoroutineScope()
     val pagerCourses = remember { mutableStateMapOf<Int, List<Course>>() }
 
+    val context = LocalContext.current
+    val isValidated = scheduleViewModel.isValidated.collectAsState().value
+
     LaunchedEffect(key1 = pagerState.currentPage) {
         pagerPage = pagerState.currentPage
         currentTerm = scheduleViewModel.termList[pagerPage]
@@ -217,6 +220,74 @@ fun ViewSchedule(navController: NavController, scheduleViewModel: ScheduleViewMo
                 CourseSchedulePage(courses = courses, navController = navController, schedule = scheduleViewModel.schedule, term = termList[page], position = position, scheduleViewModel = scheduleViewModel)
             }
         }
+
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = Modifier
+                .padding(vertical = 24.dp, horizontal = 8.dp)
+                .fillMaxSize(),
+        ) {
+            Column() {
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    modifier = Modifier.padding(bottom = 12.dp),
+                    onClick = {
+                        navController.currentBackStackEntry?.arguments?.putParcelable("schedule", scheduleViewModel.schedule)
+                        navController.currentBackStackEntry?.arguments?.putInt("position", position)
+                        navController.navigate(Screen.ChatgptScreen.route)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Filter"
+                    )
+                }
+
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    modifier = Modifier.padding(bottom = 12.dp),
+                    onClick = {
+                        navController.currentBackStackEntry?.arguments?.putParcelable("schedule", scheduleViewModel.schedule)
+                        navController.currentBackStackEntry?.arguments?.putString("term", termList[pagerPage])
+                        navController.currentBackStackEntry?.arguments?.putInt("position", position)
+                        navController.currentBackStackEntry?.arguments?.putBoolean("swap", false)
+                        navController.currentBackStackEntry?.arguments?.putInt("index", 0)
+                        navController.navigate(Screen.SearchCourse.route)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add"
+                    )
+                }
+
+                FloatingActionButton(
+                    containerColor = if (isValidated) MaterialTheme.colorScheme.secondary else Color.Red,
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    onClick = {
+                        scheduleViewModel.validateCourseSchedule(schedule = scheduleViewModel.schedule, context = context, position = position)
+                    }
+                ) {
+                    if(isValidated){
+                        Icon(
+                            imageVector = Icons.Default.Done,
+                            contentDescription = "Validate"
+                        )
+                    }
+                    else {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Validate"
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -252,56 +323,56 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                 )
             }
 
-            Box(
-                contentAlignment = Alignment.BottomEnd,
-                modifier = Modifier
-                    .padding(vertical = 24.dp)
-                    .fillMaxSize(),
-            ) {
-                Column() {
-                    FloatingActionButton(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = Color.White,
-                        shape = CircleShape,
-                        modifier = Modifier.padding(bottom = 12.dp),
-                        onClick = {
-                            navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
-                            navController.currentBackStackEntry?.arguments?.putString("term", term)
-                            navController.currentBackStackEntry?.arguments?.putInt("position", position)
-                            navController.currentBackStackEntry?.arguments?.putBoolean("swap", false)
-                            navController.currentBackStackEntry?.arguments?.putInt("index", 0)
-                            navController.navigate(Screen.SearchCourse.route)
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add"
-                        )
-                    }
-
-                    FloatingActionButton(
-                        containerColor = if (isValidated) MaterialTheme.colorScheme.secondary else Color.Red,
-                        contentColor = Color.White,
-                        shape = CircleShape,
-                        onClick = {
-                            scheduleViewModel.validateCourseSchedule(schedule = schedule, context = context, position = position)
-                        }
-                    ) {
-                        if(isValidated){
-                            Icon(
-                                imageVector = Icons.Default.Done,
-                                contentDescription = "Validate"
-                            )
-                        }
-                        else{
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = "Validate"
-                            )
-                        }
-                    }
-                }
-            }
+//            Box(
+//                contentAlignment = Alignment.BottomEnd,
+//                modifier = Modifier
+//                    .padding(vertical = 24.dp)
+//                    .fillMaxSize(),
+//            ) {
+//                Column() {
+//                    FloatingActionButton(
+//                        containerColor = MaterialTheme.colorScheme.secondary,
+//                        contentColor = Color.White,
+//                        shape = CircleShape,
+//                        modifier = Modifier.padding(bottom = 12.dp),
+//                        onClick = {
+//                            navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
+//                            navController.currentBackStackEntry?.arguments?.putString("term", term)
+//                            navController.currentBackStackEntry?.arguments?.putInt("position", position)
+//                            navController.currentBackStackEntry?.arguments?.putBoolean("swap", false)
+//                            navController.currentBackStackEntry?.arguments?.putInt("index", 0)
+//                            navController.navigate(Screen.SearchCourse.route)
+//                        }
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Add,
+//                            contentDescription = "Add"
+//                        )
+//                    }
+//
+//                    FloatingActionButton(
+//                        containerColor = if (isValidated) MaterialTheme.colorScheme.secondary else Color.Red,
+//                        contentColor = Color.White,
+//                        shape = CircleShape,
+//                        onClick = {
+//                            scheduleViewModel.validateCourseSchedule(schedule = schedule, context = context, position = position)
+//                        }
+//                    ) {
+//                        if(isValidated){
+//                            Icon(
+//                                imageVector = Icons.Default.Done,
+//                                contentDescription = "Validate"
+//                            )
+//                        }
+//                        else{
+//                            Icon(
+//                                imageVector = Icons.Default.Warning,
+//                                contentDescription = "Validate"
+//                            )
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 
@@ -342,72 +413,72 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
             }
         }
 
-        Box(
-            contentAlignment = Alignment.BottomEnd,
-            modifier = Modifier
-                .padding(vertical = 24.dp)
-                .fillMaxSize(),
-        ) {
-            Column() {
-                FloatingActionButton(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = Color.White,
-                    shape = CircleShape,
-                    modifier = Modifier.padding(bottom = 12.dp),
-                    onClick = {
-                        navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
-                        navController.currentBackStackEntry?.arguments?.putInt("position", position)
-                        navController.navigate(Screen.ChatgptScreen.route)
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "Filter"
-                    )
-                }
-
-                FloatingActionButton(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = Color.White,
-                    shape = CircleShape,
-                    modifier = Modifier.padding(bottom = 12.dp),
-                    onClick = {
-                        navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
-                        navController.currentBackStackEntry?.arguments?.putString("term", term)
-                        navController.currentBackStackEntry?.arguments?.putInt("position", position)
-                        navController.currentBackStackEntry?.arguments?.putBoolean("swap", false)
-                        navController.currentBackStackEntry?.arguments?.putInt("index", 0)
-                        navController.navigate(Screen.SearchCourse.route)
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add"
-                    )
-                }
-
-                FloatingActionButton(
-                    containerColor = if (isValidated) MaterialTheme.colorScheme.secondary else Color.Red,
-                    contentColor = Color.White,
-                    shape = CircleShape,
-                    onClick = {
-                        scheduleViewModel.validateCourseSchedule(schedule = schedule, context = context, position = position)
-                    }
-                ) {
-                    if(isValidated){
-                        Icon(
-                            imageVector = Icons.Default.Done,
-                            contentDescription = "Validate"
-                        )
-                    }
-                    else {
-                        Icon(
-                            imageVector = Icons.Default.Warning,
-                            contentDescription = "Validate"
-                        )
-                    }
-                }
-            }
-        }
+//        Box(
+//            contentAlignment = Alignment.BottomEnd,
+//            modifier = Modifier
+//                .padding(vertical = 24.dp)
+//                .fillMaxSize(),
+//        ) {
+//            Column() {
+//                FloatingActionButton(
+//                    containerColor = MaterialTheme.colorScheme.secondary,
+//                    contentColor = Color.White,
+//                    shape = CircleShape,
+//                    modifier = Modifier.padding(bottom = 12.dp),
+//                    onClick = {
+//                        navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
+//                        navController.currentBackStackEntry?.arguments?.putInt("position", position)
+//                        navController.navigate(Screen.ChatgptScreen.route)
+//                    }
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.Menu,
+//                        contentDescription = "Filter"
+//                    )
+//                }
+//
+//                FloatingActionButton(
+//                    containerColor = MaterialTheme.colorScheme.secondary,
+//                    contentColor = Color.White,
+//                    shape = CircleShape,
+//                    modifier = Modifier.padding(bottom = 12.dp),
+//                    onClick = {
+//                        navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
+//                        navController.currentBackStackEntry?.arguments?.putString("term", term)
+//                        navController.currentBackStackEntry?.arguments?.putInt("position", position)
+//                        navController.currentBackStackEntry?.arguments?.putBoolean("swap", false)
+//                        navController.currentBackStackEntry?.arguments?.putInt("index", 0)
+//                        navController.navigate(Screen.SearchCourse.route)
+//                    }
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.Add,
+//                        contentDescription = "Add"
+//                    )
+//                }
+//
+//                FloatingActionButton(
+//                    containerColor = if (isValidated) MaterialTheme.colorScheme.secondary else Color.Red,
+//                    contentColor = Color.White,
+//                    shape = CircleShape,
+//                    onClick = {
+//                        scheduleViewModel.validateCourseSchedule(schedule = schedule, context = context, position = position)
+//                    }
+//                ) {
+//                    if(isValidated){
+//                        Icon(
+//                            imageVector = Icons.Default.Done,
+//                            contentDescription = "Validate"
+//                        )
+//                    }
+//                    else {
+//                        Icon(
+//                            imageVector = Icons.Default.Warning,
+//                            contentDescription = "Validate"
+//                        )
+//                    }
+//                }
+//            }
+//        }
     }
 }
