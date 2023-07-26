@@ -140,21 +140,21 @@ class ScheduleValidator {
     
     private fun checkOpenTo(course: Course, majors: List<String>,
                             courseConstraints: MutableMap<String, ParsedPrereqData>): ValidationResult {
-//        // Only consider for math programs, and since there is no mapping between programs and faculties,
-//        // so have to include explicit elements for math faculty
-//        val facultyIncludedMajors: Set<String> = (majors + "Faculty of Mathematics").toSet()
-//
-//        // Currently only checks for majors. Not sure if minors or specializations would satisfy this requirement
-//        val notOpenTo: Set<String> = courseConstraints[course.courseID]!!.notOpenTo.toSet()
-//        val onlyOpenTo: Set<String> = courseConstraints[course.courseID]!!.onlyOpenTo.toSet()
-//        var commonMajors: Set<String> = notOpenTo.intersect(facultyIncludedMajors)
-//        if (commonMajors.isNotEmpty()) {
-//            return ValidationResult.NotOpenTo
-//        }
-//        commonMajors = onlyOpenTo.intersect(facultyIncludedMajors)
-//        if (onlyOpenTo.isNotEmpty() and commonMajors.isEmpty()) {
-//            return ValidationResult.NotOpenTo
-//        }
+        // Only consider for math programs, and since there is no mapping between programs and faculties,
+        // so have to include explicit elements for math faculty
+        val facultyIncludedMajors: Set<String> = (majors + "Faculty of Mathematics").toSet()
+
+        // Currently only checks for majors. Not sure if minors or specializations would satisfy this requirement
+        val notOpenTo: Set<String> = courseConstraints[course.courseID]!!.notOpenTo.toSet()
+        val onlyOpenTo: Set<String> = courseConstraints[course.courseID]!!.onlyOpenTo.toSet()
+        var commonMajors: Set<String> = notOpenTo.intersect(facultyIncludedMajors)
+        if (commonMajors.isNotEmpty()) {
+            return ValidationResult.NotOpenTo
+        }
+        commonMajors = onlyOpenTo.intersect(facultyIncludedMajors)
+        if (onlyOpenTo.isNotEmpty() and commonMajors.isEmpty()) {
+            return ValidationResult.NotOpenTo
+        }
         return ValidationResult.Success
     }
 
