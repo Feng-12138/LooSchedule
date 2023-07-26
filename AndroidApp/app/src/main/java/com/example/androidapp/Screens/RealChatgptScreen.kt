@@ -127,10 +127,8 @@ fun DialogBoxLoading(
                 text = "Please wait...",
                 style = TextStyle(
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 16.sp,
-//                        fontFamily = FontFamily(
-//                            Font(R.font.roboto_regular, FontWeight.Normal)
-//                        )
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
                 )
             )
         }
@@ -209,6 +207,11 @@ fun RealChatgptScreen(major: String, minor: String, specialization: String, year
             fontWeight = FontWeight.Bold,
         )
 
+        Spacer(modifier = Modifier.height(6.dp))
+
+
+        Text(text = "eg. accountant, software developer and etc.")
+
         Spacer(modifier = Modifier.height(10.dp))
 
         TextField(
@@ -218,9 +221,6 @@ fun RealChatgptScreen(major: String, minor: String, specialization: String, year
             }
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(text = "eg. accountant, software developer and etc.")
         Button(
             onClick = {
                 showLoading = true
