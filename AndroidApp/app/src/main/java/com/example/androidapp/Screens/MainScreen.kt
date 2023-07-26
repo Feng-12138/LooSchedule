@@ -49,36 +49,52 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun getTopBarColor(screen: String): Color {
-    if (screen == "LooSchedule") {
-        return Color(123, 142, 193)
-    } else if (screen == "History") {
-        return Color(51, 49, 72)
-    } else if (screen == "Contact Us") {
-        return Color(137, 179, 225)
-    } else if (screen == "Current Schedule") {
-        return Color(130, 156, 173)
-    } else if (screen == "Course") {
-        return Color(107, 119, 151)
+    return when (screen) {
+        "LooSchedule" -> Color(123, 142, 193)
+        "History" -> Color(51, 49, 72)
+        "Contact Us" -> Color(137, 179, 225)
+        "Current Schedule" -> Color(130, 156, 173)
+        "Course" -> Color(107, 119, 151)
+        else -> Color.White
     }
-
-    return Color.White
+//    if (screen == "LooSchedule") {
+//        return Color(123, 142, 193)
+//    } else if (screen == "History") {
+//        return Color(51, 49, 72)
+//    } else if (screen == "Contact Us") {
+//        return Color(137, 179, 225)
+//    } else if (screen == "Current Schedule") {
+//        return Color(130, 156, 173)
+//    } else if (screen == "Course") {
+//        return Color(107, 119, 151)
+//    }
+//
+//    return Color.White
 }
 
 @Composable
 fun getTitleColor(screen: String): Color {
-    if (screen == "LooSchedule") {
-        return Color.White
-    } else if (screen == "History") {
-        return Color.White
-    } else if (screen == "Current Schedule") {
-        return Color.White
-    } else if (screen == "Course") {
-        return Color.White
-    } else if (screen == "Contact Us") {
-        return Color.White
+    return when (screen) {
+        "LooSchedule" -> Color.White
+        "History" -> Color.White
+        "Contact Us" -> Color.White
+        "Current Schedule" -> Color.White
+        "Course" -> Color.White
+        else -> Color.Black
     }
-
-    return Color.Black
+//    if (screen == "LooSchedule") {
+//        return Color.White
+//    } else if (screen == "History") {
+//        return Color.White
+//    } else if (screen == "Current Schedule") {
+//        return Color.White
+//    } else if (screen == "Course") {
+//        return Color.White
+//    } else if (screen == "Contact Us") {
+//        return Color.White
+//    }
+//
+//    return Color.Black
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
