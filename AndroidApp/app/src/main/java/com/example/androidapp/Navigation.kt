@@ -63,7 +63,7 @@ fun Navigation(){
             }
         }
         composable(route = Screen.About.route){
-            MainScreen (navController = navController, name = "About") { AboutScreen() }
+            MainScreen (navController = navController, name = "Contact Us") { AboutScreen() }
         }
         composable(route = Screen.MainScreen.route){
             MainScreen (navController = navController, name = "LooSchedule") { GetStartScreen(navController = navController) }

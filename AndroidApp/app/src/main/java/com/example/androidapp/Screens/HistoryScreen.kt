@@ -41,7 +41,7 @@ import com.example.androidapp.models.Schedule
 @Composable
 fun HistoryScreen(scheduleItems: List<Schedule>, navController: NavController) {
     Image(
-        painter = painterResource(id = R.drawable.hist_background),
+        painter = painterResource(id = R.drawable.hist2),
         contentDescription = "",
         contentScale = ContentScale.FillBounds,
         modifier = Modifier.fillMaxSize()

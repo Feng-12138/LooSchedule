@@ -52,7 +52,9 @@ fun getTopBarColor(screen: String): Color {
     if (screen == "LooSchedule") {
         return Color(123, 142, 193)
     } else if (screen == "History") {
-        return Color(94, 96, 134)
+        return Color(51, 49, 72)
+    } else if (screen == "Contact Us") {
+        return Color(137, 179, 225)
     }
 
     return Color.White
@@ -92,7 +94,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
 
                         Box {
                             Image(
-                                painter = painterResource(id = R.drawable.nav_bar2),
+                                painter = painterResource(id = R.drawable.contact2),
                                 contentDescription = "get started",
                                 contentScale = ContentScale.FillBounds,
                                 modifier = Modifier.fillMaxSize()
@@ -175,7 +177,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                                 ) {
                                     NavigationDrawerItem(
                                         label = { Text(
-                                            text = "About",
+                                            text = "Contact Us",
                                             modifier = Modifier.align(Alignment.Center),
                                             style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                         ) },
@@ -200,6 +202,7 @@ fun MainScreen(navController: NavController, name: String, content: @Composable 
                             modifier = Modifier.padding(0.dp),
                             title = {
                                 Text(
+                                    style = TextStyle(fontSize = 30.sp),
                                     text = name,
                                     color = getTitleColor(screen = name),
                                     fontWeight = FontWeight.Bold,

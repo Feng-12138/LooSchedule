@@ -3,30 +3,34 @@ package com.example.androidapp.screens
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -55,19 +59,18 @@ fun AboutScreen() {
         mutableStateOf("")
     }
     val context = LocalContext.current
+    Box (modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.contact),
+            contentDescription = "get started",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.matchParentSize())
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(
-            text = "LooSchedule",
-            style = TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier
-                .padding(bottom = 64.dp)
-                .align(CenterHorizontally)
-        )
-
         Text(
             text = buildAnnotatedString {
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -76,6 +79,7 @@ fun AboutScreen() {
                 append("1.0.1")
             },
             style = TextStyle(fontSize = 20.sp),
+            color = Color.White,
             modifier = Modifier.padding(bottom = 24.dp)
         )
         Text(
@@ -86,6 +90,7 @@ fun AboutScreen() {
                 append("20")
             },
             style = TextStyle(fontSize = 20.sp),
+            color = Color.White,
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
@@ -97,10 +102,31 @@ fun AboutScreen() {
                 append("Joyce Dai, Kevin Jin, Kevin Ke, Michael Zhang, Steven Tian, Yiran Sun")
             },
             style = TextStyle(fontSize = 20.sp),
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
+
+        Text(
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Issues: ")
+                }
+                append("Please contact us for any technical issues or sudden requirement changes")
+            },
+            style = TextStyle(fontSize = 20.sp),
+            color = Color.White,
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
         Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = Color.Black
+            ),
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .height(80.dp)// Make the button take the full available width
+                .padding(16.dp),
             onClick = {
 //                isDialogVisible = true
                 val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
@@ -112,8 +138,11 @@ fun AboutScreen() {
                 }
                 startActivity(context, Intent.createChooser(emailIntent, "test"), null)
             }
-        ){
-            Text("Contact us")
+        ) {
+            Text(
+                text = "Contact us",
+                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            )
         }
 
 //        if (isDialogVisible) {
