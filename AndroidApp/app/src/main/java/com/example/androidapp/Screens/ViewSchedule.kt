@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -194,6 +195,7 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
     val context = LocalContext.current
     val showAlert = scheduleViewModel.showAlert.collectAsState().value
     val isValidated = scheduleViewModel.isValidated.collectAsState().value
+    val message = scheduleViewModel.message.collectAsState().value
     if (courses.isEmpty()) {
         Box(
             contentAlignment = Alignment.TopCenter,
@@ -252,10 +254,18 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                             scheduleViewModel.validateCourseSchedule(schedule = schedule, context = context, position = position)
                         }
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Done,
-                            contentDescription = "Validate"
-                        )
+                        if(isValidated){
+                            Icon(
+                                imageVector = Icons.Default.Done,
+                                contentDescription = "Validate"
+                            )
+                        }
+                        else{
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = "Validate"
+                            )
+                        }
                     }
                 }
             }
@@ -263,7 +273,6 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
     }
 
     if (showAlert) {
-        println("Here")
         AlertDialog(
             onDismissRequest = {
                 scheduleViewModel.toggleAlert()
@@ -272,13 +281,12 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                 Text(text = "Validation Result")
             },
             text = {
-                Text("Test")
+                Text(text = message)
             },
             confirmButton = {
                 Button(
                     onClick = {
                         scheduleViewModel.toggleAlert()
-                        println(isValidated)
                     }) {
                     Text("Confirm")
                 }
@@ -336,10 +344,18 @@ private fun CourseSchedulePage(courses: List<Course>, navController: NavControll
                         scheduleViewModel.validateCourseSchedule(schedule = schedule, context = context, position = position)
                     }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Done,
-                        contentDescription = "Validate"
-                    )
+                    if(isValidated){
+                        Icon(
+                            imageVector = Icons.Default.Done,
+                            contentDescription = "Validate"
+                        )
+                    }
+                    else {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Validate"
+                        )
+                    }
                 }
             }
         }
