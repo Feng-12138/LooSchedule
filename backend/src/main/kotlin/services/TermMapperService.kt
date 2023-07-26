@@ -1,15 +1,12 @@
 package services
 import entities.Course
 import repositories.ParsedPrereqData
-import repositories.PrerequisiteRepo
-import jakarta.inject.Inject
-import repositories.CourseRepo
 
 class TermMapperService {
     private var takeCourseInWT = false
     private var takenCourses: MutableList<String> = mutableListOf()
 
-    private val ListOneCourses =
+    private val listOneCourses =
         listOf("COMMST 100", "COMMST 223", "EMLS 101R", "EMLS 102R", "EMLS 129R", "ENGL 129R", "ENGL 109")
 
     fun mapCoursesToSequence(
@@ -21,7 +18,7 @@ class TermMapperService {
         val list = courseData.fallCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.winterCourses.map { it.courseID })
         list.addAll(courseData.springCourses.map { it.courseID })
-        var prereqsData = courseData.prereqMap.filterKeys { it in list }
+        val prereqsData = courseData.prereqMap.filterKeys { it in list }
         val countCourseTerm = mutableMapOf<String, Int>()
         val generatedSchedule = mutableMapOf<String, MutableList<Course>>()
         val totalNumberCourses =
@@ -78,42 +75,10 @@ class TermMapperService {
         courseData.fallCourses.clear()
         courseData.springCourses.clear()
         courseData.winterCourses.clear()
-//        val finalSchedule: MutableMap<String, MutableList<Course>> = finalizeSchedule(generatedSchedule, countCourseTerm, sequenceMap, prereqsData.toMutableMap())
-        val finalSchedule = generatedSchedule
-        return finalSchedule
+
+        return generatedSchedule
     }
 
-    // 这玩意现在没用了 请移步checkConstraint
-    private fun checkMathCourseConstraint(
-        course: Course, termName: String, season: String,
-        prereqMap: MutableMap<String, ParsedPrereqData>
-    ): Boolean {
-        val parsedPrereqData = prereqMap[course.courseID] ?: return false
-        var satisfyTerm = false
-        if (course.availability!!.contains(season) && parsedPrereqData.minimumLevel <= termName) {
-            satisfyTerm = true
-        }
-
-        if (parsedPrereqData.courses.isEmpty() || parsedPrereqData.courses.all { it.isEmpty() }) {
-            return true
-        } else {
-            for (requirement in parsedPrereqData.courses) {
-                var satisfyPrereq = true
-                for (prereqCourse in requirement) {
-                    if (prereqCourse !in takenCourses) {
-                        satisfyPrereq = false
-                        break
-                    }
-                }
-                if (satisfyPrereq && satisfyTerm) {
-                    return true
-                }
-            }
-            return false
-        }
-    }
-
-    // 有用的
     private fun checkConstraint(
         course: Course,
         parsedDataMap: MutableMap<String, ParsedPrereqData>,
@@ -122,7 +87,7 @@ class TermMapperService {
         level: String
     ): Boolean {
         val selectedCourseData = parsedDataMap[course.courseID]
-        if (selectedCourseData!!.minimumLevel != "" && selectedCourseData!!.minimumLevel > level) {
+        if (selectedCourseData!!.minimumLevel != "" && selectedCourseData.minimumLevel > level) {
             return false
         }
         if (course.courseID in takenCourses || course.courseID in retvalList) {
@@ -139,8 +104,8 @@ class TermMapperService {
             if (prereqCourseOption.size == 0) {
                 continue
             }
-            for (course in prereqCourseOption) {
-                if (course !in takenCourses) {
+            for (preReqCourse in prereqCourseOption) {
+                if (preReqCourse !in takenCourses) {
                     satisfy = false
                     break
                 }
@@ -158,8 +123,8 @@ class TermMapperService {
             if (coreqCourseOption.size == 0) {
                 continue
             }
-            for (course in coreqCourseOption) {
-                if (course !in takenCourses && course !in retvalList) {
+            for (coReqCourse in coreqCourseOption) {
+                if (coReqCourse !in takenCourses && coReqCourse !in retvalList) {
                     satisfy = false
                     break
                 }
@@ -183,7 +148,7 @@ class TermMapperService {
         springCourses: MutableSet<Course>,
         parsedPrereqDataMap: MutableMap<String, ParsedPrereqData>
     ): MutableList<Course> {
-        var arrangeCourses = mutableSetOf<Course>()
+        val arrangeCourses = mutableSetOf<Course>()
         arrangeCourses.addAll(fallCourses)
         arrangeCourses.addAll(winterCourses)
         arrangeCourses.addAll(springCourses)
@@ -210,7 +175,7 @@ class TermMapperService {
                 }
                 if (course.courseID == "MATH 135" || course.courseID == "CS 135" || course.courseID == "MATH 145"
                     || course.courseID == "MATH 137" || course.courseID == "CS 115"
-                    || course.courseID == "MATH 147" || course.courseID == "CS 145" || course.courseID in ListOneCourses
+                    || course.courseID == "MATH 147" || course.courseID == "CS 145" || course.courseID in listOneCourses
                 ) {
                     retvalList.add(course)
                     countAdded++

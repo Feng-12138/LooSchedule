@@ -11,6 +11,9 @@ yearList = []
 courseDict = {}
 levels = ['1A', '1B', '2A', '2B', '3A', "3B", "4A", "4B"]
 
+engineeringSubjects = ["AE", "ARCH", "BME", "BET", "CHE", "CIVE", "ECE", 
+                       "ENVE", "GENE", "MSCI", "ME", "MTE", "NE", "PDARCH", "STV", "SE", "SYDE"]
+
 coursePrereqDict = {}
 
 
@@ -755,8 +758,12 @@ def parsePrereqs(programList: list):
                             program = "Faculty of Mathematics"
                         onlyOpenToStr += f"{program},"
                 onlyOpenToStr = onlyOpenToStr[:-1]
-            if (prereq.find("Engineering") != -1):
-                notOpenToStr += f"Faculty of Mathematics,"
+            # if (prereq.find("Engineering") != -1 and prereq.find("Software Engineering") == -1):
+            #     notOpenToStr += f"Faculty of Mathematics,"
+            for item in engineeringSubjects:
+                if key.find(item) != -1:
+                    notOpenToStr += f"Faculty of Mathematics,"
+                    break
             if len(notOpenToStr) >= 1:
                 notOpenToStr = notOpenToStr[:-1]
             prereqList[-1].notOpenTo = notOpenToStr
