@@ -2,6 +2,7 @@ package services
 
 import entities.Communication
 import entities.Course
+import services.utilities.Requirements
 
 //@Contract
 interface IService {
@@ -10,7 +11,7 @@ interface IService {
     fun allCommunications(): List<Communication>
     fun allPlanNames(): Plans
 
-    suspend fun recommendCourses(position: String) :List<services.Course>
+    suspend fun recommendCourses(position: String) :List<services.utilities.Course>
 
     fun getRequirements(plan: AcademicPlan): Requirements
 

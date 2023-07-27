@@ -7,6 +7,10 @@ import org.hibernate.SessionFactory
 import org.hibernate.cfg.Configuration
 import repositories.*
 import services.*
+import services.utilities.CoursePlanner
+import services.utilities.RequirementsParser
+import services.utilities.SequenceGenerator
+import services.utilities.TermMapperService
 
 class ApplicationConfig : ResourceConfig() {
     init {

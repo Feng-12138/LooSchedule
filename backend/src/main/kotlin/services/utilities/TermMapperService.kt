@@ -1,4 +1,4 @@
-package services
+package services.utilities
 import entities.Course
 import repositories.ParsedPrereqData
 

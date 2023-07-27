@@ -2,6 +2,7 @@ package services
 
 import jakarta.inject.Inject
 import repositories.CourseRepo
+import services.utilities.*
 
 class RecommendScheduleStrategy: ScheduleStrategy {
     @Inject
@@ -24,7 +25,7 @@ class RecommendScheduleStrategy: ScheduleStrategy {
 
     override fun generateSchedule(
         plan: AcademicPlan,
-        recommendedCourses: MutableList<services.Course>,
+        recommendedCourses: MutableList<Course>,
     ): TermSchedule {
         val requirements = service.getRequirements(plan)
         var data = CommonRequirementsData(requirements, 0)

@@ -9,6 +9,9 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import repositories.*
+import services.utilities.Requirements
+import services.utilities.RequirementsParser
+import services.utilities.SequenceGenerator
 import java.util.concurrent.TimeUnit
 
 class Service: IService {
@@ -73,7 +76,7 @@ class Service: IService {
     }
 
     @Override
-    override suspend fun recommendCourses(position: String): List<services.Course> {
+    override suspend fun recommendCourses(position: String): List<services.utilities.Course> {
         val apiKey = System.getenv("API_KEY")
         val modelEndpoint = "https://api.openai.com/v1/chat/completions"
         val json = """
@@ -98,7 +101,7 @@ class Service: IService {
         return fetchCourses(request)
     }
 
-    private fun fetchCourses(request: Request): List<services.Course> {
+    private fun fetchCourses(request: Request): List<services.utilities.Course> {
         val client = OkHttpClient().newBuilder()
             .callTimeout(30, TimeUnit.SECONDS) // Set connection timeout
             .readTimeout(30, TimeUnit.SECONDS) // Set read timeout
@@ -116,7 +119,7 @@ class Service: IService {
             .split(",")
             .map {
                 val parts = it.trim().split(" ")
-                Course(parts[0], parts[1])
+                services.utilities.Course(parts[0], parts[1])
             }
             .toList()
 

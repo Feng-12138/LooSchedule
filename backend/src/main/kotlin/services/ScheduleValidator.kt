@@ -6,6 +6,7 @@ import jakarta.inject.Inject
 import repositories.MajorRepo
 import repositories.ParsedPrereqData
 import repositories.PrerequisiteRepo
+import services.utilities.Requirements
 
 typealias Schedule = MutableMap<String, MutableList<Course>>
 typealias CourseValidationResult = Map<String, MutableList<List<ScheduleValidator.ValidationResult>>>
@@ -165,7 +166,8 @@ class ScheduleValidator {
     }
 
     private fun checkDegreeCourseRequirements(schedule: Schedule,
-                                              requirements: Requirements): MutableSet<OverallValidationResult> {
+                                              requirements: Requirements
+    ): MutableSet<OverallValidationResult> {
         // Hard-coded to ignore validation for any lab courses for now
         requirements.mandatoryCourses.removeIf { it.code.contains("L") }
         for (optionalCourses in requirements.optionalCourses) {
@@ -206,7 +208,8 @@ class ScheduleValidator {
     }
     
     fun validateSchedule(schedule: Schedule, majors: List<String>, sequenceMap: Map<String, String>,
-                         requirements: Requirements): ScheduleValidationOutput {
+                         requirements: Requirements
+    ): ScheduleValidationOutput {
         // Since major names stored in the DB does not contain "Bachelor of ", so need to adjust names
         val adjustedMajorNames: List<String> = majors.map { it.replace("Bachelor of ", "") }.toList()
         val courseValidity = mutableMapOf<String, MutableList<List<ValidationResult>>>()

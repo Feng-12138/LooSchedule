@@ -1,6 +1,7 @@
 package services
 
 import jakarta.inject.Inject
+import services.utilities.Course
 
 class Scheduler {
 

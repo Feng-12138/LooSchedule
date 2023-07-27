@@ -1,4 +1,4 @@
-package services
+package services.utilities
 
 class SequenceGenerator {
     private val regular = mutableMapOf(

@@ -2,7 +2,7 @@ package repositories
 
 import entities.Course
 import entities.CourseID
-import services.Course as CourseData
+import services.utilities.Course as CourseData
 import jakarta.inject.Inject
 import org.hibernate.SessionFactory
 
