@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.androidapp.EverythingManager
+import com.example.androidapp.UWDataManager
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.google.gson.Gson
@@ -44,7 +44,7 @@ import java.util.Date
 fun SearchCourseScreen(navController: NavController, term: String, schedule: Schedule, position: Int, swap: Boolean, courseIndex: Int){
     var text by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
-    val courses: List<Course>? = EverythingManager.getInstance().getCourses()
+    val courses: List<Course>? = UWDataManager.getInstance().getCourses()
     Column() {
         SearchBar(
             modifier = Modifier.fillMaxWidth(),

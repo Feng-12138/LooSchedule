@@ -50,7 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.androidapp.EverythingManager
+import com.example.androidapp.UWDataManager
 import com.example.androidapp.dataClass.TermSchedule
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
@@ -68,7 +68,7 @@ import retrofit2.Response
 @Composable
 fun TermFilterScreen(schedule: Schedule, position: Int, navController: NavController){
     val terms: List<String> = schedule.termSchedule.keys.toList()
-    val courses: List<Course> = EverythingManager.getInstance().getCourses()?.map{ course -> course } ?: listOf()
+    val courses: List<Course> = UWDataManager.getInstance().getCourses()?.map{ course -> course } ?: listOf()
     val context = LocalContext.current
     var selectedTerm by remember { mutableStateOf(terms.first()) }
     var expanded by remember { mutableStateOf(false) }

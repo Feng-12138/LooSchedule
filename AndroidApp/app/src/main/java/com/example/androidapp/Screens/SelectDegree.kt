@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -31,7 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.androidapp.EverythingManager
+import com.example.androidapp.UWDataManager
 import com.example.androidapp.enum.FieldType
 import com.example.androidapp.viewModels.SelectDegreeVM
 
@@ -42,7 +40,7 @@ import com.example.androidapp.viewModels.SelectDegreeVM
 fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
     var showAlert by remember { mutableStateOf(selectDegreeVM.showDialog) }
     val viewModel: SelectDegreeVM = selectDegreeVM
-    val everythingManager: EverythingManager = EverythingManager.getInstance()
+    val UWDataManager: UWDataManager = UWDataManager.getInstance()
     val sequence: List<String> = listOf("Select your coop sequence", "Regular", "Sequence 1", "Sequence 2", "Sequence 3", "Sequence 4")
     val year: List<String> = listOf("Select your academic year", "2023", "2022", "2021", "2020", "2019")
     val context = LocalContext.current
@@ -59,7 +57,7 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
             Text("Degree: ",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
-            SelectList(everythingManager.getMajors().toTypedArray(), context, FieldType.MAJOR, viewModel)
+            SelectList(UWDataManager.getMajors().toTypedArray(), context, FieldType.MAJOR, viewModel)
             Text("Academic Year: ",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
@@ -71,11 +69,11 @@ fun SelectDegree(navController: NavController, selectDegreeVM: SelectDegreeVM) {
             Text("Minor (Optional): ",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
-            SelectList(everythingManager.getMinors().toTypedArray(), context, FieldType.MINOR, viewModel)
+            SelectList(UWDataManager.getMinors().toTypedArray(), context, FieldType.MINOR, viewModel)
             Text("Specialization (Optional): ",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 12.dp))
-            SelectList(everythingManager.getSpecializations().toTypedArray(), context, FieldType.SPECIALIZATION, viewModel)
+            SelectList(UWDataManager.getSpecializations().toTypedArray(), context, FieldType.SPECIALIZATION, viewModel)
         }
 
         Column(modifier = Modifier

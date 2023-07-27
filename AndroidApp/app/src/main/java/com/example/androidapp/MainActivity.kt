@@ -10,7 +10,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
-import com.example.androidapp.dataClass.Everything
+import com.example.androidapp.dataClass.UWData
 import com.example.androidapp.services.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -31,11 +31,11 @@ class MainActivity : ComponentActivity() {
 
     private fun fetchServerData(context: Context) {
         val api = RetrofitClient.create()
-        val call = api.getEverything()
-        call.enqueue(object : Callback<Everything> {
-            override fun onResponse(call: Call<Everything>, response: Response<Everything>) {
+        val call = api.getUWData()
+        call.enqueue(object : Callback<UWData> {
+            override fun onResponse(call: Call<UWData>, response: Response<UWData>) {
                 if (response.isSuccessful) {
-                    val dataManager = EverythingManager.getInstance()
+                    val dataManager = UWDataManager.getInstance()
                     response.body()?.let { dataManager.setEverything(it) }
                 }
                 else {
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<Everything>, t: Throwable) {
+            override fun onFailure(call: Call<UWData>, t: Throwable) {
                 Toast.makeText(context, t.message, Toast.LENGTH_SHORT).show()
                 println(t.message)
                 call.cancel()

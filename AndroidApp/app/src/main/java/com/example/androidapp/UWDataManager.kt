@@ -1,35 +1,35 @@
 package com.example.androidapp
 
-import com.example.androidapp.dataClass.Everything
+import com.example.androidapp.dataClass.UWData
 import com.example.androidapp.models.Course
 
-class EverythingManager private constructor() {
+class UWDataManager private constructor() {
     // Data fields that you want to share
-    private var everything: Everything? = null
+    private var UWData: UWData? = null
 
     companion object {
         // The single instance of DataManager
         @Volatile
-        private var instance: EverythingManager? = null
+        private var instance: UWDataManager? = null
 
         // The global access point for the DataManager instance
-        fun getInstance(): EverythingManager =
+        fun getInstance(): UWDataManager =
             instance ?: synchronized(this) {
-                instance ?: EverythingManager().also { instance = it }
+                instance ?: UWDataManager().also { instance = it }
             }
     }
 
-    fun setEverything(data: Everything) {
-        everything = data
+    fun setEverything(data: UWData) {
+        UWData = data
     }
 
     fun getCourses(): List<Course>? {
-        return everything?.courses
+        return UWData?.courses
     }
 
     fun getMajors(): List<String> {
         return mutableListOf("Select your degree").apply {
-            everything?.majors.let {
+            UWData?.majors.let {
                 if (it != null) {
                     this.addAll(it)
                 }
@@ -39,7 +39,7 @@ class EverythingManager private constructor() {
 
     fun getMinors(): List<String> {
         return mutableListOf("Select your minor").apply {
-            everything?.minors.let {
+            UWData?.minors.let {
                 if (it != null) {
                     this.addAll(it)
                 }
@@ -49,7 +49,7 @@ class EverythingManager private constructor() {
 
     fun getSpecializations(): List<String> {
         return mutableListOf("Select your specialization").apply {
-            everything?.specializations.let {
+            UWData?.specializations.let {
                 if (it != null) {
                     this.addAll(it)
                 }
