@@ -12,10 +12,7 @@ interface IService {
 
     suspend fun recommendCourses(position: String) :List<services.Course>
 
-    fun generateSchedule(
-        plan: AcademicPlan,
-        recommendedCourses: MutableList<services.Course> = mutableListOf(),
-    ): TermSchedule
+    fun getRequirements(plan: AcademicPlan): Requirements
 
     fun validateSchedule(input: ScheduleValidator.ScheduleValidationInput): ScheduleValidator.ScheduleValidationOutput
 }

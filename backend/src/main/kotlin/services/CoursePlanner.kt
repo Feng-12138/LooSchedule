@@ -73,7 +73,7 @@ class CoursePlanner {
         if (course.courseID.last() == 'E') {
             return false
         }
-        for (major in selectedCourseData!!.notOpenTo) {
+        for (major in selectedCourseData.notOpenTo) {
             if (major in majors) {
                 return false
             }
@@ -368,8 +368,8 @@ class CoursePlanner {
         requirements: Requirements,
         majors: List<String>,
         sequenceMap: MutableMap<String, String>,
-        takenCourses: List<String>,
-        recommendedCourses: Set<Course>,
+        takenCourses: List<String> = listOf(),
+        recommendedCourses: Set<Course> = setOf(),
     ): Map<String, MutableSet<Course>> {
         seasonCourseCounter["F"] = 0
         seasonCourseCounter["W"] = 0

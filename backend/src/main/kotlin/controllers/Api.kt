@@ -13,6 +13,9 @@ class Api {
     @Inject
     private lateinit var service: IService
 
+    @Inject
+    private lateinit var scheduler: Scheduler
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     fun helloWorld(): Response {
@@ -45,7 +48,7 @@ class Api {
     @Produces(MediaType.APPLICATION_JSON)
     fun getSchedule(academicPlan: AcademicPlan): Response {
         try {
-            val message = service.generateSchedule(academicPlan)
+            val message = scheduler.schedule(academicPlan)
             return Response.ok(message).build()
         } catch (e: Exception) {
             println(e.message)
@@ -75,7 +78,7 @@ class Api {
         try {
             val recommendedCourses = service.recommendCourses(request.position)
             println(recommendedCourses.map { it.subject + " " + it.code })
-            val message = service.generateSchedule(request.academicPlan, recommendedCourses.toMutableList())
+            val message = scheduler.schedule(request.academicPlan, recommendedCourses.toMutableList())
             return@runBlocking Response.ok(message).build()
         } catch (e: Exception) {
             println(e.message)

@@ -50,6 +50,22 @@ class ApplicationConfig : ResourceConfig() {
                     .to(IService::class.java)
                     .`in`(Singleton::class.java)
 
+                bind(DefaultScheduleStrategy::class.java)
+                    .to(ScheduleStrategy::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(TakenCourseScheduleStrategy::class.java)
+                    .to(ScheduleStrategy::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(RecommendScheduleStrategy::class.java)
+                    .to(ScheduleStrategy::class.java)
+                    .`in`(Singleton::class.java)
+
+                bind(Scheduler::class.java)
+                    .to(Scheduler::class.java)
+                    .`in`(Singleton::class.java)
+
                 bind(RequirementsParser::class.java)
                     .to(RequirementsParser::class.java)
                     .`in`(Singleton::class.java)
