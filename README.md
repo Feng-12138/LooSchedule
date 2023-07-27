@@ -5,3 +5,6 @@ Loo-Schedule is an initiative designed to assist students in the Mathematics fac
 
 Ticket Tracker:
 https://app.clickup.com/14224536/v/l/s/90030389826
+
+youtube Demo:  
+https://www.youtube.com/watch?v=Gp3Oa5Of8Lo
