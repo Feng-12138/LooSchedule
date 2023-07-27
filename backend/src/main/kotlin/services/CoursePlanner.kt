@@ -31,6 +31,7 @@ class CoursePlanner {
 
 
     private val listofTakenCourses = mutableListOf<String>()
+    private val takenCoursesPrereq : MutableMap<String, ParsedPrereqData> = mutableMapOf()
 
     private var countTakenNonMathCourse = 0
     private var countTakenMathCourse = 0
@@ -66,6 +67,9 @@ class CoursePlanner {
 
     private fun checkConstraint(course: Course, parsedDataMap:MutableMap<String, ParsedPrereqData>, majors: List<String>) : Boolean {
         val selectedCourseData = parsedDataMap[course.courseID]
+        if (selectedCourseData == null) {
+            return false
+        }
         if (course.courseID.last() == 'E') {
             return false
         }
@@ -113,6 +117,8 @@ class CoursePlanner {
                 return false
             }
         }
+
+
         var satisfyPrereq = false
         var satisfyCoreq = false
         for (prereqCourseOption in selectedCourseData.courses) {
@@ -279,7 +285,7 @@ class CoursePlanner {
         var mathCourseCount = countMathCourse
         val mutableReturnedCourseList = returnedCourseList.toMutableList()
         val courses = courseRepo.getBySubject(subjectSet, included).sortedWith(courseComparator)
-        val parsedDataMap = prerequisiteRepo.getParsedPrereqData(courses.map{it.courseID}.take(350))
+        val parsedDataMap = prerequisiteRepo.getParsedPrereqData(courses.map{it.courseID}.take(420))
         prereqMap.putAll(parsedDataMap)
         var idx = 0
         for (course in courses) {
@@ -308,8 +314,10 @@ class CoursePlanner {
         val returnedCourseList = mutableListOf<Course>()
         if (numNonMathNeeded < 0) {
             numMathNeeded += numNonMathNeeded
+            numNonMathNeeded = 0
         } else if (numMathNeeded < 0) {
             numNonMathNeeded += numMathNeeded
+            numMathNeeded = 0
         }
         if (numMathNeeded <= 0 && numNonMathNeeded <= 0) {
             return listOf()
@@ -363,6 +371,9 @@ class CoursePlanner {
         takenCourses: List<String>,
         recommendedCourses: Set<Course>,
     ): Map<String, MutableSet<Course>> {
+        seasonCourseCounter["F"] = 0
+        seasonCourseCounter["W"] = 0
+        seasonCourseCounter["S"] = 0
         val mathCourses: MutableSet<Course> = mutableSetOf()
         val nonMathCourses: MutableSet<Course> = mutableSetOf()
         listofTakenCourses.addAll(takenCourses)
@@ -387,6 +398,8 @@ class CoursePlanner {
         println(seasonCourseCounter["F"])
         println(seasonCourseCounter["W"])
         println(seasonCourseCounter["S"])
+
+
 
         for (major in majors) {
             if (major.contains("Computer Science")) {
@@ -451,6 +464,7 @@ class CoursePlanner {
             course.color = "red"
             computeAndUpdateTermCourses(course)
         }
+
         selectCommunication(startYear, nonMathCourses, takenCourses)
 
         // consider recommended courses
@@ -458,6 +472,7 @@ class CoursePlanner {
 
         val parsedDataMap = prerequisiteRepo.getParsedPrereqData(recommendedCourses.map { it.courseID })
         prereqMap.putAll(parsedDataMap)
+
 
         for (course in recommendedCourses) {
             val (takenCount, neededCount) = when (course.subject) {

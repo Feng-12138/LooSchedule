@@ -17,7 +17,9 @@ class TermMapperService {
         takenCourses.addAll(previousTakenCourses)
         val list = courseData.fallCourses.map { it.courseID }.toMutableList()
         list.addAll(courseData.winterCourses.map { it.courseID })
-        list.addAll(courseData.springCourses.map { it.courseID })
+        if (courseData.springCourses.size > 0) {
+            list.addAll(courseData.springCourses.map { it.courseID })
+        }
         val prereqsData = courseData.prereqMap.filterKeys { it in list }
         val countCourseTerm = mutableMapOf<String, Int>()
         val generatedSchedule = mutableMapOf<String, MutableList<Course>>()
@@ -67,15 +69,17 @@ class TermMapperService {
                 termName = key
             )
             val coursesTakeThisTerm = courseList.map { it.courseID }
-            takenCourses.addAll(coursesTakeThisTerm)
-            generatedSchedule[key] = courseList
+            if (coursesTakeThisTerm != null) {
+                takenCourses.addAll(coursesTakeThisTerm)
+            }
             println(coursesTakeThisTerm)
+            generatedSchedule[key] = courseList
+//            println(coursesTakeThisTerm)
         }
         takenCourses.clear()
         courseData.fallCourses.clear()
         courseData.springCourses.clear()
         courseData.winterCourses.clear()
-
         return generatedSchedule
     }
 
@@ -152,13 +156,6 @@ class TermMapperService {
         arrangeCourses.addAll(fallCourses)
         arrangeCourses.addAll(winterCourses)
         arrangeCourses.addAll(springCourses)
-//        if (season == "F") {
-//            arrangeCourses = fallCourses
-//        } else if (season == "W") {
-//            arrangeCourses = winterCourses
-//        } else if (season == "S") {
-//            arrangeCourses = springCourses
-//        }
         var countAdded = 0
         val notTakenCourses = mutableListOf<Course>()
         val retvalList = mutableListOf<Course>()
@@ -212,7 +209,9 @@ class TermMapperService {
                 countAdded++
             }
         }
-        takenCourses.addAll(retvalList.map{it.courseID})
+        if (retvalList.size > 0) {
+            takenCourses.addAll(retvalList.map { it.courseID })
+        }
         return retvalList
     }
 }
