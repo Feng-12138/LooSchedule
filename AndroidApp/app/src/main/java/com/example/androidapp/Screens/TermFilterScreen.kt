@@ -66,7 +66,7 @@ import retrofit2.Response
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatgptScreen(schedule: Schedule, position: Int, navController: NavController){
+fun TermFilterScreen(schedule: Schedule, position: Int, navController: NavController){
     val terms: List<String> = schedule.termSchedule.keys.toList()
     val courses: List<Course> = EverythingManager.getInstance().getCourses()?.map{ course -> course } ?: listOf()
     val context = LocalContext.current

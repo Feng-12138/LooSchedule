@@ -13,13 +13,13 @@ import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
 import com.example.androidapp.screens.AboutScreen
 import com.example.androidapp.screens.ApiPlayGround
-import com.example.androidapp.screens.ChatgptScreen
+import com.example.androidapp.screens.TermFilterScreen
 import com.example.androidapp.screens.CourseScreen
 import com.example.androidapp.screens.ErrorScreen
 import com.example.androidapp.screens.GetStartScreen
 import com.example.androidapp.screens.HistoryScreen
 import com.example.androidapp.screens.MainScreen
-import com.example.androidapp.screens.RealChatgptScreen
+import com.example.androidapp.screens.GPTAdviceScreen
 import com.example.androidapp.screens.Screen
 import com.example.androidapp.screens.SearchCourseScreen
 import com.example.androidapp.screens.SelectDegree
@@ -61,13 +61,13 @@ fun Navigation(){
                 val schedule = navController.previousBackStackEntry?.arguments?.getParcelable("schedule", Schedule::class.java)
                 val position = navController.previousBackStackEntry?.arguments?.getInt("position")
                 if (schedule != null && position != null) {
-                    ChatgptScreen(schedule = schedule, position = position, navController = navController)
+                    TermFilterScreen(schedule = schedule, position = position, navController = navController)
                 }
             }
         }
         composable(route = Screen.RealChatgptScreen.route){
             MainScreen (navController = navController, name = "Build Career Plan") {
-                RealChatgptScreen(
+                GPTAdviceScreen(
                     major = selectDegreeVM.uiState.value.major,
                     minor = selectDegreeVM.uiState.value.minor,
                     sequence = selectDegreeVM.uiState.value.sequence,
