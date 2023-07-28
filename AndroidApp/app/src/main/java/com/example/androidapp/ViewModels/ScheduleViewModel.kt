@@ -4,9 +4,11 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.androidapp.enum.ValidationResult
 import com.example.androidapp.models.Course
 import com.example.androidapp.models.Schedule
+import com.example.androidapp.screens.Screen
 import com.example.androidapp.services.RetrofitClient
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -29,7 +31,10 @@ data class AcademicPlan(
     val specializations: List<String>,
 )
 
-class ScheduleViewModel(input: Schedule) : ViewModel() {
+class ScheduleViewModel(input: Schedule, navController: NavController) : ViewModel() {
+
+    private val _navController = navController
+    val navController: NavController get() = _navController
 
     private var _schedule = MutableStateFlow(input)
     val schedule: Schedule get() = _schedule.value
@@ -163,5 +168,20 @@ class ScheduleViewModel(input: Schedule) : ViewModel() {
 
     fun toggleAlert() {
         _showAlert.value = !_showAlert.value
+    }
+
+    fun addCourse(position: Int) {
+        navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
+        navController.currentBackStackEntry?.arguments?.putString("term", currentTerm)
+        navController.currentBackStackEntry?.arguments?.putInt("position", position)
+        navController.currentBackStackEntry?.arguments?.putBoolean("swap", false)
+        navController.currentBackStackEntry?.arguments?.putInt("index", 0)
+        navController.navigate(Screen.SearchCourse.route)
+    }
+
+    fun modifySchedule(position: Int) {
+        navController.currentBackStackEntry?.arguments?.putParcelable("schedule", schedule)
+        navController.currentBackStackEntry?.arguments?.putInt("position", position)
+        navController.navigate(Screen.ChatgptScreen.route)
     }
 }

@@ -100,7 +100,7 @@ fun Navigation(){
             }
             else{
                 MainScreen (navController = navController, name = "Current Schedule") { ViewSchedule(navController = navController,
-                    scheduleViewModel = ScheduleViewModel(scheduleList[0]), position = 0) }
+                    scheduleViewModel = ScheduleViewModel(scheduleList[0], navController), position = 0) }
             }
         }
 
@@ -144,7 +144,7 @@ fun Navigation(){
                 if (listSize != null) {
                     MainScreen(navController = navController, name = "Schedule ${listSize - index!!}") {
                         ViewSchedule(navController = navController,
-                            scheduleViewModel = ScheduleViewModel(schedule), position = index
+                            scheduleViewModel = ScheduleViewModel(schedule, navController), position = index
                         )
                     }
                 }
