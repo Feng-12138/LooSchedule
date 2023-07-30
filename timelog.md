@@ -67,7 +67,7 @@
 | July 15  |               |     0.5h      |               |               |               |               | Updated data scraper to retrieve coop and double degree information for program requirements
 | July 16  |               |      7h       |               |               |               |               | Updated data scraper to retrieve all 2022 ACTSC, AMATH, CO, CS, and CFM program requirements
 | July 16  |               |               |      3h       |               |               |               | Android implement contact pages
-| July 1   |               |               |               |               |      2h       |               | Completed schedule pager
+| July 1   |               |               |               |               |      4h       |               | Completed schedule pager
 |          |               |               |               |               |               |               |
 | July 19  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D5: Design Pattern Examples
 |          |               |               |               |               |               |               |
