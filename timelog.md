@@ -22,8 +22,10 @@
 | June 11  |      6h       |               |               |               |               |               | Set up backend infrastructure with Gralde, Jersey, Guice and jaxb and example endpoints
 | June 11  |      2.5h     |               |               |               |               |       2h      | Set up Hibernate until with mySql
 | July 13  |               |               |      2h       |               |               |               | Android create select degree views
+| July 14  |               |               |               |               |      3h       |               | Android create schedule views
 | June 14  |      4h       |               |               |               |               |       2h      | Migrate backend to sqlite instead
-| June 15  |      6h       |               |               |               |               |               | Set up backend module injection and and application configuration
+| June 15  |      6h       |               |               |               |               |               | Set up backend module injection and andapplication configuration
+| July 15  |               |               |               |               |      2h       |               | Android skeleton schedule views 
 | June 15  |               |     3.5h      |               |               |               |               | Created data scraper for breadth & depth courses
 | June 15  |               |               |               |               |               |       3h      | Created data scraper for courses and prerequisites(set up)
 | June 15  |               |      2h       |               |               |               |        2h     | Refactored database-related functions to switch from MySQL to SQLite
@@ -34,6 +36,7 @@
 | July 19  |               |               |      2h       |               |               |               | Android set up models that align with the backend, setup repository for backend
 | June 24  |      2h       |               |               |               |               |               | Designed and set up requirement parser for scheduler
 | July 24  |               |               |      6h       |               |               |               | Android set up navigation logics and navigation sidebar
+| July 24  |               |               |               |               |      6h       |               | Improve view schedule with lazyColumn and ScrollableTabRow
 | June 25  |      4h       |               |               |               |               |               | Finalize requirements for an academic plan and fix repo
 | July 25  |               |               |      12h      |               |               |               | Android working navigation between choosing degrees and  schedules and the corresponding courses
 | June 26  |      2h       |               |               |               |               |               | Consider prereq in scheduler and add specializations
