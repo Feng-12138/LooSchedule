@@ -19,11 +19,11 @@
 | June 10  |               |      4h       |               |               |               |               | Created data scraper for communication courses
 |          |               |               |               |               |               |               |
 | June 11  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D2: Buddy Team's Evaluation
-| June 11  |      5h       |               |               |               |               |               | Set up backend infrastructure with Gralde, Jersey, Guice and jaxb and example endpoints
+| June 11  |      6h       |               |               |               |               |               | Set up backend infrastructure with Gralde, Jersey, Guice and jaxb and example endpoints
 | June 11  |      2.5h     |               |               |               |               |       2h      | Set up Hibernate until with mySql
 | July 13  |               |               |      2h       |               |               |               | Android create select degree views
-| June 14  |      3h       |               |               |               |               |       2h       | Migrate backend to sqlite instead
-| June 15  |      5h       |               |               |               |               |               | Set up backend module injection and and application configuration
+| June 14  |      4h       |               |               |               |               |       2h      | Migrate backend to sqlite instead
+| June 15  |      6h       |               |               |               |               |               | Set up backend module injection and and application configuration
 | June 15  |               |     3.5h      |               |               |               |               | Created data scraper for breadth & depth courses
 | June 15  |               |               |               |               |               |       3h      | Created data scraper for courses and prerequisites(set up)
 | June 15  |               |      2h       |               |               |               |        2h     | Refactored database-related functions to switch from MySQL to SQLite
@@ -39,7 +39,7 @@
 | June 26  |      2h       |               |               |               |               |               | Consider prereq in scheduler and add specializations
 | June 26  |      1h       |               |               |               |               |               | Functioning sequence generator
 | June 26  |      4h       |               |               |               |               |               | Functioning termMapperService
-| June 26  |      3h       |               |               |               |               |               | Functioning scheduler with pre-req/availability considerations
+| June 26  |      4h       |               |               |               |               |               | Functioning scheduler with pre-req/availability considerations
 | June 26  |      3h       |               |               |               |               |               | More bug fixes for all existent functions
 | June 26  |               |      4h       |               |               |               |               | Created component diagram for demo presentation (D3)
 | June 26  |               |      5h       |               |               |               |               | Updated data scraper to retrieve partial 2023 ACTSC program requirements
@@ -64,7 +64,7 @@
 | July 19  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D5: Design Pattern Examples
 |          |               |               |               |               |               |               |
 | July 22  |      0.5h     |               |               |               |               |               | Implement all programs endpoint to use in FE
-| July 22  |      4h       |               |               |               |               |               | Recommend course base on career position with openAI API
+| July 22  |      6h       |               |               |               |               |               | Recommend course base on career position with openAI API
 | July 22  |      3h       |               |               |               |               |               | Parse requirements with taken courses logic 
 | July 22  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2022 MATH program requirements
 | July 22  |               |               |      4h       |               |               |               | Android dynamic list of courses
@@ -77,5 +77,6 @@
 | July 26  |      4h       |               |               |               |               |               | Mobile UI Optimization
 | July 26  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | Final Demo preparation and recording
 | July 26  |      1h       |               |               |               |               |               | Demo Video Audio edit
+| July 28  |      6h       |      6h       |      6h       |      6h       |      6h       |      6h       | D6: Arch + Design Document
 |          |               |               |               |               |               |               |
 |  Total   |               |               |               |               |               |               |
