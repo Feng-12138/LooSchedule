@@ -38,7 +38,8 @@
 | June 24  |               |               |      6h       |               |               |               | Android set up navigation logics and navigation sidebar
 | June 24  |               |               |               |               |      6h       |               | Improve view schedule with lazyColumn and ScrollableTabRow
 | June 25  |      4h       |               |               |               |               |               | Finalize requirements for an academic plan and fix repo
-| June 25  |               |               |      12h      |               |               |               | Android working navigation between choosing degrees and  schedules and the corresponding courses
+| June 25  |               |               |      12h      |               |      6h       |               | Android working navigation between choosing degrees and  schedules and the corresponding courses
+| June 25  |               |               |               |               |      6h       |               | Android create view model and preserve state
 | June 26  |      2h       |               |               |               |               |               | Consider prereq in scheduler and add specializations
 | June 26  |      1h       |               |               |               |               |               | Functioning sequence generator
 | June 26  |      4h       |               |               |               |               |               | Functioning termMapperService
@@ -47,6 +48,8 @@
 | June 26  |               |      4h       |               |               |               |               | Created component diagram for demo presentation (D3)
 | June 26  |               |      5h       |               |               |               |               | Updated data scraper to retrieve partial 2023 ACTSC program requirements
 | June 26  |               |               |      6h       |               |               |               | Android history lists, api connection to backend
+| June 26  |               |               |               |               |      2h       |               | Created backend sequence generator
+| June 26  |               |               |               |               |      4h       |               | Updated Android course display
 | June 27  |               |     1.5h      |               |               |               |               | Created backend functions for course and communication repositories
 |          |               |               |               |               |               |               |
 | June 28  |      1h       |      1h       |      1h       |      1h       |      1h       |      1h       | D3: Prototype Document
@@ -54,6 +57,7 @@
 | June 28  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2023 ACTSC program requirements
 | June 30  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2023 AMATH program requirements
 | June 30  |               |      3h       |               |               |               |               | Updated data scraper to retrieve all 2023 CO and CM program requirements
+| July 1   |               |               |               |               |      6h       |               | Updated schedule to swipe with pager
 |          |               |               |               |               |               |               |
 | July 11  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D4: Architecture Style Examples
 |          |               |               |               |               |               |               |
@@ -63,6 +67,7 @@
 | July 15  |               |     0.5h      |               |               |               |               | Updated data scraper to retrieve coop and double degree information for program requirements
 | July 16  |               |      7h       |               |               |               |               | Updated data scraper to retrieve all 2022 ACTSC, AMATH, CO, CS, and CFM program requirements
 | July 16  |               |               |      3h       |               |               |               | Android implement contact pages
+| July 1   |               |               |               |               |      2h       |               | Completed schedule pager
 |          |               |               |               |               |               |               |
 | July 19  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D5: Design Pattern Examples
 |          |               |               |               |               |               |               |
@@ -71,13 +76,15 @@
 | July 22  |      3h       |               |               |               |               |               | Parse requirements with taken courses logic 
 | July 22  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2022 MATH program requirements
 | July 22  |               |               |      4h       |               |               |               | Android dynamic list of courses
+| July 22  |               |               |               |               |      6h       |               | Mobile UI Optimization
 | July 23  |               |      15h      |               |               |               |               | Updated data scraper to retrieve partial 2019-2021 MATH program requirements
 | July 24  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2019-2021 MATH program requirements
-| July 24  |               |               |      10h      |               |               |               | Android Implement add/delete/swap courses
+| July 24  |               |               |      10h      |               |      5h       |               | Android Implement add/delete/swap courses
 | July 25  |      7h       |               |               |               |               |               | Integrate recommended courses and taken courses into schedule API to complete backend feature
 | July 25  |      3h       |               |               |               |               |               | More bug fixes
 | July 25  |               |               |      10h      |               |               |               | Android Implement Modify Schedule, ChatGPT advising functionality
-| July 26  |      4h       |               |               |               |               |               | Mobile UI Optimization
+| July 25  |               |               |               |               |      10h      |               | Mobile UI Optimization
+| July 26  |      4h       |               |               |               |      4h       |               | Mobile UI Optimization
 | July 26  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | Final Demo preparation and recording
 | July 26  |      1h       |               |               |               |               |               | Demo Video Audio edit
 | July 28  |      6h       |      6h       |      6h       |      6h       |      6h       |      6h       | D6: Arch + Design Document
