@@ -31,14 +31,14 @@
 | June 15  |               |      2h       |               |               |               |        2h     | Refactored database-related functions to switch from MySQL to SQLite
 | June 16  |               |     1.5h      |               |               |               |               | Added sample data for program requirements
 | June 16  |               |               |               |               |               |       6h      | Created data scraper for courses
-| July 19  |               |               |      2h       |               |               |               | Android improve select degree views
-| July 18  |               |               |      3h       |               |               |               | setup repositories for backend
-| July 19  |               |               |      2h       |               |               |               | Android set up models that align with the backend, setup repository for backend
+| June 19  |               |               |      2h       |               |               |               | Android improve select degree views
+| June 18  |               |               |      3h       |               |               |               | setup repositories for backend
+| June 19  |               |               |      2h       |               |               |               | Android set up models that align with the backend, setup repository for backend
 | June 24  |      2h       |               |               |               |               |               | Designed and set up requirement parser for scheduler
-| July 24  |               |               |      6h       |               |               |               | Android set up navigation logics and navigation sidebar
-| July 24  |               |               |               |               |      6h       |               | Improve view schedule with lazyColumn and ScrollableTabRow
+| June 24  |               |               |      6h       |               |               |               | Android set up navigation logics and navigation sidebar
+| June 24  |               |               |               |               |      6h       |               | Improve view schedule with lazyColumn and ScrollableTabRow
 | June 25  |      4h       |               |               |               |               |               | Finalize requirements for an academic plan and fix repo
-| July 25  |               |               |      12h      |               |               |               | Android working navigation between choosing degrees and  schedules and the corresponding courses
+| June 25  |               |               |      12h      |               |               |               | Android working navigation between choosing degrees and  schedules and the corresponding courses
 | June 26  |      2h       |               |               |               |               |               | Consider prereq in scheduler and add specializations
 | June 26  |      1h       |               |               |               |               |               | Functioning sequence generator
 | June 26  |      4h       |               |               |               |               |               | Functioning termMapperService
@@ -46,7 +46,7 @@
 | June 26  |      3h       |               |               |               |               |               | More bug fixes for all existent functions
 | June 26  |               |      4h       |               |               |               |               | Created component diagram for demo presentation (D3)
 | June 26  |               |      5h       |               |               |               |               | Updated data scraper to retrieve partial 2023 ACTSC program requirements
-| July 26  |               |               |      6h       |               |               |               | Android history lists, api connection to backend
+| June 26  |               |               |      6h       |               |               |               | Android history lists, api connection to backend
 | June 27  |               |     1.5h      |               |               |               |               | Created backend functions for course and communication repositories
 |          |               |               |               |               |               |               |
 | June 28  |      1h       |      1h       |      1h       |      1h       |      1h       |      1h       | D3: Prototype Document
