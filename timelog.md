@@ -82,4 +82,5 @@
 | July 26  |      1h       |               |               |               |               |               | Demo Video Audio edit
 | July 28  |      6h       |      6h       |      6h       |      6h       |      6h       |      6h       | D6: Arch + Design Document
 |          |               |               |               |               |               |               |
+| July 30  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D7: Final Status Report
 |  Total   |               |               |               |               |               |               |
