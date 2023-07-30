@@ -21,11 +21,11 @@
 | June 11  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D2: Buddy Team's Evaluation
 | June 11  |      6h       |               |               |               |               |               | Set up backend infrastructure with Gralde, Jersey, Guice and jaxb and example endpoints
 | June 11  |      2.5h     |               |               |               |               |       2h      | Set up Hibernate until with mySql
-| July 13  |               |               |      2h       |               |               |               | Android create select degree views
-| July 14  |               |               |               |               |      3h       |               | Android create schedule views
+| June 13  |               |               |      2h       |               |               |               | Android create select degree views
+| June 14  |               |               |               |               |      3h       |               | Android create schedule views
 | June 14  |      4h       |               |               |               |               |       2h      | Migrate backend to sqlite instead
 | June 15  |      6h       |               |               |               |               |               | Set up backend module injection and andapplication configuration
-| July 15  |               |               |               |               |      2h       |               | Android skeleton schedule views 
+| June 15  |               |               |               |               |      2h       |               | Android skeleton schedule views 
 | June 15  |               |     3.5h      |               |               |               |               | Created data scraper for breadth & depth courses
 | June 15  |               |               |               |               |               |       3h      | Created data scraper for courses and prerequisites(set up)
 | June 15  |               |      2h       |               |               |               |        2h     | Refactored database-related functions to switch from MySQL to SQLite
