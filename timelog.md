@@ -58,7 +58,8 @@
 | July 22  |      4h       |               |               |               |               |               | Recommend course base on career position with openAI API
 | July 22  |      3h       |               |               |               |               |               | Parse requirements with taken courses logic 
 | July 22  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2022 MATH program requirements
-|July 22-24|               |      20h      |               |               |               |               | Updated data scraper to retrieve all 2019-2021 MATH program requirements
+| July 23  |               |      15h      |               |               |               |               | Updated data scraper to retrieve partial 2019-2021 MATH program requirements
+| July 24  |               |      5h      |               |               |               |               | Updated data scraper to retrieve all 2019-2021 MATH program requirements
 | July 25  |      7h       |               |               |               |               |               | Integrate recommended courses and taken courses into schedule API to complete backend feature
 | July 25  |      3h       |               |               |               |               |               | More bug fixes
 | July 26  |      4h       |               |               |               |               |               | Mobile UI Optimization
