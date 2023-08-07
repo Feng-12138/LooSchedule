@@ -19,13 +19,13 @@
 | June 10  |               |      4h       |               |               |               |               | Created data scraper for communication courses
 | June 11  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D2: Buddy Team's Evaluation
 | June 11  |      6h       |               |               |               |               |               | Set up backend infrastructure with Gralde, Jersey, Guice and jaxb and example endpoints
-| June 11  |      2.5h     |               |               |               |               |       2h      | Set up Hibernate until with mySql
+| June 11  |      2.5h     |               |               |               |               |      2h       | Set up Hibernate until with mySql
 | June 13  |               |               |      2h       |               |               |               | Android create select degree views
-| June 13  |               |               |               |      2h       |               |               | Add entities
+| June 13  |               |               |               |      4h       |               |               | Add entities
 | June 14  |               |               |               |               |      3h       |               | Android create schedule views
 | June 14  |      4h       |               |               |               |               |       2h      | Migrate backend to sqlite instead
-| June 15  |      6h       |               |               |      2h       |               |               | Set up backend module injection and and application configuration
-| June 15  |               |               |               |      2h       |               |               | Add and update entities 
+| June 15  |      6h       |               |               |      3h       |               |               | Set up backend module injection and and application configuration
+| June 15  |               |               |               |      3h       |               |               | Add and update entities 
 | June 15  |               |               |               |               |      2h       |               | Android skeleton schedule views 
 | June 15  |               |     3.5h      |               |               |               |               | Created data scraper for breadth & depth courses
 | June 15  |               |               |               |               |               |       3h      | Created data scraper for courses and prerequisites(set up)
@@ -41,9 +41,9 @@
 | June 25  |      4h       |               |               |               |               |               | Finalize requirements for an academic plan and fix repo
 | June 25  |               |               |      12h      |               |      6h       |               | Android working navigation between choosing degrees and  schedules and the corresponding courses
 | June 25  |               |               |               |               |      6h       |               | Android create view model and preserve state
-| June 25  |               |               |               |      4h       |               |               | Add helper to repositories, add Api endpoints and service functionalities
-| June 26  |               |               |               |      4h       |               |               | Add course planner
-| June 26  |               |               |               |      4h       |               |               | Add schedule finalizing function and bug fix
+| June 25  |               |               |               |      2h       |               |               | Add helper to repositories, add Api endpoints and service functionalities
+| June 26  |               |               |               |      5h       |               |               | Add course planner
+| June 26  |               |               |               |      5h       |               |               | Add schedule finalizing function and bug fix
 | June 26  |      2h       |               |               |               |               |               | Consider prereq in scheduler and add specializations
 | June 26  |      1h       |               |               |               |               |               | Functioning sequence generator
 | June 26  |      4h       |               |               |               |               |               | Functioning termMapperService
@@ -56,8 +56,9 @@
 | June 26  |               |               |               |               |      4h       |               | Updated Android course display
 | June 27  |               |     1.5h      |               |               |               |               | Created backend functions for course and communication repositories
 | June 28  |      1h       |      1h       |      1h       |      1h       |      1h       |      1h       | D3: Prototype Document
-| June 28  |               |               |               |      2h       |               |               | Decouple and debug fill schedule function
+| June 28  |               |               |               |      5h       |               |               | Decouple and debug fill schedule function
 | June 28  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2023 ACTSC program requirements
+| June 29  |               |               |               |      4h       |               |               | Debug and fix fill schedule function
 | June 30  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2023 AMATH program requirements
 | June 30  |               |      3h       |               |               |               |               | Updated data scraper to retrieve all 2023 CO and CM program requirements
 | July 1   |               |               |               |               |      6h       |               | Updated schedule to swipe with pager
@@ -70,27 +71,28 @@
 | July 16  |               |               |      3h       |               |               |               | Android implement contact pages
 | July 1   |               |               |               |               |      4h       |               | Completed schedule pager
 | July 19  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D5: Design Pattern Examples
+| July 21  |               |               |               |      3h       |               |               | Tidy and refactor code
 | July 22  |      0.5h     |               |               |               |               |               | Implement all programs endpoint to use in FE
 | July 22  |      6h       |               |               |               |               |               | Recommend course base on career position with openAI API
 | July 22  |      3h       |               |               |               |               |               | Parse requirements with taken courses logic 
 | July 22  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2022 MATH program requirements
 | July 22  |               |               |      4h       |               |               |               | Android dynamic list of courses
 | July 22  |               |               |               |               |      6h       |               | Mobile UI Optimization
-| July 22  |               |               |               |      4h       |               |               | Add schedule validator and tidy up code
+| July 22  |               |               |               |      6h       |               |               | Add schedule validator
 | July 23  |               |      15h      |               |               |               |               | Updated data scraper to retrieve partial 2019-2021 MATH program requirements
 | July 23  |               |               |               |      5h       |               |               | Update schedule validator
-| July 24  |               |               |               |      2h       |               |               | Add separated degree requirement validation
+| July 24  |               |               |               |      5h       |               |               | Add separated degree requirement validation
 | July 24  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2019-2021 MATH program requirements
 | July 24  |               |               |      10h      |               |      5h       |               | Android Implement add/delete/swap courses
 | July 25  |      7h       |               |               |               |               |               | Integrate recommended courses and taken courses into schedule API to complete backend feature
 | July 25  |      3h       |               |               |               |               |               | More bug fixes
-| July 25  |               |               |               |      5h       |               |               | Complete validation factors and fix bug
+| July 25  |               |               |               |      7h       |               |               | Complete validation factors and fix bug
 | July 25  |               |               |      10h      |               |               |               | Android Implement Modify Schedule, ChatGPT advising functionality
-| July 26  |               |               |               |      3h       |               |               | Fix bug in validator
+| July 26  |               |               |               |      4h       |               |               | Fix bug in validator
 | July 25  |               |               |               |               |      10h      |               | Mobile UI Optimization
 | July 26  |      4h       |               |               |               |      4h       |               | Mobile UI Optimization
 | July 26  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | Final Demo preparation and recording
 | July 26  |      1h       |               |               |               |               |               | Demo Video Audio edit
 | July 28  |      6h       |      6h       |      6h       |      6h       |      6h       |      6h       | D6: Arch + Design Document
 | July 30  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D7: Final Status Report
-|  Total   |               |               |               |               |               |               |
+|  Total   |      91h      |      111.5h   |      95h      |      89h      |      92h      |      46h      |
