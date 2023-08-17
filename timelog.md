@@ -35,6 +35,8 @@
 | June 19  |               |               |      2h       |               |               |               | Android improve select degree views
 | June 18  |               |               |      3h       |               |               |               | setup repositories for backend
 | June 19  |               |               |      2h       |               |               |               | Android set up models that align with the backend, setup repository for backend
+| June 19  |               |               |               |               |               |      2h       | Write the feature road map doc
+| June 24  |               |               |               |               |               |       8h       | Write the first version prereq parser
 | June 24  |      2h       |               |               |               |               |               | Designed and set up requirement parser for scheduler
 | June 24  |               |               |      6h       |               |               |               | Android set up navigation logics and navigation sidebar
 | June 24  |               |               |               |               |      6h       |               | Improve view schedule with lazyColumn and ScrollableTabRow
@@ -54,6 +56,9 @@
 | June 26  |               |               |      6h       |               |               |               | Android history lists, api connection to backend
 | June 26  |               |               |               |               |      2h       |               | Created backend sequence generator
 | June 26  |               |               |               |               |      4h       |               | Updated Android course display
+=======
+| June 26  |               |               |               |               |               |       4h       | Test, debug and modify prereq parser
+| June 26  |               |               |               |               |               |       5h       | Write the first version of Term Mapper
 | June 27  |               |     1.5h      |               |               |               |               | Created backend functions for course and communication repositories
 | June 28  |      1h       |      1h       |      1h       |      1h       |      1h       |      1h       | D3: Prototype Document
 | June 28  |               |               |               |      5h       |               |               | Decouple and debug fill schedule function
@@ -67,6 +72,7 @@
 | July 15  |               |     2.5h      |               |               |               |               | Updated data scraper to retrieve all 2023 MATH program requirements
 | July 15  |               |               |      2h       |               |               |               | Android modify styles
 | July 15  |               |     0.5h      |               |               |               |               | Updated data scraper to retrieve coop and double degree information for program requirements
+| July 15-16  |               |           |               |               |               |     12h       | Do the second version of prereq parser
 | July 16  |               |      7h       |               |               |               |               | Updated data scraper to retrieve all 2022 ACTSC, AMATH, CO, CS, and CFM program requirements
 | July 16  |               |               |      3h       |               |               |               | Android implement contact pages
 | July 1   |               |               |               |               |      4h       |               | Completed schedule pager
@@ -84,6 +90,8 @@
 | July 24  |               |               |               |      5h       |               |               | Add separated degree requirement validation
 | July 24  |               |      5h       |               |               |               |               | Updated data scraper to retrieve all 2019-2021 MATH program requirements
 | July 24  |               |               |      10h      |               |      5h       |               | Android Implement add/delete/swap courses
+| July 24  |               |               |      10h      |               |               |               | Android Implement add/delete/swap courses
+| July 22-25  |               |               |           |               |               |         20h      | Continous implementing/testing/optimizing course planner and term mapper 
 | July 25  |      7h       |               |               |               |               |               | Integrate recommended courses and taken courses into schedule API to complete backend feature
 | July 25  |      3h       |               |               |               |               |               | More bug fixes
 | July 25  |               |               |               |      7h       |               |               | Complete validation factors and fix bug
@@ -91,8 +99,10 @@
 | July 26  |               |               |               |      4h       |               |               | Fix bug in validator
 | July 25  |               |               |               |               |      10h      |               | Mobile UI Optimization
 | July 26  |      4h       |               |               |               |      4h       |               | Mobile UI Optimization
+| July 26  |      4h       |               |               |               |               |      5h        | Mobile UI Optimization
 | July 26  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | Final Demo preparation and recording
 | July 26  |      1h       |               |               |               |               |               | Demo Video Audio edit
+| July 27  |            |               |               |               |               |      7h        | Try various deploy options
 | July 28  |      6h       |      6h       |      6h       |      6h       |      6h       |      6h       | D6: Arch + Design Document
 | July 30  |      3h       |      3h       |      3h       |      3h       |      3h       |      3h       | D7: Final Status Report
-|  Total   |      91h      |      111.5h   |      95h      |      89h      |      92h      |      46h      |
+|  Total   |      91h      |      111.5h   |      95h      |      89h      |      92h      |      99h      |
